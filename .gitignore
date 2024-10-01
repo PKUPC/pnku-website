@@ -1,0 +1,16 @@
+.idea
+.vscode
+__pycache__
+
+local*/
+data/
+backend_static/
+scripts/local*
+
+link_to_conda.sh
+
+build/
+dist/
+
+*.local.*
+

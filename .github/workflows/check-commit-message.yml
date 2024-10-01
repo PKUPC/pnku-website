@@ -1,0 +1,75 @@
+name: Check Commit Messages
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-commit-messages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages
+        run: |
+          echo "Checking commit messages..."
+          # Determine the base commit for pull requests
+          if [[ $GITHUB_EVENT_NAME == "pull_request" ]]; then
+            base_commit=$(jq -r .pull_request.base.sha "$GITHUB_EVENT_PATH")
+            head_commit=$(jq -r .pull_request.head.sha "$GITHUB_EVENT_PATH")
+          else
+            base_commit=HEAD^
+            head_commit=HEAD
+          fi
+
+          # Get the list of commits in the push or PR
+          commit_list=$(git log --format="%H" $base_commit..$head_commit)
+          echo "Commits to check: $commit_list"
+
+          # Iterate over each commit
+          for commit in $commit_list; do
+            # Get the commit message
+            commit_message=$(git log -1 --pretty=format:"%s" $commit)
+            echo "Checking commit: $commit with message: $commit_message"
+
+            # Get the list of changed files in the commit
+            changed_files=$(git diff-tree --no-commit-id --name-only -r $commit)
+            echo "Files changed in this commit: $changed_files"
+
+            # Determine the type of change
+            frontend_changed=false
+            backend_changed=false
+            misc_changed=false
+
+            for file in $changed_files; do
+              if [[ $file == frontend/* ]]; then
+                frontend_changed=true
+              elif [[ $file == backend/* ]]; then
+                backend_changed=true
+              else
+                misc_changed=true
+              fi
+            done
+
+            # Validate the commit message
+            if $frontend_changed && [[ $commit_message != "[Frontend] "* ]]; then
+              echo "Error: Commit affecting 'frontend' should start with '[Frontend]'."
+              exit 1
+            fi
+
+            if $backend_changed && [[ $commit_message != "[Backend] "* ]]; then
+              echo "Error: Commit affecting 'backend' should start with '[Backend]'."
+              exit 1
+            fi
+
+            if $misc_changed && [[ $commit_message != "[Misc] "* ]]; then
+              echo "Error: Commit affecting files outside 'frontend' and 'backend' should start with '[Misc]'."
+              exit 1
+            fi
+
+          done
+
+          echo "All commit messages are valid."

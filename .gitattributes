@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+frontend/pnpm-lock.yaml linguist-vendored
+frontend/package-lock.json linguist-vendored
+frontend/src/archive/**/* linguist-vendored
+backend/src/admin/static/ace-build/* linguist-vendored
