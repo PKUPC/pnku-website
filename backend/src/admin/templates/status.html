@@ -1,0 +1,98 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+    <h2>服务器状态监控</h2>
+    <ul>
+        {% for k, v in sys_status.items() %}
+            <li><b>{{ k }}</b>: {{ v }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>用户概况</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th></th>
+            {% for tname in user_fields.values() %}
+                <th>{{ tname }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for group_name, user_dict in user_data.items() %}
+            <tr>
+                <td>{{ group_name }}</td>
+                {% for ukey in user_fields.keys() %}
+                    <td>{{ user_dict[ukey] }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>队伍概况</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            {% for tname in team_fields.values() %}
+                <th>{{ tname }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            {% for tkey in team_fields.keys() %}
+                <td>{{ team_data[tkey] }}</td>
+            {% endfor %}
+        </tr>
+        </tbody>
+        <thead>
+        <tr>
+            {% for tname in teams_statistic_fields.values() %}
+                <th>{{ tname }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            {% for tkey in teams_statistic_fields.keys() %}
+                <td>{{ teams_statistic_data[tkey] }}</td>
+            {% endfor %}
+        </tr>
+        </tbody>
+    </table>
+
+
+    <h2>Worker 状态遥测</h2>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th></th>
+            {% for tname in tel_fields.values() %}
+                <th>{{ tname }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for worker_name, tel_dict in tel_data.items() %}
+            <tr>
+                <td>{{ worker_name }}</td>
+                {% for tkey in tel_fields.keys() %}
+                    <td>{{ tel_dict[tkey] }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p>
+        <a href="test_push">测试飞书推送</a>
+        /
+        <a href="clear_telemetry">清空遥测数据</a>
+        /
+        <a href="update_media">更新图片（media中上传新文件后点这里）</a>
+        /
+        <a href="prepare_media">初始化所有图片（重新生成所有图片）</a>
+    </p>
+{% endblock %}

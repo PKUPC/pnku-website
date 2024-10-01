@@ -1,0 +1,14 @@
+.idea
+.vscode
+__pycache__
+/venv/
+/migrations/
+
+/.dmypy.json
+/.mypy_cache
+
+/src/secret.py
+/src/custom.py
+
+/data/
+/test/

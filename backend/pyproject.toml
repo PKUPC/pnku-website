@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["kinami"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+bleach = "^6.1"
+bleach-allowlist = "^1.0"
+Flask = "^2.3"
+Flask-Admin = "^1.6"
+Flask-SQLAlchemy = "^3.1"
+sanic = { version = "^24.6.0", extras = ["ext"] }
+pydantic = "^2.8.2"
+markdown = "^3.7"
+aiosmtplib = "^3.0"
+pymysql = "^1.1.1"
+pyjwt = "^2.9.0"
+pyzmq = "^26.2.0"
+httpx = { version = "^0.27.0", extras = ["http2"] }
+psutil = "^6.0.0"
+pytz = "^2024.1"
+email-validator = "^2.2.0"
+gevent = "^24.2.1"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.11.1"
+types-aiofiles = "^24.1.0.20240626"
+types-bleach = "^6.1.0.20240331"
+types-cryptography = "^3.3.23.2"
+types-markdown = "^3.6.0.20240316"
+types-psutil = "^6.0.0.20240621"
+types-pyopenssl = "^24.1.0.20240722"
+types-pytz = "^2024.1.0.20240417"
+types-wtforms = "^3.1.0.20240425"
+
+
+
