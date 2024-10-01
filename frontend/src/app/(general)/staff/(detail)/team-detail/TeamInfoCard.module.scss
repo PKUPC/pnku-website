@@ -1,0 +1,17 @@
+.teamInfoCard {
+  :global(.ant-card) {
+    :global(.ant-card-body) {
+      padding: 24px !important;
+    }
+
+    :global(.ant-card-head-title) {
+      font-weight: bold !important;
+    }
+  }
+
+  :global(.ant-form) {
+    :global(.ant-row:last-child) {
+      margin-bottom: 0 !important;
+    }
+  }
+}

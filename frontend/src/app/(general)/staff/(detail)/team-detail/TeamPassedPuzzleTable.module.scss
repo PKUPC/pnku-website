@@ -1,0 +1,11 @@
+.teamPassedPuzzleTable {
+  :global(.ant-card) {
+    :global(.ant-card-body) {
+      padding: 0 !important;
+    }
+
+    :global(.ant-card-head-title0) {
+      font-weight: bold !important;
+    }
+  }
+}

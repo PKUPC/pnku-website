@@ -1,0 +1,20 @@
+.hintsList {
+  :global(.ant-collapse) {
+    margin-bottom: 16px;
+
+    :global(.ant-collapse-header) {
+      padding: 9px 12px;
+    }
+
+    :global(.ant-collapse-extra) {
+      margin: auto;
+      //  antd 的 tag 的奇妙动画效果
+    }
+  }
+
+  :global(.ant-collapse-item-disabled) {
+    :global(.ant-collapse-header) {
+      cursor: unset;
+    }
+  }
+}

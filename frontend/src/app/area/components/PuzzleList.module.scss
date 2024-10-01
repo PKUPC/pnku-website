@@ -1,0 +1,90 @@
+.puzzleList {
+  margin-bottom: 16px;
+  --icon-scale: 24px;
+  --text-scale: 18px;
+
+  :global(.puzzle-row) {
+    display: flex;
+    flex-direction: row;
+    padding: calc(var(--icon-scale) / 2) 0;
+    height: calc(26px + var(--icon-scale));
+    width: 100%;
+
+    border-bottom: 1px solid hsl(var(--b3));
+
+    &:first-child {
+      border-top-left-radius: var(--rounded-btn);
+      border-top-right-radius: var(--rounded-btn);
+    }
+
+    &:last-child {
+      border-bottom-left-radius: var(--rounded-btn);
+      border-bottom-right-radius: var(--rounded-btn);
+      border-bottom: 0;
+    }
+
+    &:not(:global(.puzzle-row-select)):hover {
+      background-color: hsl(var(--b2));
+    }
+  }
+
+  :global(.puzzle-row-select) {
+    background-color: hsl(var(--b3));
+  }
+
+  :global(.puzzle-row-disabled) {
+    display: flex;
+    flex-direction: row;
+    padding: calc(var(--icon-scale) / 2) 0;
+    height: calc(26px + var(--icon-scale));
+    background: repeating-linear-gradient(-45deg, #eee, #eee 10px, #f8f8f8 10px, #f8f8f8 20px);
+    width: 100%;
+
+    border-bottom: 1px solid hsl(var(--b3));
+
+    &:first-child {
+      border-top-left-radius: var(--rounded-btn);
+      border-top-right-radius: var(--rounded-btn);
+    }
+
+    &:last-child {
+      border-bottom-left-radius: var(--rounded-btn);
+      border-bottom-right-radius: var(--rounded-btn);
+      border-bottom: 0;
+    }
+
+    &:hover {
+      background-color: #fbfbfb;
+    }
+  }
+
+  :global(.anticon) {
+    width: var(--icon-scale);
+    height: var(--icon-scale);
+  }
+
+  :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.puzzle-title) {
+    padding-left: 0.5rem;
+    flex: 1 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: var(--icon-scale);
+    display: flex;
+    align-items: center;
+  }
+
+  :global(.puzzle-title-text) {
+    padding-left: 0.5rem;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: var(--text-scale);
+    display: inline-block;
+    vertical-align: top;
+    line-height: normal; /* Reset line-height for the text */
+  }
+}

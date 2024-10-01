@@ -1,0 +1,42 @@
+.storyList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.storyItem {
+  --icon-scale: 24px;
+  --text-scale: 18px;
+
+  display: flex;
+  flex-direction: row;
+  padding: calc(var(--icon-scale) / 2) 0;
+  height: calc(26px + var(--icon-scale));
+  width: 100%;
+
+  border-bottom: 1px solid hsl(var(--b3));
+
+  &:first-child {
+    border-top-left-radius: var(--rounded-btn);
+    border-top-right-radius: var(--rounded-btn);
+  }
+
+  &:last-child {
+    border-bottom-left-radius: var(--rounded-btn);
+    border-bottom-right-radius: var(--rounded-btn);
+    border-bottom: 0;
+  }
+
+  &:not(:global(.puzzle-row-select)):hover {
+    background-color: hsl(var(--b3));
+  }
+}
+
+.storyTitleText {
+  padding-left: 0.5rem;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: var(--text-scale);
+  display: inline-block;
+  vertical-align: top;
+  line-height: normal;
+}

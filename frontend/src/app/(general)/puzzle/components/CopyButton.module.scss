@@ -1,0 +1,17 @@
+.copyButton {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  margin: 10px 0;
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: unset;
+    :global(.ant-btn) {
+      margin-bottom: 16px;
+    }
+  }
+
+  :global(.ant-btn) {
+    margin-right: 16px;
+  }
+}

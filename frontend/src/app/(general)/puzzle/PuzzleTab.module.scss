@@ -1,0 +1,44 @@
+.puzzleBody {
+  :global(.flavor-text) {
+    /* Flavor Text 的格式统一在这里 */
+    font-style: italic;
+    font-size: 16px;
+  }
+
+  :global(.puzzle-image) {
+    width: 600px;
+    max-width: 100%;
+    margin: auto;
+  }
+
+  :global(.hint-text) {
+    font-size: 16px;
+  }
+
+  :global(.left) {
+    text-align: start;
+  }
+
+  :global(.right) {
+    text-align: end;
+  }
+
+  :global(.center) {
+    text-align: center;
+  }
+
+  :global(.passed-block) {
+    margin: 16px auto;
+    padding: 10px;
+    text-align: left;
+    font-size: 16px;
+    border: 2px dashed var(--main-color);
+    border-radius: 0.5em;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.puzzleAction {
+  font-size: 16px;
+  font-weight: 700;
+}

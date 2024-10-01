@@ -1,0 +1,139 @@
+.teamCard {
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+
+  display: block;
+  margin-bottom: 16px;
+  break-inside: avoid;
+  width: 100%;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  :global(.team-description) {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  .recruitingTagWrapper {
+    position: relative;
+    height: 32px;
+    width: 100%;
+  }
+
+  .recruitingTag {
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    width: 32px;
+    height: 32px;
+    right: 0;
+    transform: translateX(10px) translateY(10px);
+  }
+}
+
+.cardTeamName {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.35);
+  padding-bottom: 10px;
+  margin: 0 0 10px;
+
+  :global(.team-member-status) {
+    margin-left: 4px;
+    display: inline-block;
+    font-size: 14px;
+    color: #666666;
+    font-weight: normal;
+  }
+}
+
+.teamCardModalWrapper {
+  padding: 0;
+
+  :global(.ant-modal-content) {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  :global(.teamCardModal) {
+    padding: 20px;
+
+    :global(.team-name) {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.35);
+      padding-bottom: 10px;
+      margin: 0 0 10px;
+
+      :global(.team-member-status) {
+        margin-left: 4px;
+        display: inline;
+        font-size: 12px;
+        color: #555;
+        font-weight: normal;
+      }
+    }
+
+    :global(.team-description) {
+      font-size: 16px;
+      color: #666;
+      margin: 0;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+  }
+}
+
+.plazaTitles {
+  text-align: center;
+}
+
+.plazaTitles h3 {
+  margin: auto;
+  display: flex;
+  width: 100%;
+  max-width: 500px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.plazaTitles h3:before,
+.plazaTitles h3:after {
+  content: '';
+  border-top: 1px solid;
+  margin: 0 20px 0 0;
+  flex: 1 0 20px;
+  color: #666666;
+}
+
+.plazaTitles h3:after {
+  margin: 0 0 0 20px;
+}
+
+.teamList {
+  margin-top: 16px;
+  margin-left: 8px;
+  margin-right: 8px;
+  column-width: 250px;
+  column-count: auto; /* 默认显示 1 列 */
+  column-gap: 16px; /* 列之间的间隔 */
+  column-fill: balance;
+}
+
+.teamListWrapper {
+}

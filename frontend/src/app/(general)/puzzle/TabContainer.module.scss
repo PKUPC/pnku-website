@@ -1,0 +1,30 @@
+.tabContainer {
+  :global(.puzzle-action) {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+  }
+
+  .puzzleTitle {
+    .titleContent {
+      font-size: 2em;
+      font-weight: 500;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .unlockTime {
+      font-size: 0.8em;
+      font-style: italic;
+      color: #838383;
+      display: inline-block;
+    }
+  }
+
+  :global(.ant-tabs-tab-icon) {
+    margin-inline-end: 8px !important;
+  }
+
+  :global(.ant-tabs-tab) + :global(.ant-tabs-tab) {
+    margin: 0 0 0 16px;
+  }
+}

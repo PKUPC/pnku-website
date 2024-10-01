@@ -1,0 +1,22 @@
+.linkTitle {
+  font-size: 24px;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  a {
+    display: inline-block;
+    text-decoration: none; /* 移除下划线 */
+    color: inherit; /* 继承其父元素的颜色 */
+  }
+}
+
+.clickTitle {
+  cursor: pointer;
+  font-size: 24px;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}

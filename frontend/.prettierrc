@@ -1,0 +1,23 @@
+{
+  "tabWidth": 4,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 120,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "overrides": [
+    {
+      "files": "*.{md,mdx,json,yml,yaml,prettierrc,eslintrc,scss,vue,astro}",
+      "options": {
+        "tabWidth": 2
+      }
+    }
+  ],
+  "importOrder": ["^@logic/(.*)$", "^@hooks/(.*)$", "^@components/(.*)$", "^@app/(.*)$", "^@/(.*)$", "^[./]"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "plugins": ["prettier-plugin-tailwindcss", "@trivago/prettier-plugin-sort-imports"]
+}

@@ -1,0 +1,13 @@
+.main {
+  :global(.submit-form-item) {
+    :global(.ant-form-item-row) {
+      justify-content: center;
+    }
+  }
+
+  :global(.recaptcha-wrapper) {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+}

@@ -1,0 +1,15 @@
+.difficultyStatus {
+  vertical-align: 0.01em;
+  margin-left: 6px !important;
+  margin-right: 6px !important;
+
+  :global(.ant-progress-text) {
+    display: none;
+  }
+
+  :global(.ant-progress-steps-item) {
+    height: 11px !important;
+    margin-right: var(--aligned-margin) !important;
+    width: var(--aligned-width) !important;
+  }
+}

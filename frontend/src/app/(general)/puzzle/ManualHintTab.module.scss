@@ -1,0 +1,11 @@
+.manualHintCard {
+  width: 400px;
+  max-width: 100%;
+  margin: 10px auto;
+}
+.manualHintContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: left;
+}

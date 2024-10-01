@@ -1,0 +1,108 @@
+@font-face {
+    font-family: 'digital-7';
+    src: url('/mion/fonts/digital-7.ttf') format('truetype');
+}
+
+.clock-display {
+    text-align: center;
+    border: solid 5px #ffffff;
+    border-radius: 10px;
+    background-color: #000000;
+    color: #ffffff;
+    box-shadow: 4px 4px 7px 4px rgba(0, 0, 0, 0.3);
+}
+
+.date-field {
+    font-family: 'digital-7', serif;
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.date-field div {
+    position: relative;
+}
+
+.date-field div p {
+    font-size: 60px;
+    position: relative;
+    z-index: 100;
+    margin: 0.1em 0;
+    line-height: 1em;
+}
+
+.date-field div p.prefix {
+    color: #2b2828;
+}
+
+.date-field div p.placeholder {
+    color: #2b2828;
+    position: absolute;
+    top: 0;
+    z-index: 50;
+}
+
+.date-field div p.type {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.clock-field {
+    font-family: 'digital-7';
+    margin: 5px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.clock-field div {
+    position: relative;
+}
+
+.clock-field div p {
+    font-size: 100px;
+    position: relative;
+    z-index: 100;
+    margin: 0.1em 0;
+    line-height: 1em;
+}
+
+.clock-field div p.placeholder {
+    color: #2b2828;
+    position: absolute;
+    top: 0;
+    z-index: 50;
+}
+
+.clock-field .number .type {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    margin-top: -10px;
+    margin-bottom: 0;
+}
+
+.clock-field .am-pm {
+    font-family: sans-serif;
+    text-transform: uppercase;
+    width: 20px;
+}
+
+.clock-field .am-pm div p {
+    font-size: 12px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.clock-field .am,
+.clock-field .pm {
+    color: #2b2828;
+}
+
+.date-field .light-on,
+.clock-field .light-on {
+    color: #ffffff !important;
+}

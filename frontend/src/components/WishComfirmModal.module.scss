@@ -1,0 +1,13 @@
+.wishConfirmModal {
+  :global(.ant-modal-content) {
+    :global(.ant-modal-header) {
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    :global(.ant-modal-body) {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+  }
+}

@@ -1,0 +1,5 @@
+.uploadBox {
+  :global(.ant-upload-list-item-thumbnail) {
+    cursor: unset;
+  }
+}

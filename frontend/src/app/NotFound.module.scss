@@ -1,0 +1,55 @@
+.container {
+  max-width: 1200px;
+  margin: 20vh auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  :global(.svg-container) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 4;
+    margin-left: 100px;
+  }
+
+  :global(.svg-body) {
+    width: 80%;
+    margin: auto;
+  }
+
+  :global(.settings) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    margin-left: 10px;
+
+    h4 {
+      margin: 30px 0 15px 0;
+      font-size: 18px;
+      color: #2cb7fd;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 100px;
+      color: #404404;
+    }
+
+    p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    div a {
+      display: inline-block;
+      padding: 10px 40px;
+      margin-top: 40px;
+      border: 1px solid #2cb7fd;
+      font-size: 15px;
+      color: #2cb7fd;
+      text-decoration: none;
+    }
+  }
+}

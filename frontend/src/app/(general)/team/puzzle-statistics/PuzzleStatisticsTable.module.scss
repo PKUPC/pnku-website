@@ -1,0 +1,18 @@
+$small-board: 650px;
+.puzzleStatisticsTable {
+  .areaTitle {
+    display: inline;
+    font-size: 16px;
+  }
+
+  :global(td).areaTd {
+    vertical-align: top;
+  }
+
+  .areaTd {
+    width: 140px;
+    @media (max-width: $small-board) {
+      width: 102px;
+    }
+  }
+}

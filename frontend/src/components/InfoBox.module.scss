@@ -1,0 +1,24 @@
+.infoBox {
+  :global(.wrapper) {
+    position: relative;
+    margin: 10px;
+    padding: 20px;
+    border: 2px solid #666;
+    color: #666;
+    border-radius: 8px;
+
+    :global(.info-title-wrapper) {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+      background-color: rgb(255, 255, 255);
+      padding: 0 8px;
+    }
+
+    :global(.info-content) {
+      font-size: 16px;
+    }
+  }
+}

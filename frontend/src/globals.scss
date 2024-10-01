@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@200;400;900&family=Noto+Serif+SC:wght@200;400;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --border-radius: 12px;
+  --font-mono: ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', 'Oxygen Mono',
+    'Ubuntu Monospace', 'Source Code Pro', 'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+}
+
+body {
+  overflow-y: scroll;
+}
+
+a {
+  /*color: inherit;*/
+  text-decoration: none;
+}
+
+.slim-container {
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+a.link-nostyle {
+  text-decoration: none; /* 移除下划线 */
+  color: inherit; /* 继承其父元素的颜色 */
+  cursor: default; /* 使用默认的指针样式，而不是链接的手型指针 */
+}
+
+.router-menu {
+  .ant-menu-item {
+    padding: 0 10px !important;
+
+    &:after {
+      left: 10px !important;
+      right: 10px !important;
+    }
+
+    &:first-child {
+      padding-left: 0 !important;
+    }
+
+    &:first-child:after {
+      left: 0 !important;
+    }
+  }
+}
+
+.push-notification {
+  &.ant-notification-notice {
+    padding: 12px;
+  }
+
+  .ant-notification-notice-icon {
+    transform: translateY(8px);
+  }
+
+  .ant-notification-notice-close {
+    top: 10px;
+    right: 16px;
+    transform: scale(1.5);
+  }
+
+  .ant-notification-notice-message {
+    font-weight: bold;
+  }
+
+  &.ant-notification-notice-info {
+    .ant-notification-notice-icon {
+      color: #108ee9;
+    }
+  }
+
+  &.ant-notification-notice-success {
+    .ant-notification-notice-icon {
+      color: #52c41a;
+    }
+  }
+}
