@@ -25,6 +25,13 @@ P&KU Website（暂定）是为 P&KU 这一 Puzzle Hunt 活动开发的比赛平�
 
 TBD
 
+## License
+
+本项目基于 MIT 开放源代码许可证开源，参见[这个文件](./LICENSE.md)
+
+后端部分主要基于 [Guiding Star 的后端部分](https://github.com/PKU-GeekGame/gs-backend)
+开发，原项目许可证见[这个文件](./backend/GS_LICENSE.md)。
+
 
 
 
