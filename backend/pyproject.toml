@@ -14,7 +14,7 @@ Flask = "^2.3"
 Flask-Admin = "^1.6"
 Flask-SQLAlchemy = "^3.1"
 sanic = { version = "^24.6.0", extras = ["ext"] }
-pydantic = "^2.8.2"
+pydantic = "^2.9.2"
 markdown = "^3.7"
 aiosmtplib = "^3.0"
 pymysql = "^1.1.1"
@@ -22,7 +22,7 @@ pyjwt = "^2.9.0"
 pyzmq = "^26.2.0"
 httpx = { version = "^0.27.0", extras = ["http2"] }
 psutil = "^6.0.0"
-pytz = "^2024.1"
+pytz = "^2024.2"
 email-validator = "^2.2.0"
 gevent = "^24.2.1"
 
