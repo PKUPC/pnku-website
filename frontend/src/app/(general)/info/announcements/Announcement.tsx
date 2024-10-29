@@ -5,6 +5,7 @@ import { redirect } from 'react-router-dom';
 
 import { SimpleTemplateStr } from '@/components/Template';
 import TimestampAgo from '@/components/TimestampAgo';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo, useTheme } from '@/logic/contexts.ts';
 import { Wish } from '@/types/wish.ts';
 import { mixColor } from '@/utils.ts';
@@ -24,7 +25,7 @@ export function Announcement({
     const headerTextColor = mixColor(color.baseContent, color.info, 0.3);
     const contentBgColor = mixColor(color.base100, color.info, 0.05);
 
-    if (import.meta.env.VITE_ARCHIVE_MODE !== 'true' && !info.game.login) redirect('/home');
+    if (!ARCHIVE_MODE && !info.game.login) redirect('/home');
     return (
         <div
             className="rounded-box border-[1px] overflow-hidden"

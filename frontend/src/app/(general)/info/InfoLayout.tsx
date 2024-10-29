@@ -4,6 +4,7 @@ import { useLocation, useOutlet } from 'react-router-dom';
 import { MailIcon } from '@/SvgIcons';
 import NotFound from '@/app/NotFound.tsx';
 import { TabsNavbar } from '@/components/TabsNavbar.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
 function InfoLayoutBody() {
@@ -28,7 +29,7 @@ function InfoLayoutBody() {
 
     // 序章开放后并且组队了并且不是 playground 模式
     if (
-        import.meta.env.VITE_ARCHIVE_MODE !== 'true' &&
+        !ARCHIVE_MODE &&
         info.user &&
         info.user.group !== 'staff' &&
         info.team &&
@@ -54,6 +55,6 @@ function InfoLayoutBody() {
 
 export function InfoLayout() {
     const info = useSuccessGameInfo();
-    if (import.meta.env.VITE_ARCHIVE_MODE !== 'true' && !info.user) return <NotFound />;
+    if (!ARCHIVE_MODE && !info.user) return <NotFound />;
     return <InfoLayoutBody />;
 }

@@ -5,6 +5,7 @@ import { LeftCircleIcon } from '@/SvgIcons';
 import NotFound from '@/app/NotFound.tsx';
 import { ClickTitle } from '@/components/LinkTitle';
 import { TabsNavbar } from '@/components/TabsNavbar.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
 export function ToolsLayout() {
@@ -14,7 +15,7 @@ export function ToolsLayout() {
     const { pathname: loc } = useLocation();
     const navigate = useNavigate();
 
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true' || !info.user) return <NotFound />;
+    if (ARCHIVE_MODE || !info.user) return <NotFound />;
 
     const items = [
         {

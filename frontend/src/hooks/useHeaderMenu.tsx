@@ -11,6 +11,7 @@ import { BiNavigation } from 'react-icons/bi';
 
 import { EveryUserIcon, HomeIcon, IdCardIcon, PlazaIcon, RankingIcon } from '@/SvgIcons.tsx';
 import { ImageWithSkeleton } from '@/components/ImageWithSkeleton.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { make_auth_url } from '@/utils.ts';
 
@@ -53,10 +54,7 @@ export function useHeaderMenu(compact: boolean = false) {
     const items: MenuItems = [];
     const compactItems: MenuItem[] = [];
     // 主页，在序章开放后并且组队之后就能看到区域列表
-    if (
-        import.meta.env.VITE_ARCHIVE_MODE !== 'true' &&
-        (!info.user || (info.user.group !== 'staff' && (!info.team || !info.game.isPrologueUnlock)))
-    ) {
+    if (ARCHIVE_MODE && (!info.user || (info.user.group !== 'staff' && (!info.team || !info.game.isPrologueUnlock)))) {
         items.push({ type: 'link', label: '主页', href: '/home', key: '/home', icon: <HomeIcon /> });
     } else {
         const submenuItems: MenuItem[] = [{ type: 'link', label: '主页', key: '/home', href: '/home' }];
@@ -73,7 +71,7 @@ export function useHeaderMenu(compact: boolean = false) {
         if (
             (info.user?.group === 'player' && info.game.isGameBegin && info.team?.gaming) ||
             info.user?.group == 'staff' ||
-            import.meta.env.VITE_ARCHIVE_MODE === 'true'
+            ARCHIVE_MODE
         ) {
             submenuItems.push({ type: 'divider' });
             submenuItems.push({ type: 'link', href: '/puzzle-list', label: '谜题一览', key: '/puzzle-list' });
@@ -100,7 +98,7 @@ export function useHeaderMenu(compact: boolean = false) {
     else items.push(aboutItem);
 
     // 如果是存档模式可以看到排行榜、信息和浏览设置
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') {
+    if (ARCHIVE_MODE) {
         if (info.game.boards.length > 0) {
             const boardItem = {
                 type: 'link',

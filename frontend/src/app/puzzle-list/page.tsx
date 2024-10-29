@@ -4,6 +4,7 @@ import NotFound from '@/app/NotFound.tsx';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import { Footer } from '@/components/Footer.tsx';
 import { WishError } from '@/components/WishError.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { GameStatusContext, useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';
 
@@ -27,7 +28,7 @@ function PuzzleListBody() {
 export function PuzzleListPage() {
     const gameInfo = useSuccessGameInfo();
 
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') {
+    if (ARCHIVE_MODE) {
         /* empty */
     } else if (!gameInfo.user) return NotFound();
     else if (gameInfo.user.group !== 'staff' && (!gameInfo.game.isGameBegin || !gameInfo.team?.gaming))

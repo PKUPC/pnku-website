@@ -10,6 +10,7 @@ import NotFound from '@/app/NotFound.tsx';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import { ClickTitle } from '@/components/LinkTitle';
 import { WishError } from '@/components/WishError.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { SiteSettingContext, useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';
 
@@ -37,7 +38,7 @@ export function PuzzlePage() {
 
     console.log(data);
 
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') {
+    if (ARCHIVE_MODE) {
         /* empty */
     } else if (!info.user) return <NotFound />;
     else if (info.user.group !== 'staff' && (!info.game.isGameBegin || !info.team?.gaming)) return <NotFound />;

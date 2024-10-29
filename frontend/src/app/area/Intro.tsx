@@ -8,6 +8,7 @@ import { FancySlimContainer } from '@/components/FancySlimContainer';
 import { Footer } from '@/components/Footer.tsx';
 import { TemplateFile } from '@/components/Template';
 import { WishConfirmModal } from '@/components/WishConfirmModal';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { GameInfoContext, GameStatusContext, useSuccessGameInfo } from '@/logic/contexts.ts';
 import { Wish } from '@/types/wish.ts';
 
@@ -133,7 +134,7 @@ function IntroBody({ areaData }: { areaData: Wish.Game.IntroArea }) {
     };
 
     let component;
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') {
+    if (ARCHIVE_MODE) {
         component = <IntroAnswerInput />;
     } else {
         if (!info.team) component = <Alert type={'info'} showIcon={true} message={'您还不在任何队伍中，请先组队！'} />;
@@ -166,10 +167,7 @@ function IntroBody({ areaData }: { areaData: Wish.Game.IntroArea }) {
 
 export function Intro({ areaData }: { areaData: Wish.Game.IntroArea }) {
     const info = useSuccessGameInfo();
-    if (
-        import.meta.env.VITE_ARCHIVE_MODE !== 'true' &&
-        (!info.user || (info.user.group !== 'staff' && !info.game.isPrologueUnlock))
-    )
+    if (!ARCHIVE_MODE && (!info.user || (info.user.group !== 'staff' && !info.game.isPrologueUnlock)))
         return <NotFound />;
     return <IntroBody areaData={areaData} />;
 }
