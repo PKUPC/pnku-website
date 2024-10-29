@@ -16,6 +16,17 @@ CREATE TABLE `announcement`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for counter
+-- ----------------------------
+DROP TABLE IF EXISTS `counter`;
+CREATE TABLE `counter`  (
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `value` int(11) NOT NULL
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+INSERT INTO `counter`VALUES ('emt', 0);
+
+-- ----------------------------
 -- Table structure for game_policy
 -- ----------------------------
 DROP TABLE IF EXISTS `game_policy`;
@@ -43,6 +54,46 @@ CREATE TABLE `hint`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Table structure for log
+-- ----------------------------
+DROP TABLE IF EXISTS `log`;
+CREATE TABLE `log`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `level` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `process` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `module` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for log_user
+-- ----------------------------
+DROP TABLE IF EXISTS `log_user`;
+CREATE TABLE `log_user`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `user_id` int(11) NULL DEFAULT NULL,
+  `team_id` int(11) NULL DEFAULT NULL,
+  `ip_address` varchar(96) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `ram` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `rem` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `emt` int(11) NULL DEFAULT NULL,
+  `module` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `event` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `extra` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_user_id`(`user_id`) USING BTREE,
+  INDEX `idx_team_id`(`team_id`) USING BTREE,
+  INDEX `idx_ram`(`ram`) USING BTREE,
+  INDEX `idx_rem`(`rem`) USING BTREE,
+  INDEX `idx_emt`(`emt`) USING BTREE,
+  INDEX `idx_event`(`event`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for message
@@ -99,6 +150,38 @@ CREATE TABLE `submission`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for team
+-- ----------------------------
+DROP TABLE IF EXISTS `team`;
+CREATE TABLE `team`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `updated_at` bigint(20) NOT NULL,
+  `team_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `team_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `leader_id` int(11) NOT NULL,
+  `team_secret` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `ban_status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `extra_info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `status_index`(`status`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for team_event
+-- ----------------------------
+DROP TABLE IF EXISTS `team_event`;
+CREATE TABLE `team_event`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `team_id` int(11) NOT NULL,
+  `info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for ticket
 -- ----------------------------
 DROP TABLE IF EXISTS `ticket`;
@@ -126,37 +209,6 @@ CREATE TABLE `ticket_message`  (
   `direction` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `content_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for team
--- ----------------------------
-DROP TABLE IF EXISTS `team`;
-CREATE TABLE `team`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_at` bigint(20) NOT NULL,
-  `updated_at` bigint(20) NOT NULL,
-  `team_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `team_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `leader_id` int(11) NOT NULL,
-  `team_secret` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `extra_status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `extra_info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for team_event
--- ----------------------------
-DROP TABLE IF EXISTS `team_event`;
-CREATE TABLE `team_event`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_at` bigint(20) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `team_id` int(11) NOT NULL,
-  `info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
@@ -193,58 +245,5 @@ CREATE TABLE `user`  (
   INDEX `team_id`(`team_id`) USING BTREE,
   CONSTRAINT `user_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for log
--- ----------------------------
-DROP TABLE IF EXISTS `log`;
-CREATE TABLE `log`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_at` bigint(20) NOT NULL,
-  `level` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `process` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `module` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
-
--- ----------------------------
--- Table structure for log_user
--- ----------------------------
-DROP TABLE IF EXISTS `log_user`;
-CREATE TABLE `log_user`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_at` bigint(20) NOT NULL,
-  `user_id` int(11),
-  `team_id` int(11),
-  `ip_address` varchar(96) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `ram` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `rem` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `emt` int(11),
-  `module` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `event` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `extra` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_user_id` (`user_id`) USING BTREE,
-  INDEX `idx_team_id` (`team_id`) USING BTREE,
-  INDEX `idx_ram` (`ram`) USING BTREE,
-  INDEX `idx_rem` (`rem`) USING BTREE,
-  INDEX `idx_emt` (`emt`) USING BTREE,
-  INDEX `idx_event` (`event`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for counter
--- ----------------------------
-DROP TABLE IF EXISTS `counter`;
-CREATE TABLE `counter`  (
-  `key` varchar(255) NOT NULL,
-  `value` int(11) NOT NULL
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
-INSERT INTO `counter`VALUES ('emt', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
