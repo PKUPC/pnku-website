@@ -4,6 +4,7 @@ import { useContext, useLayoutEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 
 import { WishConfirmModal } from '@/components/WishConfirmModal';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { NeverError } from '@/errors';
 import { useCooldown } from '@/hooks/useCooldown';
 import { GameInfoContext, GameStatusContext } from '@/logic/contexts.ts';
@@ -64,7 +65,7 @@ export function PuzzleAnswerInput({ puzzle, reload }: { puzzle: Wish.Puzzle.Puzz
     let content;
     if (info.user && info.user.group === 'staff')
         content = <>你是工作人员，可以验证答案并看到提交记录，但是谜题不会变为通过状态。</>;
-    else if (import.meta.env.VITE_ARCHIVE_MODE === 'true')
+    else if (ARCHIVE_MODE)
         content = (
             <>
                 目前处于归档模式，你可以在这里验证你的答案。

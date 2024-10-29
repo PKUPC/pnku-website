@@ -1,6 +1,7 @@
 import { useOutlet } from 'react-router-dom';
 
 import NotFound from '@/app/NotFound.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
 import { StaffDetailLayout } from './(detail)/layout';
@@ -14,7 +15,7 @@ import { StaffTicketPage } from './(menu)/tickets/page';
 function StaffLayout() {
     const outlet = useOutlet();
     const info = useSuccessGameInfo();
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') return <NotFound />;
+    if (ARCHIVE_MODE) return <NotFound />;
     if (!info.user || info.user.group !== 'staff') return <NotFound />;
 
     return outlet;

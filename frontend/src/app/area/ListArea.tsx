@@ -7,6 +7,7 @@ import { PuzzleList } from '@/app/area/components/PuzzleList';
 import { FancySlimContainer } from '@/components/FancySlimContainer';
 import { Footer } from '@/components/Footer.tsx';
 import { TemplateFile } from '@/components/Template';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { Wish } from '@/types/wish.ts';
 
@@ -39,11 +40,7 @@ export function ListArea({ areaData }: { areaData: Wish.Game.ListArea }) {
 
     console.log(areaData);
 
-    if (
-        import.meta.env.VITE_ARCHIVE_MODE !== 'true' &&
-        (!info.user || (info.user.group !== 'staff' && !info.game.isGameBegin))
-    )
-        return <NotFound />;
+    if (!ARCHIVE_MODE && (!info.user || (info.user.group !== 'staff' && !info.game.isGameBegin))) return <NotFound />;
 
     return (
         <div className="relative w-full" style={themeColors}>

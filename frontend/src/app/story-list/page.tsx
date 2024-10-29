@@ -3,6 +3,7 @@ import { StoryList } from '@/app/story-list/StoryList';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import { Footer } from '@/components/Footer.tsx';
 import { WishError } from '@/components/WishError';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';
 
@@ -20,7 +21,7 @@ function StoryListBody() {
 export function StoryListPage() {
     const gameInfo = useSuccessGameInfo();
 
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') {
+    if (ARCHIVE_MODE) {
         /* empty */
     } else if (!gameInfo.user) return <NotFound />;
     else if (gameInfo.user.group !== 'staff' && (!gameInfo.game.isGameBegin || !gameInfo.team?.gaming))

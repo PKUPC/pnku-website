@@ -2,6 +2,7 @@ import { Button } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import NotFound from '@/app/NotFound.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { NeverError } from '@/errors';
 import { useGameInfo } from '@/logic/contexts.ts';
 
@@ -14,7 +15,7 @@ export function LoginErrorPage() {
     console.log(errorMsg);
     const info = useGameInfo();
     if (info.status === 'error') throw new NeverError();
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') return <NotFound />;
+    if (ARCHIVE_MODE) return <NotFound />;
 
     return (
         <div className={'slim-container ' + styles.main}>

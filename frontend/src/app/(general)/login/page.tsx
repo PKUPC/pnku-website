@@ -4,6 +4,7 @@ import { redirect } from 'react-router-dom';
 import { DevLogin } from '@/app/(general)/login/DevLogin.tsx';
 import { EmailLogin } from '@/app/(general)/login/EmailLogin.tsx';
 import NotFound from '@/app/NotFound.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
 import styles from './page.module.scss';
@@ -43,7 +44,7 @@ export function LoginBody() {
 }
 
 export function LoginPage() {
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') return <NotFound />;
+    if (ARCHIVE_MODE) return <NotFound />;
 
     return <LoginBody />;
 }

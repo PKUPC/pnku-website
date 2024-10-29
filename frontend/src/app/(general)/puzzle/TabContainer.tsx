@@ -7,6 +7,7 @@ import { ManualHintTab } from '@/app/(general)/puzzle/ManualHintTab.tsx';
 import { SolutionTab } from '@/app/(general)/puzzle/SolutionTab.tsx';
 import { SubmissionTab } from '@/app/(general)/puzzle/SubmissionTab.tsx';
 import { TabsNavbar } from '@/components/TabsNavbar.tsx';
+import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
@@ -30,7 +31,7 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
         },
     ];
 
-    if (import.meta.env.VITE_ARCHIVE_MODE !== 'true')
+    if (!ARCHIVE_MODE)
         items.push({
             type: 'button',
             label: '提交记录',
@@ -47,7 +48,7 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
         onClick: () => setTabKey('hints'),
     });
 
-    if (import.meta.env.VITE_ARCHIVE_MODE !== 'true' && info.user?.group === 'player' && !info.feature.playground)
+    if (!ARCHIVE_MODE && info.user?.group === 'player' && !info.feature.playground)
         items.push({
             type: 'button',
             label: '神谕',
@@ -56,7 +57,7 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
             onClick: () => setTabKey('manual-hints'),
         });
 
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true' || info.user?.group === 'staff')
+    if (ARCHIVE_MODE || info.user?.group === 'staff')
         items.push({
             type: 'button',
             label: '解析',

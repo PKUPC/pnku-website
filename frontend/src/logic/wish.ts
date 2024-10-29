@@ -1,4 +1,4 @@
-import { TEMPLATE_ROOT, WISH_ROOT } from '@/constants';
+import { ARCHIVE_MODE, TEMPLATE_ROOT, WISH_ROOT } from '@/constants';
 import { Wish } from '@/types/wish.ts';
 
 export const WISH_VER = 'wish.2023.v6';
@@ -10,7 +10,7 @@ export function wish<T extends Wish.WishParams>({
     console.log(endpoint, payload);
     console.log(WISH_ROOT + endpoint);
 
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') {
+    if (ARCHIVE_MODE) {
         return new Promise((resolve) => {
             import('@/archive/archiveWish').then((module) => {
                 const result = module.archiveWish({ endpoint, payload });
@@ -54,7 +54,7 @@ export function wish<T extends Wish.WishParams>({
 }
 
 export function fetchTemplateFile(fileName: string): Promise<string> {
-    if (import.meta.env.VITE_ARCHIVE_MODE === 'true') {
+    if (ARCHIVE_MODE) {
         return new Promise((resolve) => {
             import('@/archive/archiveWish').then((module) => {
                 const result = module.archiveFetchTemplateFile(fileName);
