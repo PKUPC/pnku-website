@@ -11,5 +11,6 @@ link_to_conda.sh
 build/
 dist/
 
+*.local
 *.local.*
 
