@@ -54,7 +54,7 @@ export function useHeaderMenu(compact: boolean = false) {
     const items: MenuItems = [];
     const compactItems: MenuItem[] = [];
     // 主页，在序章开放后并且组队之后就能看到区域列表
-    if (ARCHIVE_MODE && (!info.user || (info.user.group !== 'staff' && (!info.team || !info.game.isPrologueUnlock)))) {
+    if (!ARCHIVE_MODE && (!info.user || (info.user.group !== 'staff' && (!info.team || !info.game.isPrologueUnlock)))) {
         items.push({ type: 'link', label: '主页', href: '/home', key: '/home', icon: <HomeIcon /> });
     } else {
         const submenuItems: MenuItem[] = [{ type: 'link', label: '主页', key: '/home', href: '/home' }];
