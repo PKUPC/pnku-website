@@ -3,27 +3,27 @@
   font-size: 16px;
 
   h1 {
-    @apply text-[2rem] font-bold mb-2 mt-2;
+    @apply mb-2 mt-2 text-[2rem] font-bold;
   }
 
   h2 {
-    @apply text-2xl font-bold mb-2 mt-2;
+    @apply mb-2 mt-2 text-2xl font-bold;
   }
 
   h3 {
-    @apply text-xl font-bold mb-2 mt-2;
+    @apply mb-2 mt-2 text-xl font-bold;
   }
 
   h4 {
-    @apply text-base font-bold mb-2 mt-2;
+    @apply mb-2 mt-2 text-base font-bold;
   }
 
   h5 {
-    @apply text-base font-bold mb-2 mt-2;
+    @apply mb-2 mt-2 text-base font-bold;
   }
 
   h6 {
-    @apply text-base font-bold mb-2 mt-2;
+    @apply mb-2 mt-2 text-base font-bold;
   }
 
   ul {
