@@ -1,7 +1,7 @@
-from typing import Any, Optional, Tuple, Dict, List, Literal
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
-from pydantic import BaseModel, ConfigDict, ValidationError, Field
-from sqlalchemy import Integer, String, Text, JSON
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from sqlalchemy import Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src import utils
@@ -47,7 +47,6 @@ class PuzzleStoreModel(BaseModel):
     subcategory: str
     sorting_index: int
     content_template: str
-    content_special: list[dict[str, Any]]
     clipboard: list[ClipboardModel]
     puzzle_metadata: PuzzleMetadataModel
     actions: list[MediaActionModel | WebpageActionModel]
@@ -87,8 +86,6 @@ class PuzzleStore(Table):
     subcategory: Mapped[str] = mapped_column(String(128), nullable=False, default="normal")
     sorting_index: Mapped[int] = mapped_column(Integer, nullable=False)
     content_template: Mapped[str] = mapped_column(Text, nullable=False)
-    # 需要前端特殊渲染的内容，例如拼图、走马灯等不太方便直接在 template 中做的内容
-    content_special: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=True)
     # 游戏的一些元信息，包括作者、游戏特殊设置等等
     puzzle_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     actions: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False)
@@ -110,11 +107,6 @@ class PuzzleStore(Table):
     ACTION_SNIPPETS = {
         'webpage': '''{"name": "题目网页", "type": "webpage", "url" : "https://puzzleXX.pkupuzzle.art"}''',
         'media': '''{"name": "题目附件", "type": "media", "media_url" : "填写 media 的链接"}''',
-    }
-
-    SPECIAL_SNIPPETS: dict[str, Any] = {
-        # 'jigsaw': '''{"type": "jigsaw", "background": "背景图", "tiles": {}, "answer": ""}''',
-        # 'carousel': '''{"type": "carousel", "images": []}''',
     }
 
     def validated_model(self) -> PuzzleStoreModel:

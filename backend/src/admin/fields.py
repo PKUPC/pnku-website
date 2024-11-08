@@ -236,7 +236,3 @@ class PuzzleTriggersField(flask_admin.form.JSONField):  # type: ignore[misc]
 
 class PuzzleActionsField(flask_admin.form.JSONField):  # type: ignore[misc]
     widget = JsonListInputWithSnippets(store.PuzzleStore.ACTION_SNIPPETS)
-
-
-class PuzzleSpecialField(flask_admin.form.JSONField):  # type: ignore[misc]
-    widget = JsonListInputWithSnippets(store.PuzzleStore.SPECIAL_SNIPPETS)

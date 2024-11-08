@@ -20,7 +20,7 @@ TBD
 ### mypy 检查
 
 ```bash
-python3 -m mypy.dmypy run
+python -m mypy.dmypy run
 ```
 
 TBD

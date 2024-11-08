@@ -3,7 +3,7 @@ import os
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Union, Callable, Dict, Iterator, Literal
+from typing import Callable, Dict, Iterator, Literal, Union
 
 import psutil
 
@@ -24,12 +24,12 @@ def log_slow(logger: Callable[[LogLevel, str, str], None], module: str, func: st
 
 @contextmanager
 def chdir(wd: Union[str, Path]) -> Iterator[None]:
-    curdir = os.getcwd()
+    cur_dir = os.getcwd()
     try:
         os.chdir(wd)
         yield
     finally:
-        os.chdir(curdir)
+        os.chdir(cur_dir)
 
 
 def sys_status() -> Dict[str, Union[int, float]]:
@@ -39,10 +39,11 @@ def sys_status() -> Dict[str, Union[int, float]]:
     disk = psutil.disk_usage('/')
     G = 1024 ** 3
 
+    cpu_count = psutil.cpu_count(logical=False)
     return {
         'process': len(psutil.pids()),
 
-        'n_cpu': psutil.cpu_count(logical=False),
+        'n_cpu': cpu_count if cpu_count is not None else 0,
         'load_1': load_1,
         'load_5': load_5,
         'load_15': load_15,

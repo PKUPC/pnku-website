@@ -1,16 +1,16 @@
 import time
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field
-from sanic import Request, Blueprint
+from sanic import Blueprint, Request
 from sanic_ext import validate
 
-from src import utils, adhoc
+from src import adhoc, utils
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
 from src.store import HintStore
-from . import wish_response, wish_checker
+from . import wish_checker, wish_response
 
 bp = Blueprint('wish-puzzle', url_prefix='/wish/puzzle')
 
@@ -259,9 +259,6 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: O
 
     if len(puzzle.model.clipboard) > 0:
         return_value["clipboard"] = [x.model_dump() for x in puzzle.model.clipboard]
-
-    if len(puzzle.model.content_special) > 0:
-        return_value["special_list"] = puzzle.model.content_special
 
     return {"data": return_value}
 
