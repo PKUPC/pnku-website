@@ -1,8 +1,8 @@
 import json
-from typing import Any, Optional, Dict, List
+from typing import Any, Dict, List, Optional
 
 import flask_admin
-from flask import current_app, flash, redirect, make_response, request
+from flask import current_app, flash, make_response, redirect, request
 from flask.typing import ResponseReturnValue
 from flask_admin import expose
 from flask_admin.actions import action
@@ -13,7 +13,7 @@ from src import adhoc
 from src.admin import fields
 from src.logic import glitter
 from src.logic.reducer import Reducer
-from src.store import PuzzleStoreModel, PuzzleStore
+from src.store import PuzzleStore, PuzzleStoreModel
 from .base_view import BaseView
 
 
@@ -30,7 +30,6 @@ class PuzzleView(BaseView):
     column_default_sort = 'sorting_index'
     column_formatters = {
         'actions': lambda _v, _c, model, _n: '；'.join([f'[{a["type"]}] {a["name"]}' for a in model.actions]),
-        "content_special": lambda _v, _c, model, _n: '；'.join([f'[{a["type"]}]' for a in model.content_special]),
         'triggers': lambda _v, _c, model, _n: '；'.join([f'{f["type"]}: {f["value"]}' for f in model.triggers]),
         "puzzle_metadata": lambda _v, _c, model, _n: (
             f"type: {model.puzzle_metadata.get('type', 'unknown')}; "
@@ -41,13 +40,11 @@ class PuzzleView(BaseView):
         'key': '题目唯一 ID，将会显示在 URL 中，比赛中不要随意修改，否则会导致已有提交失效',
         'sorting_index': '越小越靠前',
         'content_template': '支持 Markdown 和 Jinja2 模板（group: Optional[str]、tick: int）',
-        "content_special": "需要前端特殊渲染的内容，例如拼图、走马灯等不太方便直接在 template 中做的内容",
         'puzzle_metadata': '题目的其他元信息',
         'actions': '题面底部展示的动作列表',
     }
     form_overrides = {
         'content_template': fields.MarkdownField,
-        "content_special": fields.PuzzleSpecialField,
         'puzzle_metadata': fields.JsonField,
         'actions': fields.PuzzleActionsField,
         'triggers': fields.PuzzleTriggersField,
@@ -66,8 +63,7 @@ class PuzzleView(BaseView):
             "subcategory": puzzle.subcategory,
             "sorting_index": puzzle.sorting_index,
             "content_template": puzzle.content_template,
-            "content_special": puzzle.content_special,
-            "clipboard": puzzle.content_special,
+            "clipboard": puzzle.clipboard,
             "puzzle_metadata": puzzle.puzzle_metadata,
             "actions": puzzle.actions,
             "triggers": puzzle.triggers,
@@ -81,7 +77,6 @@ class PuzzleView(BaseView):
         puzzle.subcategory = data['subcategory']
         puzzle.sorting_index = data['sorting_index']
         puzzle.content_template = data['content_template']
-        puzzle.content_special = data["content_special"]
         puzzle.clipboard = data["clipboard"]
         puzzle.puzzle_metadata = data['puzzle_metadata']
         puzzle.actions = data['actions']
