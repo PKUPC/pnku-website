@@ -1,8 +1,9 @@
-import jwt
 import time
-from src import secret
-
 from typing import Literal
+
+import jwt
+
+from src import secret
 
 
 def jwt_encode(payload: dict[str, str | int], exp: int | None = None) -> str:
@@ -18,7 +19,7 @@ def jwt_encode(payload: dict[str, str | int], exp: int | None = None) -> str:
 
 def jwt_decode(token: str) -> tuple[Literal[True], dict[str, str | int]] | tuple[Literal[False], str]:
     try:
-        info = jwt.decode(token, secret.JWT_SALT, algorithms=['HS256'], verify=True)
+        info = jwt.decode(token, secret.JWT_SALT, algorithms=[secret.JWT_ALGO], verify=True)
         return True, info
     except jwt.exceptions.ExpiredSignatureError:
         return False, "登录已过期，请重新登录"

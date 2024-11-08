@@ -1,16 +1,10 @@
 import datetime
-import hashlib
-import logging
 import random
 import secrets
-import sys
 import time
-import traceback
-from typing import Union, Callable, Any, Type, TypeVar
+from typing import Callable, Union
 
 import pytz
-
-T = TypeVar("T")
 
 
 def gen_random_str(length: int = 32, *, crypto: bool = False) -> str:
@@ -33,13 +27,6 @@ def formatted_ts_to_timestamp(formatted_ts: str) -> int:
     ts = int(time.mktime(date_obj.timetuple()))
     return ts
 
-
-def get_traceback(e: Exception) -> str:
-    return repr(e) + '\n' + ''.join(traceback.format_exception(type(e), e, e.__traceback__))
-
-
-def calc_md5(content: str) -> str:
-    return hashlib.md5(content.encode(encoding="utf-8")).hexdigest()
 
 
 def clean_submission(origin: str) -> str:
@@ -81,24 +68,3 @@ def count_blank_in_string(origin: str) -> int:
 
 def count_non_blank_in_string(origin: str) -> int:
     return len(origin) - count_blank_in_string(origin)
-
-
-def make_logging_handlers(formatter: logging.Formatter) -> list[logging.Handler]:
-    # 设置stdout处理器，仅输出DEBUG和INFO级别的日志
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    stdout_handler.setLevel(logging.DEBUG)
-    stdout_handler.addFilter(lambda record: record.levelno <= logging.INFO)  # 只允许DEBUG和INFO级别的日志通过
-    stdout_handler.setFormatter(formatter)
-
-    # 设置stderr处理器，输出WARNING及以上级别的日志
-    stderr_handler = logging.StreamHandler(sys.stderr)
-    stderr_handler.setLevel(logging.WARNING)  # WARNING, ERROR, CRITICAL
-    stderr_handler.setFormatter(formatter)
-    return [stdout_handler, stderr_handler]
-
-
-def get_value(d: dict[str, Any], key: str, cls: Type[T]) -> T:
-    assert key in d
-    value = d[key]
-    assert isinstance(value, cls)
-    return value
