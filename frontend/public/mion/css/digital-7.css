@@ -26,7 +26,7 @@
 .date-field div p {
     font-size: 60px;
     position: relative;
-    z-index: 100;
+    z-index: 10;
     margin: 0.1em 0;
     line-height: 1em;
 }
@@ -39,7 +39,7 @@
     color: #2b2828;
     position: absolute;
     top: 0;
-    z-index: 50;
+    z-index: 5;
 }
 
 .date-field div p.type {
@@ -64,7 +64,7 @@
 .clock-field div p {
     font-size: 100px;
     position: relative;
-    z-index: 100;
+    z-index: 10;
     margin: 0.1em 0;
     line-height: 1em;
 }
@@ -73,7 +73,7 @@
     color: #2b2828;
     position: absolute;
     top: 0;
-    z-index: 50;
+    z-index: 5;
 }
 
 .clock-field .number .type {
