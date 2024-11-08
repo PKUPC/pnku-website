@@ -11,6 +11,8 @@ TBD
 - 安装依赖：`poetry install`
 - 更新依赖：`poetry update`
 - 导出部署时需要的依赖：`poetry export -f requirements.txt --output requirements.txt --without-hashes`
+- 导出包含 `dev` 的依赖：`poetry export -f requirements.txt --output requirements-dev.txt --without-hashes --with dev
+`
 
 ### 运行
 
