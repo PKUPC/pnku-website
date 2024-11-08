@@ -8,7 +8,7 @@ from aiosmtplib.errors import SMTPTimeoutError
 
 from src import secret
 
-HTML_TEMPLATE = """
+_HTML_TEMPLATE = """
 <html>
 <head></head>
 <body>
@@ -39,7 +39,6 @@ HTML_TEMPLATE = """
 
 # <class 'aiosmtplib.errors.SMTPDataError'>
 # (554, 'Reject by behaviour spamANTISPAM_BAT[01201311R2268S1430114234, maildocker-behaviorspam033045086103]: too frequently sending')
-#
 
 async def send_email(massage: Message) -> Tuple[bool, Union[None, str]]:
     try:
@@ -66,7 +65,7 @@ async def send_email(massage: Message) -> Tuple[bool, Union[None, str]]:
 
 async def send_reg_email(password: str, to: str) -> Tuple[bool, Union[None, str]]:
     # msg = MIMEText(password, "plain", "utf-8")
-    msg = MIMEText(HTML_TEMPLATE.format(
+    msg = MIMEText(_HTML_TEMPLATE.format(
         PASSWORD=password,
         EMAIL=to,
     ), "html", "utf-8")

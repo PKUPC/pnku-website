@@ -1,7 +1,7 @@
 import httpx
 
-from .utils import get_traceback
-from .. import secret
+from src import secret
+from .system import get_traceback
 
 
 async def check_recaptcha_response(res: str) -> bool:

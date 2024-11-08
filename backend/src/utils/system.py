@@ -1,6 +1,7 @@
 import asyncio
 import os
 import time
+import traceback
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, Dict, Iterator, Literal, Union
@@ -8,6 +9,10 @@ from typing import Callable, Dict, Iterator, Literal, Union
 import psutil
 
 LogLevel = Literal['debug', 'wish', 'info', 'warning', 'error', 'critical', 'success']
+
+
+def get_traceback(e: Exception) -> str:
+    return repr(e) + '\n' + ''.join(traceback.format_exception(type(e), e, e.__traceback__))
 
 
 @contextmanager
