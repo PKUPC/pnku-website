@@ -1,8 +1,8 @@
 from src import store
 from src.admin import fields
 
-from .base_view import BaseView
 from ...logic import glitter
+from .base_view import BaseView
 
 
 class MessageView(BaseView):
@@ -13,10 +13,10 @@ class MessageView(BaseView):
     column_searchable_list = ['user_id', 'direction']
     column_filters = ['user_id', 'direction']
     column_display_pk = True
-    column_sortable_list = ["id", "created_at"]
+    column_sortable_list = ['id', 'created_at']
     column_default_sort = ('created_at', True)
 
-    form_excluded_columns = ["id", "created_at", "user_id", "team_id", "direction", "content_type"]
+    form_excluded_columns = ['id', 'created_at', 'user_id', 'team_id', 'direction', 'content_type']
 
     column_descriptions = {
         'created_at': '用户发送消息的时间',

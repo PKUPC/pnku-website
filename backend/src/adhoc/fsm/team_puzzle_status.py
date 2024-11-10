@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import Literal, TYPE_CHECKING, Hashable, Any
+from typing import TYPE_CHECKING, Any, Hashable, Literal
 
-from src import utils, secret
-from src.state import SubmissionResult
+from src import secret, utils
+from src.state.submission_state import SubmissionResult
 from src.store import PuzzleActionEvent
 
+
 if TYPE_CHECKING:
-    from src.state import Team, Puzzle, Submission
+    from src.state import Puzzle, Submission, Team
+
     from .team_game_state import TeamGameStatus
 
 if secret.DEBUG_MODE:
@@ -21,7 +23,7 @@ class TeamPuzzleStatus:
         self.game_status = game_status
         self.team: Team = team
         self.puzzle: Puzzle = puzzle
-        self.visible: Literal["unlock", "lock", "found"] = "lock"
+        self.visible: Literal['unlock', 'lock', 'found'] = 'lock'
         self.wrong_count = 0
         self.cold_down_ts = -1
         self.submission_set: set[str] = set()
@@ -36,9 +38,9 @@ class TeamPuzzleStatus:
         assert submission.cleaned_content not in self.submission_set
         self.submission_set.add(submission.cleaned_content)
         match submission.result.type:
-            case "wrong":
+            case 'wrong':
                 self.handle_wrong_submission(submission)
-            case "pass":
+            case 'pass':
                 self.correct_answers.append(submission.result.trigger_value)
 
     def test_submission(self, submission: str) -> SubmissionResult:
@@ -46,12 +48,12 @@ class TeamPuzzleStatus:
         for trigger in self.puzzle.model.triggers:
             if cleaned_submission == utils.clean_submission(trigger.value):
                 result_type, result_info = trigger.type, trigger.info
-                if result_type == "answer":
-                    result_type = "pass"
-                if result_type == "pass" and result_info in ["答案正确", ""]:
-                    result_info = "答案正确！"
+                if result_type == 'answer':
+                    result_type = 'pass'
+                if result_type == 'pass' and result_info in ['答案正确', '']:
+                    result_info = '答案正确！'
                 return SubmissionResult(result_type, result_info, trigger_value=trigger.value)
-        return SubmissionResult("wrong", "答案错误！你没有得到任何信息！")
+        return SubmissionResult('wrong', '答案错误！你没有得到任何信息！')
 
     def get_render_info(self) -> tuple[tuple[str, str | int | tuple[Hashable, ...]], ...]:
         return tuple()

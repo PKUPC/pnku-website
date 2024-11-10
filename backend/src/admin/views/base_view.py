@@ -1,9 +1,9 @@
 import asyncio
+
 from typing import Any, Optional
 
 from flask import current_app
-from flask_admin.contrib import fileadmin
-from flask_admin.contrib import sqla
+from flask_admin.contrib import fileadmin, sqla
 from flask_admin.form import SecureForm
 
 from src.logic import glitter

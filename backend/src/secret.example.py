@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import pathlib
+
 from typing import TYPE_CHECKING, Literal
+
 
 if TYPE_CHECKING:
     from . import utils
@@ -31,12 +33,12 @@ USE_ARCHIVE_API = False
 # 是否重新 hash media 文件名
 HASH_MEDIA_FILENAME = False
 # puzzle_key hash 方法 "none": 不 hash, "key_only": 只 hash puzzle_key, "key_and_team": hash team_id + puzzle_key
-HASH_PUZZLE_KEY: Literal["none", "key_only", "key_and_team"] = "none"
+HASH_PUZZLE_KEY: Literal['none', 'key_only', 'key_and_team'] = 'none'
 # 性能警报设置
 HEALTH_CHECK_THROTTLE = {
-    "ram_throttle": .2,  # 剩余空间小于此比例报警
-    "disk_throttle": .1,  # 剩余空间小于此比例报警
-    "cpu_throttle": 2 / 3,  # 占用率大于此比例报警（已考虑多核情况）
+    'ram_throttle': 0.2,  # 剩余空间小于此比例报警
+    'disk_throttle': 0.1,  # 剩余空间小于此比例报警
+    'cpu_throttle': 2 / 3,  # 占用率大于此比例报警（已考虑多核情况）
 }
 
 
@@ -47,12 +49,9 @@ def IS_ADMIN(user_id: int) -> bool:
 
 
 # JWT 相关设置
-JWT_ALGO = "HS256"
-JWT_HEADERS = {
-    "alg": "HS256",
-    "typ": "JWT"
-}
-JWT_SALT = "xxx"
+JWT_ALGO = 'HS256'
+JWT_HEADERS = {'alg': 'HS256', 'typ': 'JWT'}
+JWT_SALT = 'xxx'
 JWT_DEFAULT_TIMEOUT = 6 * 60 * 60  # 单位秒
 
 ###
@@ -68,8 +67,8 @@ FEISHU_WEBHOOK_ADDR = 'https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxx'
 ADMIN_SESSION_SECRET = 'xxx'
 GLITTER_SSRF_TOKEN = 'xxx'
 ADMIN_2FA_COOKIE = 'xxx'
-MEDIA_HASH_SALT = "xxx"
-PUZZLE_KEY_HASH_SALT = "xxx"
+MEDIA_HASH_SALT = 'xxx'
+PUZZLE_KEY_HASH_SALT = 'xxx'
 
 ###
 # 部署设置
@@ -79,7 +78,7 @@ PUZZLE_KEY_HASH_SALT = "xxx"
 DB_CONNECTOR = 'mysql+pymysql://username:password@host:port/database?charset=utf8mb4'
 
 # 各种文件的存储路径
-BASE_PATH = "/path/to/base"
+BASE_PATH = '/path/to/base'
 TEMPLATE_PATH = pathlib.Path(BASE_PATH + '/templates').resolve()
 UPLOAD_PATH = pathlib.Path(BASE_PATH + '/upload').resolve()  # 用户上传文件的文件夹
 MEDIA_PATH = pathlib.Path(BASE_PATH + '/media').resolve()  # 原始 MEDIA 文件
@@ -108,11 +107,11 @@ WORKER_API_SERVER_KWARGS = lambda idx0: {  # will be passed to `Sanic.run`
 REDUCER_ADMIN_SERVER_ADDR = ('127.0.0.1', 10009)
 
 # email 设置
-EMAIL_TESTER = "tester@email.com"
-EMAIL_SENDER = "user@email.com"
-EMAIL_USERNAME = "username"
-EMAIL_PASSWORD = "password"
-EMAIL_HOSTNAME = "smtp.email.com"
+EMAIL_TESTER = 'tester@email.com'
+EMAIL_SENDER = 'user@email.com'
+EMAIL_USERNAME = 'username'
+EMAIL_PASSWORD = 'password'
+EMAIL_HOSTNAME = 'smtp.email.com'
 EMAIL_PORT = 25
 EMAIL_TIMEOUT = 3
 EMAIL_USE_TLS = False
@@ -140,7 +139,7 @@ RE_CAPTCHA_VERIFY_ADDR = 'https://recaptcha.net/recaptcha/api/siteverify'
 # OAUTH 设置（目前没有启用）
 
 FRONTEND_PORTAL_URL = '/'  # redirected to this after (successful or failed) login
-FRONTEND_AUTH_ERROR_URL = "/login/error"
+FRONTEND_AUTH_ERROR_URL = '/login/error'
 BACKEND_HOSTNAME = 'localhost'  # used for oauth redirects
 BACKEND_SCHEME = 'http'  # used for oauth redirects
 
@@ -161,9 +160,7 @@ def BUILD_OAUTH_CALLBACK_URL(url: str) -> str:
 MANUAL_AUTH_ENABLED = DEBUG_MODE  # 是否允许手动创建用户
 # 为某些账号设置固定密码而不是随机密码，在开发阶段可能会方便一些
 # 只有当 MANUAL_AUTH_ENABLED 启用时才会启用（即 DEBUG 模式）
-MANUAL_PASSWORDS: dict[str, str] = {
-    "user@email.com": "password"
-}
+MANUAL_PASSWORDS: dict[str, str] = {'user@email.com': 'password'}
 
 EMAIL_REG_PERMISSION = False  # 是否使用邮箱限制，开启后只允许白名单内的邮箱注册
 VALID_EMAILS: set[str] = set()  # 邮箱白名单

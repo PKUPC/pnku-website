@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import time
+
 from functools import lru_cache
-from typing import TYPE_CHECKING, List, Optional, Dict, Any
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from src.store import AnnouncementStore
+
 from .. import utils
+
 
 if TYPE_CHECKING:
     from . import Game, User
@@ -42,12 +45,7 @@ class Announcements:
 
         self._sort_list()
 
-        self._game.worker.emit_ws_message({
-            "type": "normal",
-            "payload": {
-                "type": "update_announcements"
-            }
-        })
+        self._game.worker.emit_ws_message({'type': 'normal', 'payload': {'type': 'update_announcements'}})
 
     @property
     def next_announcement_ts(self) -> int:
@@ -80,16 +78,19 @@ class Announcement:
         try:
             return utils.render_template(self.store.content_template, {'group': group, 'tick': tick})
         except Exception as e:
-            self._game.worker.log('error', 'announcement.render_template',
-                                  f'template render failed: {self.store.id} ({self.store.title}): {utils.get_traceback(e)}')
+            self._game.worker.log(
+                'error',
+                'announcement.render_template',
+                f'template render failed: {self.store.id} ({self.store.title}): {utils.get_traceback(e)}',
+            )
             return '<i>（模板渲染失败）</i>'
 
     def describe_json(self, user: Optional[User]) -> Dict[str, Any]:
         return {
-            "id": self.store.id,
-            "category": AnnouncementStore.Category.dict()[self.store.category],
-            "publish_at": self.store.publish_at,
-            "sorting_index": self.store.sorting_index,
-            "title": self.title,
-            "content": self._render_template(self._game.cur_tick, None if user is None else user.model.group),
+            'id': self.store.id,
+            'category': AnnouncementStore.Category.dict()[self.store.category],
+            'publish_at': self.store.publish_at,
+            'sorting_index': self.store.sorting_index,
+            'title': self.title,
+            'content': self._render_template(self._game.cur_tick, None if user is None else user.model.group),
         }

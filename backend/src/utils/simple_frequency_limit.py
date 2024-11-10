@@ -1,5 +1,6 @@
 from typing import Hashable
 
+
 _cache: dict[Hashable, float] = {}
 
 

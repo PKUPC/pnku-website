@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import time
-from src.utils.enum import EnumWrapper
+
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Integer, BigInteger, Text
+from sqlalchemy import BigInteger, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
+
+from src.utils.enum import EnumWrapper
+
 
 if TYPE_CHECKING:
     # noinspection PyUnresolvedReferences
-    from . import UserStore, TeamStore
+    pass
 from . import Table
 
 
@@ -17,11 +20,11 @@ class TicketMessageStore(Table):
     __tablename__ = 'ticket_message'
 
     class Direction(EnumWrapper):
-        TO_PLAYER = "发送给玩家"
-        TO_STAFF = "发送给工作人员"
+        TO_PLAYER = '发送给玩家'
+        TO_STAFF = '发送给工作人员'
 
     class ContentType(EnumWrapper):
-        TEXT = "文字消息"
+        TEXT = '文字消息'
 
     created_at: Mapped[int] = mapped_column(BigInteger, nullable=False, default=lambda: int(1000 * time.time()))
 
@@ -36,4 +39,4 @@ class TicketMessageStore(Table):
     content: Mapped[str] = mapped_column(Text, nullable=False)
 
     def __repr__(self) -> str:
-        return f"[User#{self.user_id}][Ticket#{self.ticket_id}]"
+        return f'[User#{self.user_id}][Ticket#{self.ticket_id}]'

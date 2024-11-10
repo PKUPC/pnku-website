@@ -6,6 +6,7 @@ from src import store
 from src.admin import fields
 from src.logic import glitter
 from src.state import Trigger
+
 from .base_view import BaseView
 
 

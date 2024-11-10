@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, List, Tuple, Dict, Optional
+
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+
 
 if TYPE_CHECKING:
-    from . import Game
     from ..store import *
+    from . import Game
 
 
 class Trigger:
@@ -34,8 +36,9 @@ class Trigger:
         if self.TICK_GAME_START in self.trigger_by_tick:
             self.board_begin_ts = self.trigger_by_tick[self.TICK_GAME_START].timestamp_s
         else:
-            self._game.log('error', 'trigger.on_store_reload',
-                           'trigger_board_begin not found, estimating a time for it')
+            self._game.log(
+                'error', 'trigger.on_store_reload', 'trigger_board_begin not found, estimating a time for it'
+            )
             self.board_begin_ts = self._stores[0].timestamp_s if len(self._stores) > 0 else int(time.time()) - 600
 
         if self.TICK_GAME_END in self.trigger_by_tick:

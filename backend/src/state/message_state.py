@@ -2,18 +2,19 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from . import WithGameLifecycle
 from ..store import MessageStore
+from .base import WithGameLifecycle
+
 
 if TYPE_CHECKING:
-    from . import WithGameLifecycle, Game
+    from . import Game
 
 
 class MessageList:
-    """
-        用来存储消息的 list，稍微做一些优化
-        消息应该天然是有序的
-        这个结构同时管理未读消息状态，这里我们做了一个假定：用户不可能已读 t 时刻消息缺未读 t - \delta_t 时刻的消息
+    r"""
+    用来存储消息的 list，稍微做一些优化
+    消息应该天然是有序的
+    这个结构同时管理未读消息状态，这里我们做了一个假定：用户不可能已读 t 时刻消息缺未读 t - \delta_t 时刻的消息
     """
 
     def __init__(self) -> None:
@@ -26,7 +27,7 @@ class MessageList:
 
     def append(self, x: MessageStore) -> None:
         if len(self._list) > 0:
-            assert x.created_at > self._list[-1].created_at, "MESSAGE_TIME_ERROR"
+            assert x.created_at > self._list[-1].created_at, 'MESSAGE_TIME_ERROR'
         self.team_unread_idx = len(self._list) if x.player_unread else -1
         self.staff_unread_idx = len(self._list) if x.staff_unread else -1
         self.id_to_idx[x.id] = len(self._list)
@@ -43,9 +44,9 @@ class MessageList:
 
     def find_idx_before(self, timestamp: int) -> int:
         """
-            找到小于等于给定时间戳的第一个 idx
-            理论上来说应该找的都是等于的
-            2024-07-12: 这玩意到底是干啥的，一点用都没有
+        找到小于等于给定时间戳的第一个 idx
+        理论上来说应该找的都是等于的
+        2024-07-12: 这玩意到底是干啥的，一点用都没有
         """
         if len(self._list) == 0 or timestamp < self._list[0].created_at:
             return -1
@@ -86,7 +87,7 @@ class MessageList:
             start_idx = self.id_to_idx[start_id]
             if start_idx == len(self._list) - 1:
                 return []
-            return self._list[self.id_to_idx[start_id] + 1:]
+            return self._list[self.id_to_idx[start_id] + 1 :]
         else:
             return None
 
@@ -111,9 +112,9 @@ class MessageList:
 
 class Messages(WithGameLifecycle):
     """
-        消息载入逻辑：
-            服务器启动时，base.py 中会读入所有的 store，然后传给 Game 的构造函数，Game 中管理其他的 State，会将读出的 Store
-            列表传给各个 State 进行初始化
+    消息载入逻辑：
+        服务器启动时，base.py 中会读入所有的 store，然后传给 Game 的构造函数，Game 中管理其他的 State，会将读出的 Store
+        列表传给各个 State 进行初始化
     """
 
     def __init__(self, game: Game, stores: list[MessageStore]):
@@ -169,7 +170,7 @@ class Messages(WithGameLifecycle):
     @property
     def total_staff_unread_cnt(self) -> int:
         """
-            统计 staff 有多少个队伍的未读消息
+        统计 staff 有多少个队伍的未读消息
         """
         cnt = 0
         for key in self.message_by_team_id:

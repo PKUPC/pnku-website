@@ -4,9 +4,11 @@ from email.mime.text import MIMEText
 from typing import Tuple, Union
 
 import aiosmtplib
+
 from aiosmtplib.errors import SMTPTimeoutError
 
 from src import secret
+
 
 _HTML_TEMPLATE = """
 <html>
@@ -40,6 +42,7 @@ _HTML_TEMPLATE = """
 # <class 'aiosmtplib.errors.SMTPDataError'>
 # (554, 'Reject by behaviour spamANTISPAM_BAT[01201311R2268S1430114234, maildocker-behaviorspam033045086103]: too frequently sending')
 
+
 async def send_email(massage: Message) -> Tuple[bool, Union[None, str]]:
     try:
         await aiosmtplib.send(
@@ -54,23 +57,27 @@ async def send_email(massage: Message) -> Tuple[bool, Union[None, str]]:
         )
     except SMTPTimeoutError as e:
         print(e)
-        return False, "发送邮件超时，请稍后再试。"
+        return False, '发送邮件超时，请稍后再试。'
     except Exception as e:
-        print("unknown email error")
+        print('unknown email error')
         print(type(e))
         print(e)
-        return False, "内部错误，请通知网站管理员"
+        return False, '内部错误，请通知网站管理员'
     return True, None
 
 
 async def send_reg_email(password: str, to: str) -> Tuple[bool, Union[None, str]]:
     # msg = MIMEText(password, "plain", "utf-8")
-    msg = MIMEText(_HTML_TEMPLATE.format(
-        PASSWORD=password,
-        EMAIL=to,
-    ), "html", "utf-8")
-    msg["From"] = secret.EMAIL_SENDER
-    msg["To"] = to
+    msg = MIMEText(
+        _HTML_TEMPLATE.format(
+            PASSWORD=password,
+            EMAIL=to,
+        ),
+        'html',
+        'utf-8',
+    )
+    msg['From'] = secret.EMAIL_SENDER
+    msg['To'] = to
 
-    msg["Subject"] = Header(f"账号创建通知", "utf-8")  # type:ignore[assignment]
+    msg['Subject'] = Header('账号创建通知', 'utf-8')  # type:ignore[assignment]
     return await send_email(msg)

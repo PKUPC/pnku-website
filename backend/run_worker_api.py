@@ -1,15 +1,14 @@
 import logging
 import multiprocessing
+
 from typing import List
 
 from src import utils
 
+
 logger = logging.getLogger('init')
 logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter(
-    f'[%(asctime)s] [init] [%(levelname)s] %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S %z'
-)
+formatter = logging.Formatter('[%(asctime)s] [init] [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S %z')
 logging_handlers = utils.make_logging_handlers(formatter)
 for handler in logging_handlers:
     logger.addHandler(handler)
@@ -23,7 +22,6 @@ def process(idx0: int) -> None:
 
 
 if __name__ == '__main__':
-
     utils.fix_zmq_asyncio_windows()
     ps: List[multiprocessing.Process] = []
 

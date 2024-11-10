@@ -6,20 +6,18 @@ from gevent.pywsgi import WSGIServer
 
 from src import utils
 
+
 logger = logging.getLogger('init')
 logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter(
-    f'[%(asctime)s] [init] [%(levelname)s] %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S %z'
-)
+formatter = logging.Formatter('[%(asctime)s] [init] [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S %z')
 logging_handlers = utils.make_logging_handlers(formatter)
 for handler in logging_handlers:
     logger.addHandler(handler)
 
-from src import secret
-from src import utils
+from src import secret, utils
 from src.admin.app import app
 from src.logic.reducer import Reducer
+
 
 reducer_started_event = threading.Event()
 
@@ -39,12 +37,12 @@ def reducer_thread(loop: asyncio.AbstractEventLoop, reducer: Reducer) -> None:
 if __name__ == '__main__':
     utils.fix_zmq_asyncio_windows()
 
-    l = asyncio.new_event_loop()
-    r = Reducer('reducer')
-    threading.Thread(target=reducer_thread, args=(l, r), daemon=True).start()
+    loop = asyncio.new_event_loop()
+    reducer = Reducer('reducer')
+    threading.Thread(target=reducer_thread, args=(loop, reducer), daemon=True).start()
 
     reducer_started_event.wait()
 
-    app.config['reducer_loop'] = l
-    app.config['reducer_obj'] = r
+    app.config['reducer_loop'] = loop
+    app.config['reducer_obj'] = reducer
     WSGIServer(secret.REDUCER_ADMIN_SERVER_ADDR, app, log=None).serve_forever()

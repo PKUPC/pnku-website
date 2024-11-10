@@ -1,19 +1,23 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Dict, Optional, TYPE_CHECKING, Literal
+
+from typing import TYPE_CHECKING, Any, Dict, Literal, Optional
 
 import sqlalchemy
+
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic_core import ValidationError
-from sqlalchemy import String, JSON, Integer, ForeignKey, BigInteger, Boolean, func
+from sqlalchemy import JSON, BigInteger, Boolean, ForeignKey, Integer, String, func
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 if TYPE_CHECKING:
-    from .team_store import TeamStore
+    pass
 
 from . import Table
+
 
 USER_GROUPS = {
     'staff': '工作人员',
@@ -23,7 +27,7 @@ USER_GROUPS = {
 
 
 class EmailLoginPropertyModel(BaseModel):
-    type: Literal["email"]
+    type: Literal['email']
     salt: str
     cnt: str  # TODO: 当时是怀着怎样的心情把这个设置为 str 的
     jwt_salt: str
@@ -32,7 +36,7 @@ class EmailLoginPropertyModel(BaseModel):
 
 
 class ManualLoginPropertyModel(BaseModel):
-    type: Literal["manual"]
+    type: Literal['manual']
 
 
 class WebsiteSettingModel(BaseModel):
@@ -62,19 +66,18 @@ class UserStoreModel(BaseModel):
     login_key: str
     login_properties: EmailLoginPropertyModel | ManualLoginPropertyModel
     enabled: bool
-    group: Literal["player", "staff"]
+    group: Literal['player', 'staff']
     team_id: int | None
     user_info: UserInfoModel
 
     def format_login_properties(self) -> str:
-
         match self.login_properties.type:
-            case "email":
-                return f"[E-Mail] {self.user_info.email}"
-            case "manual":
-                return f"[Manual]"
+            case 'email':
+                return f'[E-Mail] {self.user_info.email}'
+            case 'manual':
+                return '[Manual]'
             case _:
-                return f"[{self.login_properties.type}]"
+                return f'[{self.login_properties.type}]'
 
     def group_disp(self) -> str:
         return USER_GROUPS.get(self.group, f'({self.group})')
@@ -97,22 +100,22 @@ class UserStore(Table):
     group: Mapped[str] = mapped_column(String(32), nullable=False)
 
     team_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('team.id'), nullable=True)
-    _team = relationship('TeamStore', back_populates="_members", foreign_keys=[team_id])
+    _team = relationship('TeamStore', back_populates='_members', foreign_keys=[team_id])
     user_info: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
 
     @hybrid_property
     def nickname(self):
-        return self.user_info.get("nickname", None)
+        return self.user_info.get('nickname', None)
 
     # ignore type to make mypy happy
     @nickname.expression  # type: ignore[no-redef]
     def nickname(cls):
         return sqlalchemy.case(
             (
-                sqlalchemy.func.json_extract(cls.user_info, "$.nickname").isnot(None),
-                sqlalchemy.cast(sqlalchemy.func.json_extract(cls.user_info, "$.nickname"), String(128))
+                sqlalchemy.func.json_extract(cls.user_info, '$.nickname').isnot(None),
+                sqlalchemy.cast(sqlalchemy.func.json_extract(cls.user_info, '$.nickname'), String(128)),
             ),
-            else_=sqlalchemy.null()
+            else_=sqlalchemy.null(),
         )
 
     @hybrid_property
@@ -120,24 +123,27 @@ class UserStore(Table):
         if self.team_id is None:
             return None
         else:
-            return f"{self._team.team_name} [T#{self._team.id}]"
+            return f'{self._team.team_name} [T#{self._team.id}]'
 
     @team_info.expression  # type: ignore[no-redef]
     def team_info(cls):
         from .team_store import TeamStore
+
         return sqlalchemy.case(
             (
                 cls.team_id.isnot(None),
                 func.concat(
                     sqlalchemy.select(TeamStore.team_name).where(TeamStore.id == cls.team_id).scalar_subquery(),
-                    " [T#", cls.team_id, "]"
-                )
+                    ' [T#',
+                    cls.team_id,
+                    ']',
+                ),
             ),
-            else_=sqlalchemy.null()
+            else_=sqlalchemy.null(),
         )
 
     def __repr__(self) -> str:
-        nick = self.user_info["nickname"]
+        nick = self.user_info['nickname']
         login_key = self.login_key
         return f'[U#{self.id} {login_key} {nick!r} T#{self.team_id}]'
 

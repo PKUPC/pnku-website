@@ -1,24 +1,26 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Dict, Tuple, Set
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
 
 from sanic import HTTPResponse
 
 from src import secret
-from . import WithGameLifecycle
-from .team_state import Team
+
 from .. import utils
+from .base import WithGameLifecycle
+from .team_state import Team
+
 
 if TYPE_CHECKING:
-    from . import WithGameLifecycle, Game
     from ..store import *
+    from . import Game
 
 
 class Users(WithGameLifecycle):
     constructed: bool = False
 
     def __init__(self, game: Game, stores: List[UserStore]):
-        assert not Users.constructed, "Users State 只能有一个实例"
+        assert not Users.constructed, 'Users State 只能有一个实例'
         Users.constructed = True
         self.game: Game = game
         self._stores: List[UserStore] = []
@@ -39,7 +41,7 @@ class Users(WithGameLifecycle):
         self._stores = stores
         self.list = [User(self.game, x) for x in self._stores]
         self._update_aux_dicts()
-        self.staff_ids = set(x.model.id for x in self.list if x.model.group == "staff")
+        self.staff_ids = set(x.model.id for x in self.list if x.model.group == 'staff')
 
     def on_create_team(self, user_id: int, store: Optional[UserStore]) -> None:
         assert store is not None
@@ -62,7 +64,7 @@ class Users(WithGameLifecycle):
         assert store is not None and user_id in self.user_by_id
         assert store.team_id is None
         target_user = self.user_by_id[user_id]
-        assert target_user.model.team_id in self.game.teams.team_by_id, f"target team_id is {target_user.model.team_id}"
+        assert target_user.model.team_id in self.game.teams.team_by_id, f'target team_id is {target_user.model.team_id}'
         # 从队伍列表中移除成员
         self.game.teams.team_by_id[target_user.model.team_id].members.remove(target_user)
         target_user.on_store_reload(store)
@@ -80,14 +82,14 @@ class Users(WithGameLifecycle):
             # TODO: 检查这个情况 self.game.need_reloading_scoreboard = True
         elif old_user is None:  # add
             self.list = other_users + [User(self.game, new_store)]
-            if new_store.group == "staff":
+            if new_store.group == 'staff':
                 self.staff_ids.add(id)
             # no need to reload scoreboard, because newly added user does not have any submissions yet
         else:  # modify
             old_user.on_store_reload(new_store)
-            if new_store.group == "staff":
+            if new_store.group == 'staff':
                 self.staff_ids.add(id)
-            elif new_store.group != "staff" and old_user.model.group == "staff":
+            elif new_store.group != 'staff' and old_user.model.group == 'staff':
                 self.staff_ids.remove(id)
 
         self._update_aux_dicts()
@@ -120,11 +122,11 @@ class User(WithGameLifecycle):
 
     @property
     def avatar_url(self) -> str:
-        return f"https://cravatar.cn/avatar/{utils.calc_md5(self.model.user_info.email)}?d=mp"
+        return f'https://cravatar.cn/avatar/{utils.calc_md5(self.model.user_info.email)}?d=mp'
 
     @property
     def is_staff(self) -> bool:
-        return self.model.group == "staff"
+        return self.model.group == 'staff'
 
     @property
     def is_admin(self) -> bool:
@@ -137,7 +139,7 @@ class User(WithGameLifecycle):
         #     self.game.need_reloading_scoreboard = True
         # 处理 group 切换
         staff_flag = False
-        if self._store.group != "staff" and store.group == "staff":
+        if self._store.group != 'staff' and store.group == 'staff':
             staff_flag = True
 
         self.game.need_updating_scoreboard = True
@@ -157,12 +159,12 @@ class User(WithGameLifecycle):
 
     def check_status(self) -> Optional[Tuple[str, str]]:
         """
-            基本的用户信息检查，之后会考虑替换掉其他的check，检查以下信息：
-            - 是否 enable
-            - 是否阅读了参赛须知
-            - 是否被 ban 了
+        基本的用户信息检查，之后会考虑替换掉其他的check，检查以下信息：
+        - 是否 enable
+        - 是否阅读了参赛须知
+        - 是否被 ban 了
 
-            大部分操作都应当需要这个检查
+        大部分操作都应当需要这个检查
         """
         if not self.model.enabled:
             return 'USER_DISABLED', '账号不允许登录'
@@ -174,8 +176,8 @@ class User(WithGameLifecycle):
 
     def check_update_profile(self) -> Optional[Tuple[str, str]]:
         """
-            用户当前是否能修改信息
-            判断：是否登录、是否阅读了参赛须知、是否被 ban 了
+        用户当前是否能修改信息
+        判断：是否登录、是否阅读了参赛须知、是否被 ban 了
         """
         if self.check_login() is not None:
             return self.check_login()
@@ -192,23 +194,23 @@ class User(WithGameLifecycle):
 
     def get_teammate_ids(self) -> List[int]:
         """
-            获取队友的 id（不包含自己）
-            如果没有组队则返回空列表
+        获取队友的 id（不包含自己）
+        如果没有组队则返回空列表
         """
         if self.team is None:
             return []
         return [t.model.id for t in self.team.members if t.model.id != self.model.id]
 
     def update_cookie(self, res: HTTPResponse) -> None:
-        if self.model.login_properties.type == "email":
-            auth_token_value = utils.jwt_encode({
-                "user_id": self.model.id, "jwt_salt": self.model.login_properties.jwt_salt
-            })
+        if self.model.login_properties.type == 'email':
+            auth_token_value = utils.jwt_encode(
+                {'user_id': self.model.id, 'jwt_salt': self.model.login_properties.jwt_salt}
+            )
         else:
-            auth_token_value = utils.jwt_encode({"user_id": self.model.id})
-        utils.add_cookie(res, "auth_token", auth_token_value, "/", secret.JWT_DEFAULT_TIMEOUT)
+            auth_token_value = utils.jwt_encode({'user_id': self.model.id})
+        utils.add_cookie(res, 'auth_token', auth_token_value, '/', secret.JWT_DEFAULT_TIMEOUT)
         user_token = utils.calc_md5(f'nginx uid{self.model.id}')
-        utils.add_cookie(res, "user_token", user_token, "/", secret.JWT_DEFAULT_TIMEOUT)
+        utils.add_cookie(res, 'user_token', user_token, '/', secret.JWT_DEFAULT_TIMEOUT)
 
     def __repr__(self) -> str:
-        return f"User[{self.model.id}][{self.model.group}]"
+        return f'User[{self.model.id}][{self.model.group}]'

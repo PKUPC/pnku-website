@@ -1,12 +1,14 @@
 import time
+
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Integer, String, ForeignKey, BigInteger, JSON
+from sqlalchemy import JSON, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
+
 
 if TYPE_CHECKING:
     # noinspection PyUnresolvedReferences
-    from . import UserStore
+    pass
 from . import Table
 
 
