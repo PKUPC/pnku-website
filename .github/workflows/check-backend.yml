@@ -1,4 +1,4 @@
-name: Check Backend with mypy
+name: Check Backend
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  check-backend-with-mypy:
+  check-backend:
     runs-on: ubuntu-latest
 
     defaults:
@@ -58,8 +58,12 @@ jobs:
       - name: Run mypy
         if: env.has_changes == 'true'
         run: |
-          poetry run python -m mypy.dmypy start
-          poetry run python -m mypy.dmypy check src
-          poetry run python -m mypy.dmypy stop
+          poetry run mypy
+      
+      - name: Run ruff
+        if: env.has_changes == 'true'
+        run: |
+          poetry run ruff check
+          poetry run ruff format --check
 
 
