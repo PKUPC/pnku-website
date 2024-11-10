@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from . import WithGameLifecycle
-from ..store import TicketStore, TicketMessageStore
+from ..store import TicketMessageStore, TicketStore
+from .base import WithGameLifecycle
+
 
 if TYPE_CHECKING:
-    from . import WithGameLifecycle, Game, Team
+    from . import Game, Team
 
 
 class Ticket(WithGameLifecycle):
@@ -54,14 +55,14 @@ class Ticket(WithGameLifecycle):
     @property
     def status_repr(self) -> str:
         if len(self.message_list) == 0:
-            return "异常"
-        return TicketStore.TicketStatus.dict().get(self.model.status, "异常")
+            return '异常'
+        return TicketStore.TicketStatus.dict().get(self.model.status, '异常')
 
     @property
     def type_repr(self) -> str:
         if len(self.message_list) == 0:
-            return "异常"
-        return TicketStore.TicketType.dict().get(self.model.type, "异常")
+            return '异常'
+        return TicketStore.TicketType.dict().get(self.model.type, '异常')
 
 
 class Tickets(WithGameLifecycle):

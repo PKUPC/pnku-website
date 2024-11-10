@@ -8,29 +8,30 @@ from flask_admin import AdminIndexView, expose
 from src import utils
 from src.logic.reducer import Reducer
 
+
 USER_STATUS = {
-    "total": "总数",
-    "disabled": "已禁用",
-    "have_team": "已组队",
-    "not_have_team": "未组队",
+    'total': '总数',
+    'disabled': '已禁用',
+    'have_team': '已组队',
+    'not_have_team': '未组队',
 }
 
 TEAM_STATUS = {
-    "total": "总数",
-    "dissolved": "已解散",
-    "disabled": "已禁用",
-    "hide": "已隐藏",
-    "preparing": "准备中",
-    "gaming": "游戏中",
+    'total': '总数',
+    'dissolved': '已解散',
+    'disabled': '已禁用',
+    'hide': '已隐藏',
+    'preparing': '准备中',
+    'gaming': '游戏中',
 }
 
 TEAM_STATISTICS = {
-    "count_1": "1 人",
-    "count_2": "2 人",
-    "count_3": "3 人",
-    "count_4": "4 人",
-    "count_5": "5 人",
-    "average": "平均人数",
+    'count_1': '1 人',
+    'count_2': '2 人',
+    'count_3': '3 人',
+    'count_4': '4 人',
+    'count_5': '5 人',
+    'average': '平均人数',
 }
 
 TELEMETRY_FIELDS = {
@@ -64,24 +65,20 @@ class StatusView(AdminIndexView):  # type: ignore[misc]
 
         return self.render(  # type: ignore[no-any-return]
             'status.html',
-
             sys_status=sys_status,
-
             user_fields=USER_STATUS,
             user_data=users_cnt_by_group,
-
             team_fields=TEAM_STATUS,
             team_data=teams_cnt,
-
             teams_statistic_fields=TEAM_STATISTICS,
             teams_statistic_data=teams_statistic_cnt,
-
             tel_fields=TELEMETRY_FIELDS,
             tel_data={
                 worker_name: {
                     'last_update': f'{int(time.time() - last_update):d}s',
                     **tel_dict,
-                } for worker_name, (last_update, tel_dict) in sorted(reducer.received_telemetries.items())
+                }
+                for worker_name, (last_update, tel_dict) in sorted(reducer.received_telemetries.items())
             },
         )
 

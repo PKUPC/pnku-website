@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
-from typing import TYPE_CHECKING, List, Dict, Any
 
-from . import WithGameLifecycle
-# noinspection PyUnresolvedReferences
-from ..store import GamePolicyStore, GamePolicyStoreModel, PolicyModel
+from datetime import datetime
+from typing import TYPE_CHECKING, Any, Dict, List
+
+from .base import WithGameLifecycle
+
+
+if TYPE_CHECKING:
+    from ..store import GamePolicyStore, GamePolicyStoreModel, PolicyModel
+    from . import Game, Team
 
 
 class GamePolicy(WithGameLifecycle):
@@ -63,12 +67,12 @@ class GamePolicy(WithGameLifecycle):
     @property
     def ap_increase_policy(self) -> list[tuple[int, int]]:
         """
-            体力值增长的计算方式，是一个列表
-            列表的每一项是一个元组，第一项为精确到分钟的时间戳，第二项是从这个时间戳开始每分钟获取的体力值
+        体力值增长的计算方式，是一个列表
+        列表的每一项是一个元组，第一项为精确到分钟的时间戳，第二项是从这个时间戳开始每分钟获取的体力值
         """
         rst = []
         for item in self.cur_policy_modal.ap_increase_setting:
-            date_obj = datetime.strptime(item.begin_time_min, "%Y-%m-%d %H:%M")
+            date_obj = datetime.strptime(item.begin_time_min, '%Y-%m-%d %H:%M')
             t_min = int(time.mktime(date_obj.timetuple())) // 60
             rst.append((t_min, item.increase_per_min))
 
@@ -101,24 +105,19 @@ class GamePolicy(WithGameLifecycle):
     @property
     def board_setting(self) -> Dict[str, Any]:
         """
-           排行榜设置
+        排行榜设置
         """
         rst = {}
         board_setting = self.cur_policy_modal.board_setting
-        date_obj = datetime.strptime(board_setting.begin_time, "%Y-%m-%d %H:%M:%S")
+        date_obj = datetime.strptime(board_setting.begin_time, '%Y-%m-%d %H:%M:%S')
         ts = int(time.mktime(date_obj.timetuple()))
-        rst["begin_ts"] = ts
-        date_obj = datetime.strptime(board_setting.end_time, "%Y-%m-%d %H:%M:%S")
+        rst['begin_ts'] = ts
+        date_obj = datetime.strptime(board_setting.end_time, '%Y-%m-%d %H:%M:%S')
         ts = int(time.mktime(date_obj.timetuple()))
-        rst["end_ts"] = ts
-        rst["top_star_n"] = board_setting.top_star_n
+        rst['end_ts'] = ts
+        rst['top_star_n'] = board_setting.top_star_n
         return rst
 
     @property
     def puzzle_passed_display(self) -> list[int]:
         return self.cur_policy_modal.puzzle_passed_display
-
-
-if TYPE_CHECKING:
-    from . import *
-    from ..store import *

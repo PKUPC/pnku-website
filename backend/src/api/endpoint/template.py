@@ -1,14 +1,15 @@
 import re
+
 from pathlib import Path
-from typing import Dict, Tuple, Optional
+from typing import Dict, Optional, Tuple
 
-from sanic import Blueprint, Request, HTTPResponse, response
+from sanic import Blueprint, HTTPResponse, Request, response
 
-from src import secret
-from src import utils
+from src import secret, utils
 from src.custom import store_user_log
 from src.logic.worker import Worker
 from src.state import User
+
 
 bp = Blueprint('template', url_prefix='/template')
 
@@ -30,18 +31,18 @@ def etagged_response(req: Request, etag: str, html_body: str) -> HTTPResponse:
 
 _cache: Dict[Tuple[str, Optional[str], int], Tuple[int, str]] = {}
 
-PUBLIC_TEMPLATE = ["introduction", "faq", "tools", "endoftime"]
+PUBLIC_TEMPLATE = ['introduction', 'faq', 'tools', 'endoftime']
 if secret.DEBUG_MODE:
-    PUBLIC_TEMPLATE.append("dev_log")
+    PUBLIC_TEMPLATE.append('dev_log')
 
 # ATTENTION: 目前在序章开放后就将 day1_intro 添加到了 unlock_templates 里面去
 # 这里额外做一个限制
-TEMPLATE_AFTER_GAME_START = {"day1_intro"}
+TEMPLATE_AFTER_GAME_START = {'day1_intro'}
 
 
 def check_template_permission(filename: str, worker: Worker, user: Optional[User]) -> bool:
     # 写给 admin 看的信息
-    if filename == "admin_doc":
+    if filename == 'admin_doc':
         return user is not None and secret.IS_ADMIN(user.model.id)
 
     # 公开的模板始终可以访问
@@ -52,7 +53,7 @@ def check_template_permission(filename: str, worker: Worker, user: Optional[User
         return False
 
     # staff 始终可以访问
-    if user.model.group == "staff":
+    if user.model.group == 'staff':
         return True
 
     assert user is not None
@@ -63,7 +64,7 @@ def check_template_permission(filename: str, worker: Worker, user: Optional[User
     # ADHOC
     # 序章判断
 
-    if filename == "prologue":
+    if filename == 'prologue':
         return worker.game_nocheck.is_intro_unlock()
 
     # 没到时间不能访问
@@ -87,8 +88,8 @@ async def get_template(req: Request, filename: str, worker: Worker, user: Option
     p = (TEMPLATE_PATH / f'{filename}.md').resolve()
 
     if not p.is_relative_to(TEMPLATE_PATH):
-        store_user_log(req, "api.get_template", "abnormal", "试图访问危险路径！", {"template": filename})
-        return response.text("?!", status=403)
+        store_user_log(req, 'api.get_template', 'abnormal', '试图访问危险路径！', {'template': filename})
+        return response.text('?!', status=403)
 
     if not p.is_file():
         return response.text('没有这个模板', status=404)
@@ -99,7 +100,7 @@ async def get_template(req: Request, filename: str, worker: Worker, user: Option
 
     ts = int(p.stat().st_mtime * 1000)
 
-    store_user_log(req, "api.get_template", "get_template", "", {"template": filename})
+    store_user_log(req, 'api.get_template', 'get_template', '', {'template': filename})
 
     group = None if user is None else user.model.group
     tick = worker.game.cur_tick
@@ -116,8 +117,9 @@ async def get_template(req: Request, filename: str, worker: Worker, user: Option
         try:
             html = utils.render_template(md, {'group': group, 'tick': tick})
         except Exception as e:
-            worker.log('error', 'api.template.get_template',
-                       f'template render failed: {filename}: {utils.get_traceback(e)}')
+            worker.log(
+                'error', 'api.template.get_template', f'template render failed: {filename}: {utils.get_traceback(e)}'
+            )
             return response.text('<i>（模板渲染失败）</i>')
 
         _cache[cache_key] = (ts, html)

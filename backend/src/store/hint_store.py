@@ -3,14 +3,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, ValidationError
-from sqlalchemy import String, JSON, BigInteger, Boolean, Text
+from sqlalchemy import JSON, BigInteger, Boolean, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.utils.enum import EnumWrapper
 
+
 if TYPE_CHECKING:
     # noinspection PyUnresolvedReferences
-    from . import UserStore, TeamStore
+    pass
 from . import Table
 
 
@@ -27,7 +28,7 @@ class HintStoreModel(BaseModel):
     puzzle_key: str
     question: str
     answer: str
-    type: Literal["BASIC", "NORMAL", "ADVANCE"]
+    type: Literal['BASIC', 'NORMAL', 'ADVANCE']
     effective_after_ts: int
     extra: ExtraInfoModel
 
@@ -45,9 +46,9 @@ class HintStore(Table):
     type: Mapped[str] = mapped_column(String(32), nullable=False)
 
     class HintType(EnumWrapper):
-        BASIC = "指引"
-        NORMAL = "观测"
-        ADVANCE = "灵视"
+        BASIC = '指引'
+        NORMAL = '观测'
+        ADVANCE = '灵视'
 
     # 注意，这里指的是时间，不是 tick。这里用的是精确到秒的时间戳
     effective_after_ts: Mapped[int] = mapped_column(BigInteger, nullable=False, default=1672502400)
@@ -56,9 +57,9 @@ class HintStore(Table):
     extra: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
 
     EXTRA_SNIPPETS = {
-        "basic": '''{"provider": "staff", "cost" : 50}''',
-        "normal": '''{"provider": "staff", "cost" : 150}''',
-        "advance": '''{"provider": "staff", "cost" : 300}''',
+        'basic': """{"provider": "staff", "cost" : 50}""",
+        'normal': """{"provider": "staff", "cost" : 150}""",
+        'advance': """{"provider": "staff", "cost" : 300}""",
     }
 
     def validated_model(self) -> HintStoreModel:
@@ -79,4 +80,4 @@ class HintStore(Table):
         return True, None
 
     def __repr__(self) -> str:
-        return f"Hint#{self.id} type=\"{self.type}\" puzzle_key={self.puzzle_key}"
+        return f'Hint#{self.id} type="{self.type}" puzzle_key={self.puzzle_key}'

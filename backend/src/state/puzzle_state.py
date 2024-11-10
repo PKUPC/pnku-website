@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import TYPE_CHECKING, Literal, Hashable
+from typing import TYPE_CHECKING, Hashable, Literal
 
 from src import utils
 from src.adhoc import gen_puzzles_by_structure
 from src.store import SubmissionEvent
-from . import WithGameLifecycle
+
+from .base import WithGameLifecycle
+
 
 if TYPE_CHECKING:
-    from . import WithGameLifecycle, Game, Submission, User, Team, TeamEvent
     from src.store import PuzzleStore
+
+    from . import Game, Submission, Team, TeamEvent, User
 
 
 class Puzzles(WithGameLifecycle):
@@ -50,8 +53,7 @@ class Puzzles(WithGameLifecycle):
 
     def on_store_update(self, puzzle_id: int, new_store: PuzzleStore | None) -> None:
         old_puzzle: Puzzle | None = (
-                [x for x in self.list if x.model.id == puzzle_id] +
-                [None]  # type: ignore  # make pycharm happy
+            [x for x in self.list if x.model.id == puzzle_id] + [None]  # type: ignore  # make pycharm happy
         )[0]
         other_puzzles = [x for x in self.list if x.model.id != puzzle_id]
 
@@ -107,7 +109,7 @@ class Puzzle(WithGameLifecycle):
 
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
         match reloading_type:
-            case "all":
+            case 'all':
                 self.passed_teams = set()
                 self.attempted_teams = set()
                 self.passed_submissions = set()
@@ -118,7 +120,7 @@ class Puzzle(WithGameLifecycle):
                 submission = self.game.submissions_by_id[submission_id]
                 assert submission.puzzle is self
 
-                if submission.result.type == "pass":
+                if submission.result.type == 'pass':
                     self.passed_teams.add(submission.team)
                     self.attempted_teams.add(submission.team)
                     self.passed_submissions.add(submission)
@@ -175,9 +177,9 @@ class Puzzle(WithGameLifecycle):
             green_num = red_num
 
         return {
-            "total_num": total_num,
-            "green_num": green_num,
-            "red_num": red_num - green_num,
+            'total_num': total_num,
+            'green_num': green_num,
+            'red_num': red_num - green_num,
         }
 
     def render_desc(self, user: User) -> str:
@@ -188,32 +190,47 @@ class Puzzle(WithGameLifecycle):
             is_finished = user.team.game_status.finished
         return self._render_template(
             tick=self.game.cur_tick,
-            passed=user.team in self.passed_teams or user.model.group == "staff",
-            is_staff=user.is_staff, is_finished=is_finished, is_archived=False,
-            extra=extra
+            passed=user.team in self.passed_teams or user.model.group == 'staff',
+            is_staff=user.is_staff,
+            is_finished=is_finished,
+            is_archived=False,
+            extra=extra,
         )
 
     def render_desc_for_archive(self, extra: tuple[tuple[str, str | int | tuple[Hashable, ...]], ...] = tuple()) -> str:
         return self._render_template(
-            tick=self.game.cur_tick,
-            passed=False, is_staff=False, is_finished=False, is_archived=True,
-            extra=extra
+            tick=self.game.cur_tick, passed=False, is_staff=False, is_finished=False, is_archived=True, extra=extra
         )
 
     @lru_cache(32)
-    def _render_template(self, tick: int = 0, passed: bool = False, is_staff: bool = False, is_finished: bool = False,
-                         is_archived: bool = False, extra: tuple[tuple[str, str | int], ...] | None = None) -> str:
-        render_dict: dict[str, str | int] = {"tick": tick, "passed": passed, "is_staff": is_staff,
-                                             "is_finished": is_finished, "is_archived": is_archived}
+    def _render_template(
+        self,
+        tick: int = 0,
+        passed: bool = False,
+        is_staff: bool = False,
+        is_finished: bool = False,
+        is_archived: bool = False,
+        extra: tuple[tuple[str, str | int], ...] | None = None,
+    ) -> str:
+        render_dict: dict[str, str | int] = {
+            'tick': tick,
+            'passed': passed,
+            'is_staff': is_staff,
+            'is_finished': is_finished,
+            'is_archived': is_archived,
+        }
         if extra is not None:
             for item in extra:
                 render_dict[item[0]] = item[1]
-        print("rendering", self.model.title, render_dict)
+        print('rendering', self.model.title, render_dict)
         try:
             return utils.render_template(self.model.content_template, render_dict)
         except Exception as e:
-            self.game.worker.log('error', 'announcement.render_template',
-                                 f'template render failed: {self.model.key} ({self.model.title}): {utils.get_traceback(e)}')
+            self.game.worker.log(
+                'error',
+                'announcement.render_template',
+                f'template render failed: {self.model.key} ({self.model.title}): {utils.get_traceback(e)}',
+            )
             return '<i>（模板渲染失败）</i>'
 
     def __repr__(self) -> str:

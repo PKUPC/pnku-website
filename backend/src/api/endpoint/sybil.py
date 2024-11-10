@@ -2,6 +2,7 @@ from sanic import Blueprint, HTTPResponse, Request
 
 from src import custom
 
+
 bp = Blueprint('sybil', url_prefix='/sybil')
 
 

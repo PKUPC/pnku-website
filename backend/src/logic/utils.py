@@ -1,14 +1,16 @@
 import logging
 
-from typing import Callable, Any
+from typing import Any, Callable
+
 
 CbMethod = Callable[[Any, Any], Any] | Callable[[Any, Any, Any], Any]
 
 logger = logging.getLogger('init')
 
 
-def make_callback_decorator(caller: str = "anonymous") \
-        -> tuple[Callable[[Any], Callable[[CbMethod], CbMethod]], dict[Any, CbMethod]]:
+def make_callback_decorator(
+    caller: str = 'anonymous',
+) -> tuple[Callable[[Any], Callable[[CbMethod], CbMethod]], dict[Any, CbMethod]]:
     listeners: dict[Any, CbMethod] = {}
 
     # decorator 接受一个 glitter 中定义的某种名称，返回一个装饰器

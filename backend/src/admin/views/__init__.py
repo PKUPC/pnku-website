@@ -17,6 +17,7 @@ from .ticket_view import TicketView
 from .trigger_view import TriggerView
 from .user_view import UserView
 
+
 VIEWS = {
     'AnnouncementStore': AnnouncementView,
     'GamePolicyStore': GamePolicyView,
@@ -26,10 +27,10 @@ VIEWS = {
     'TriggerStore': TriggerView,
     'UserStore': UserView,
     'MessageStore': MessageView,
-    "PuzzleStore": PuzzleView,
-    "HintStore": HintView,
-    "TeamEventStore": TeamEventView,
-    "TicketStore": TicketView,
-    "TicketMessageStore": TicketMessageView,
-    "LogUserStore": LogUserView,
+    'PuzzleStore': PuzzleView,
+    'HintStore': HintView,
+    'TeamEventStore': TeamEventView,
+    'TicketStore': TicketView,
+    'TicketMessageStore': TicketMessageView,
+    'LogUserStore': LogUserView,
 }

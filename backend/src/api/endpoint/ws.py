@@ -1,7 +1,8 @@
 import json
+
 from collections import Counter
 from copy import deepcopy
-from typing import Dict, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 from sanic import Blueprint, Request
 from sanic.server.websockets.impl import WebsocketImplProtocol
@@ -11,6 +12,7 @@ from src import secret
 from src.api import get_cur_user
 from src.custom import store_user_log
 from src.store import AnnouncementStore
+
 
 if TYPE_CHECKING:
     from src.logic import Worker
@@ -50,7 +52,7 @@ async def push(req: Request, ws: WebsocketImplProtocol) -> None:
         return
 
     online_uids[user.model.id] += 1
-    store_user_log(req, "ws", "ws_online", "", {})
+    store_user_log(req, 'ws', 'ws_online', '', {})
 
     telemetry['ws_online_uids'] = len(online_uids)
     telemetry['ws_online_clients'] = sum(online_uids.values())
@@ -68,42 +70,45 @@ async def push(req: Request, ws: WebsocketImplProtocol) -> None:
                     msg = worker.ws_messages.get(message_id, None)
                     message_id += 1
 
-                    if msg is None or msg.get("type", None) is None:
+                    if msg is None or msg.get('type', None) is None:
                         continue
 
-                    msg_type = msg.get("type")
+                    msg_type = msg.get('type')
                     payload = deepcopy(msg['payload'])
 
                     match msg_type:
-                        case "normal":
-                            to_groups: list[str] | None = msg.get("to_groups", None)
-                            to_users: list[int] | None = msg.get("to_users", None)
+                        case 'normal':
+                            to_groups: list[str] | None = msg.get('to_groups', None)
+                            to_users: list[int] | None = msg.get('to_users', None)
 
                             if to_groups is None or user.model.group in to_groups:
                                 if to_users is None or user.model.id in to_users:
-                                    store_user_log(req, "ws.send", "type_normal", "", payload)
+                                    store_user_log(req, 'ws.send', 'type_normal', '', payload)
                                     await ws.send(json.dumps(payload))
-                        case "new_announcement":
-                            category = msg["category"]
+                        case 'new_announcement':
+                            category = msg['category']
                             # 用户当前能看到这个类别的公告才推送
                             if user.is_staff:
-                                store_user_log(req, "ws.send", "type_new_announcement", "", payload)
+                                store_user_log(req, 'ws.send', 'type_new_announcement', '', payload)
                                 await ws.send(json.dumps(payload))
                             else:
                                 if category == AnnouncementStore.Category.GENERAL.name:
-                                    store_user_log(req, "ws.send", "type_new_announcement", "", payload)
+                                    store_user_log(req, 'ws.send', 'type_new_announcement', '', payload)
                                     await ws.send(json.dumps(payload))
                                 else:
-                                    if (user.team is not None and worker.game_nocheck.is_game_begin()
-                                            and category in user.team.game_status.unlock_announcement_categories):
-                                        store_user_log(req, "ws.send", "type_new_announcement", "", payload)
+                                    if (
+                                        user.team is not None
+                                        and worker.game_nocheck.is_game_begin()
+                                        and category in user.team.game_status.unlock_announcement_categories
+                                    ):
+                                        store_user_log(req, 'ws.send', 'type_new_announcement', '', payload)
                                         await ws.send(json.dumps(payload))
-                        case "first_blood":
+                        case 'first_blood':
                             pass
 
     finally:
         worker.log('debug', 'api.ws.push', f'disconnected from {user}')
-        store_user_log(req, "ws", "ws_offline", "", {})
+        store_user_log(req, 'ws', 'ws_offline', '', {})
         online_uids[user.model.id] -= 1
         if online_uids[user.model.id] == 0:
             del online_uids[user.model.id]

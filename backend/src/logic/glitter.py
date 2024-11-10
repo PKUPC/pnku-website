@@ -3,14 +3,15 @@ from __future__ import annotations
 import asyncio
 import json
 import pickle
+
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Any, Optional, List, Literal
+from typing import Any, List, Literal, Optional
 
 from zmq.asyncio import Socket
 
-from .. import secret
-from .. import utils
+from .. import secret, utils
+
 
 PROTOCOL_VER = 'glitter.alpha.v2'
 
@@ -206,7 +207,7 @@ class TicketMessageReq(ActionReq):
 class SetTicketStatusReq(ActionReq):
     user_id: int
     ticket_id: int
-    status: Literal["OPEN", "CLOSED"]
+    status: Literal['OPEN', 'CLOSED']
 
 
 @dataclass
@@ -291,10 +292,16 @@ class Action:
             return cls(data)
         except Exception as e:
             print(utils.get_traceback(e))
-            await sock.send_multipart([json.dumps({
-                'error_msg': 'malformed packet',
-                'state_counter': -1,
-            }).encode('utf-8')])
+            await sock.send_multipart(
+                [
+                    json.dumps(
+                        {
+                            'error_msg': 'malformed packet',
+                            'state_counter': -1,
+                        }
+                    ).encode('utf-8')
+                ]
+            )
             return None
 
     @staticmethod

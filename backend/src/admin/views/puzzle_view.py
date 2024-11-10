@@ -1,7 +1,9 @@
 import json
+
 from typing import Any, Dict, List, Optional
 
 import flask_admin
+
 from flask import current_app, flash, make_response, redirect, request
 from flask.typing import ResponseReturnValue
 from flask_admin import expose
@@ -14,6 +16,7 @@ from src.admin import fields
 from src.logic import glitter
 from src.logic.reducer import Reducer
 from src.store import PuzzleStore, PuzzleStoreModel
+
 from .base_view import BaseView
 
 
@@ -26,15 +29,15 @@ class PuzzleView(BaseView):
     can_delete = False
     can_create = False
 
-    column_exclude_list = ['content_template', "clipboard"]
+    column_exclude_list = ['content_template', 'clipboard']
     column_default_sort = 'sorting_index'
     column_formatters = {
         'actions': lambda _v, _c, model, _n: '；'.join([f'[{a["type"]}] {a["name"]}' for a in model.actions]),
         'triggers': lambda _v, _c, model, _n: '；'.join([f'{f["type"]}: {f["value"]}' for f in model.triggers]),
-        "puzzle_metadata": lambda _v, _c, model, _n: (
+        'puzzle_metadata': lambda _v, _c, model, _n: (
             f"type: {model.puzzle_metadata.get('type', 'unknown')}; "
             f"author: {model.puzzle_metadata.get('author', 'unknown')}"
-        )
+        ),
     }
     column_descriptions = {
         'key': '题目唯一 ID，将会显示在 URL 中，比赛中不要随意修改，否则会导致已有提交失效',
@@ -48,7 +51,7 @@ class PuzzleView(BaseView):
         'puzzle_metadata': fields.JsonField,
         'actions': fields.PuzzleActionsField,
         'triggers': fields.PuzzleTriggersField,
-        "clipboard": ClipboardField,
+        'clipboard': ClipboardField,
     }
     form_choices = {
         'category': [(x, x) for x in adhoc.PUZZLE_CATEGORY_LIST],
@@ -57,16 +60,16 @@ class PuzzleView(BaseView):
     @staticmethod
     def _export_puzzle(puzzle: PuzzleStoreModel) -> Dict[str, Any]:
         return {
-            "key": puzzle.key,
-            "title": puzzle.title,
-            "category": puzzle.category,
-            "subcategory": puzzle.subcategory,
-            "sorting_index": puzzle.sorting_index,
-            "content_template": puzzle.content_template,
-            "clipboard": puzzle.clipboard,
-            "puzzle_metadata": puzzle.puzzle_metadata,
-            "actions": puzzle.actions,
-            "triggers": puzzle.triggers,
+            'key': puzzle.key,
+            'title': puzzle.title,
+            'category': puzzle.category,
+            'subcategory': puzzle.subcategory,
+            'sorting_index': puzzle.sorting_index,
+            'content_template': puzzle.content_template,
+            'clipboard': puzzle.clipboard,
+            'puzzle_metadata': puzzle.puzzle_metadata,
+            'actions': puzzle.actions,
+            'triggers': puzzle.triggers,
         }
 
     @staticmethod
@@ -77,7 +80,7 @@ class PuzzleView(BaseView):
         puzzle.subcategory = data['subcategory']
         puzzle.sorting_index = data['sorting_index']
         puzzle.content_template = data['content_template']
-        puzzle.clipboard = data["clipboard"]
+        puzzle.clipboard = data['clipboard']
         puzzle.puzzle_metadata = data['puzzle_metadata']
         puzzle.actions = data['actions']
         puzzle.triggers = data['triggers']
@@ -114,7 +117,7 @@ class PuzzleView(BaseView):
                     rst, _ = puzzle.validate()
                     if not rst:
                         n_failed += 1
-                        failed_puzzles.append(puzzle_data["key"])
+                        failed_puzzles.append(puzzle_data['key'])
                         continue
 
                     if add_flag:
@@ -134,7 +137,9 @@ class PuzzleView(BaseView):
             if n_failed == 0:
                 flash(f'成功增加 {n_added} 个题目、修改 {n_modified} 个题目。', 'success')
             else:
-                flash(f'成功增加 {n_added} 个题目、修改 {n_modified} 个题目。\n失败题目：{str(failed_puzzles)}', 'success')
+                flash(
+                    f'成功增加 {n_added} 个题目、修改 {n_modified} 个题目。\n失败题目：{str(failed_puzzles)}', 'success'
+                )
 
             return redirect(url)
 

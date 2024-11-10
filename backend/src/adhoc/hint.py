@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from src.store import HintStore
 
+
 if TYPE_CHECKING:
     from src.state import Hint
 

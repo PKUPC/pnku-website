@@ -1,10 +1,11 @@
-import httpx
-from collections import deque
-from typing import Dict, Deque
 import time
 
-from .. import utils
-from .. import secret
+from collections import deque
+from typing import Deque, Dict
+
+import httpx
+
+from .. import secret, utils
 
 
 class Pusher:
@@ -34,11 +35,14 @@ class Pusher:
 
         async with httpx.AsyncClient(http2=True) as client:
             try:
-                await client.post(secret.FEISHU_WEBHOOK_ADDR, json={
-                    'msg_type': 'text',
-                    'content': {
-                        'text': str(msg),
+                await client.post(
+                    secret.FEISHU_WEBHOOK_ADDR,
+                    json={
+                        'msg_type': 'text',
+                        'content': {
+                            'text': str(msg),
+                        },
                     },
-                })
+                )
             except Exception as e:
                 print('PUSH MESSAGE FAILED', utils.get_traceback(e))

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import time
+
 from typing import TYPE_CHECKING, Hashable
 
 from ..team_puzzle_status import TeamPuzzleStatus
 
+
 if TYPE_CHECKING:
-    from src.state import Team, Puzzle
+    from src.state import Puzzle, Team
     from src.store import PuzzleActionEvent
+
     from ..team_game_state import TeamGameStatus
 
 
@@ -25,8 +28,8 @@ class Day202Status(TeamPuzzleStatus):
             virtual_seconds += 8 * 3600
         virtual_hour = (virtual_seconds // 3600) % 24
         virtual_minute = (virtual_seconds // 60) % 60
-        return ("hour", virtual_hour), ("minute", virtual_minute)
+        return ('hour', virtual_hour), ('minute', virtual_minute)
 
     def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
-        self.real_seconds = int(event.content.get("real_seconds", -1))
-        self.target_seconds = int(event.content.get("target_seconds", -1))
+        self.real_seconds = int(event.content.get('real_seconds', -1))
+        self.target_seconds = int(event.content.get('target_seconds', -1))

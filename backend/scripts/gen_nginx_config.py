@@ -1,8 +1,11 @@
 import sys
+
 from pathlib import Path
 
-sys.path.append(str((Path(__file__).parent / "..").resolve()))
+
+sys.path.append(str((Path(__file__).parent / '..').resolve()))
 from src import secret
+
 
 CONFIG_TEMPLATE = """map $cookie_user_token $user_hash {{
     "" $remote_addr;
@@ -106,16 +109,18 @@ server {{
 }}
 """
 
-worker_config_str = ""
+worker_config_str = ''
 
 for i in range(secret.N_WORKERS):
     worker_config = secret.WORKER_API_SERVER_KWARGS(i)
-    worker_config_str += "    server {}:{} fail_timeout=0s;\n".format(worker_config["host"], worker_config["port"])
+    worker_config_str += '    server {}:{} fail_timeout=0s;\n'.format(worker_config['host'], worker_config['port'])
 
-print(CONFIG_TEMPLATE.format(
-    admin_ip=secret.REDUCER_ADMIN_SERVER_ADDR[0],
-    admin_port=secret.REDUCER_ADMIN_SERVER_ADDR[1],
-    worker_config=worker_config_str,
-    admin_url=secret.ADMIN_URL,
-    admin_2fa=secret.ADMIN_2FA_COOKIE,
-))
+print(
+    CONFIG_TEMPLATE.format(
+        admin_ip=secret.REDUCER_ADMIN_SERVER_ADDR[0],
+        admin_port=secret.REDUCER_ADMIN_SERVER_ADDR[1],
+        worker_config=worker_config_str,
+        admin_url=secret.ADMIN_URL,
+        admin_2fa=secret.ADMIN_2FA_COOKIE,
+    )
+)

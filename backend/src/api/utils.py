@@ -7,6 +7,7 @@ from sanic.request import Request
 from src import utils
 from src.state import User
 
+
 if TYPE_CHECKING:
     pass
 
@@ -33,13 +34,13 @@ def get_cur_user(req: Request) -> User | None:
                 return None
                 # raise UserJWTError(info)
             assert isinstance(info, dict)
-            user = game.users.user_by_id.get(info.get("user_id", None), None)
+            user = game.users.user_by_id.get(info.get('user_id', None), None)
 
             if user is not None and user.check_login() is not None:
                 return None
 
-            if user is not None and user.model.login_properties.type == "email":
-                if info.get("jwt_salt", "") != user.model.login_properties.jwt_salt:
+            if user is not None and user.model.login_properties.type == 'email':
+                if info.get('jwt_salt', '') != user.model.login_properties.jwt_salt:
                     return None
 
     return user

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import time
+
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Integer, BigInteger, Boolean, Text
+from sqlalchemy import BigInteger, Boolean, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
+
 
 if TYPE_CHECKING:
     # noinspection PyUnresolvedReferences
-    from . import UserStore, TeamStore
+    pass
 from . import Table
 
 
@@ -35,24 +37,28 @@ class MessageStore(Table):
     staff_unread: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     class DIRECTION:
-        TO_STAFF: str = "to_staff"
-        TO_USER: str = "to_user"
+        TO_STAFF: str = 'to_staff'
+        TO_USER: str = 'to_user'
 
         TYPE_SET: set[str] = {TO_USER, TO_STAFF}
 
     class CONTENT_TYPE:
-        TEXT: str = "text"
-        IMAGE: str = "image"
+        TEXT: str = 'text'
+        IMAGE: str = 'image'
 
         TYPE_SET: set[str] = {TEXT, IMAGE}
 
     def __repr__(self) -> str:
         content = self.content[:20]
         if len(self.content) > 20:
-            content += "..."
+            content += '...'
         if self.direction == self.DIRECTION.TO_USER:
-            return f'[Staff#{self.user_id} reply to Team#{self.team_id}' \
-                   f'content={self.content} su={self.staff_unread} pu={self.player_unread}]'
+            return (
+                f'[Staff#{self.user_id} reply to Team#{self.team_id}'
+                f'content={self.content} su={self.staff_unread} pu={self.player_unread}]'
+            )
         else:
-            return f'[User#{self.user_id} ask Staff content={self.content}' \
-                   f'su={self.staff_unread} pu={self.player_unread}]'
+            return (
+                f'[User#{self.user_id} ask Staff content={self.content}'
+                f'su={self.staff_unread} pu={self.player_unread}]'
+            )

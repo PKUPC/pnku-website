@@ -1,6 +1,7 @@
 from flask_admin.model.template import macro
 
 from src.admin import fields
+
 from .base_view import BaseView
 
 

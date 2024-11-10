@@ -3,36 +3,57 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from src import secret
-from src.store import SubmissionEvent, GameStartEvent, PuzzleActionEvent
-from . import Submission, Messages, Puzzles, Board, ScoreBoard, FirstBloodBoard, TeamEvent
-from . import WithGameLifecycle, Trigger, GamePolicy, Announcements, Teams, Users, Hints, Tickets
-from .board_state import SpeedRunBoard
+from src.store import GameStartEvent, PuzzleActionEvent, SubmissionEvent
+
+from .announcement_state import Announcements
+from .base import WithGameLifecycle
+from .board_state import Board, FirstBloodBoard, ScoreBoard, SpeedRunBoard
+from .game_policy_state import GamePolicy
+from .hint_state import Hints
+from .message_state import Messages
+from .puzzle_state import Puzzles
+from .submission_state import Submission
+from .team_event_state import TeamEvent
+from .team_state import Teams
+from .ticket_state import Tickets
+from .trigger_state import Trigger
+from .user_state import Users
+
 
 if TYPE_CHECKING:
     from src.logic.base import StateContainerBase
     from src.store import (
-        GamePolicyStore, TriggerStore, AnnouncementStore, UserStore, TeamStore, MessageStore, PuzzleStore,
-        HintStore, TeamEventStore, TicketStore, TicketMessageStore
+        AnnouncementStore,
+        GamePolicyStore,
+        HintStore,
+        MessageStore,
+        PuzzleStore,
+        TeamEventStore,
+        TeamStore,
+        TicketMessageStore,
+        TicketStore,
+        TriggerStore,
+        UserStore,
     )
 
 
 class Game(WithGameLifecycle):
     def __init__(
-            self,
-            worker: StateContainerBase,
-            cur_tick: int,
-            game_policy_stores: list[GamePolicyStore],
-            trigger_stores: list[TriggerStore],
-            announcement_stores: list[AnnouncementStore],
-            user_stores: list[UserStore],
-            team_stores: list[TeamStore],
-            message_stores: list[MessageStore],
-            puzzle_stores: list[PuzzleStore],
-            hint_stores: list[HintStore],
-            team_event_stores: list[TeamEventStore],
-            ticket_stores: list[TicketStore],
-            ticket_message_stores: list[TicketMessageStore],
-            use_boards: bool,
+        self,
+        worker: StateContainerBase,
+        cur_tick: int,
+        game_policy_stores: list[GamePolicyStore],
+        trigger_stores: list[TriggerStore],
+        announcement_stores: list[AnnouncementStore],
+        user_stores: list[UserStore],
+        team_stores: list[TeamStore],
+        message_stores: list[MessageStore],
+        puzzle_stores: list[PuzzleStore],
+        hint_stores: list[HintStore],
+        team_event_stores: list[TeamEventStore],
+        ticket_stores: list[TicketStore],
+        ticket_message_stores: list[TicketMessageStore],
+        use_boards: bool,
     ):
         self.worker: StateContainerBase = worker
         self.log = self.worker.log
@@ -65,12 +86,17 @@ class Game(WithGameLifecycle):
         self.hints: Hints = Hints(self, hint_stores)
         self.team_events: list[TeamEvent] = [TeamEvent(self, x) for x in team_event_stores]
 
-        self.boards: dict[str, Board] = {
-            "score_board": ScoreBoard("score_board", "排名", None, self),
-            "first_blood": FirstBloodBoard("first_blood", "一血榜", None, self),
-            "speed_run": SpeedRunBoard("speed_run", "速通榜",
-                                       "本榜仅供参考！注：由于开赛时服务器出现问题，前 5 题是直接公开的。", self),
-        } if (use_boards and not secret.PLAYGROUND_MODE) else {}
+        self.boards: dict[str, Board] = (
+            {
+                'score_board': ScoreBoard('score_board', '排名', None, self),
+                'first_blood': FirstBloodBoard('first_blood', '一血榜', None, self),
+                'speed_run': SpeedRunBoard(
+                    'speed_run', '速通榜', '本榜仅供参考！注：由于开赛时服务器出现问题，前 5 题是直接公开的。', self
+                ),
+            }
+            if (use_boards and not secret.PLAYGROUND_MODE)
+            else {}
+        )
 
         self.n_corr_submission: int = 0
 
@@ -82,9 +108,9 @@ class Game(WithGameLifecycle):
         for b in self.boards.values():
             b.on_tick_change()
 
-    def on_preparing_to_reload_team_event(self, reloading_type: str = "all") -> None:
+    def on_preparing_to_reload_team_event(self, reloading_type: str = 'all') -> None:
         match reloading_type:
-            case "all":
+            case 'all':
                 Submission.constructed_ids = set()
                 self.submission_list = []
                 self.submissions_by_id = {}
@@ -118,11 +144,15 @@ class Game(WithGameLifecycle):
                 submission = Submission(self, self.worker.submission_stores[sub_id])
                 # important!
                 # 过滤脏数据
-                if submission.result.type == "pass" and submission.store.puzzle_key in submission.team.game_status.passed_puzzle_keys:
-                    self.log("debug", 'game.on_team_event', f"dirty submission! passed! Sub#{sub_id}")
+                if (
+                    submission.result.type == 'pass'
+                    and submission.store.puzzle_key in submission.team.game_status.passed_puzzle_keys
+                ):
+                    self.log('debug', 'game.on_team_event', f'dirty submission! passed! Sub#{sub_id}')
                 elif submission.cleaned_content in submission.team.game_status.get_submission_set(
-                        submission.puzzle.model.key):
-                    self.log("debug", 'game.on_team_event', f"dirty submission! in submission set! Sub#{sub_id}")
+                    submission.puzzle.model.key
+                ):
+                    self.log('debug', 'game.on_team_event', f'dirty submission! in submission set! Sub#{sub_id}')
                 else:
                     self.submission_list.append(submission)
                     self.submissions_by_id[sub_id] = submission
@@ -134,11 +164,11 @@ class Game(WithGameLifecycle):
                     for b in self.boards.values():
                         b.on_team_event(event, is_reloading)
 
-                    if submission.result.type == "pass":
+                    if submission.result.type == 'pass':
                         self.n_corr_submission += 1
             case GameStartEvent():
                 if event.team.gaming:
-                    self.log("debug", 'game.on_team_event', f"dirty event! game start! Event#{event.model.id}")
+                    self.log('debug', 'game.on_team_event', f'dirty event! game start! Event#{event.model.id}')
                 else:
                     event.team.on_team_event(event, is_reloading)
             case PuzzleActionEvent():
@@ -151,8 +181,9 @@ class Game(WithGameLifecycle):
                     b.on_team_event(event, is_reloading)
 
     def on_team_event_reload_done(self) -> None:
-        self.log('debug', 'game.on_team_event_reload_done',
-                 f'batch update received {len(self.team_events)} team events')
+        self.log(
+            'debug', 'game.on_team_event_reload_done', f'batch update received {len(self.team_events)} team events'
+        )
 
         self.teams.on_team_event_reload_done()
         self.hints.on_team_event_reload_done()
@@ -201,12 +232,12 @@ class Game(WithGameLifecycle):
         assert team_id in self.teams.team_by_id
         if team_id == 0:  # staff 队伍
             return puzzle_key
-        if secret.HASH_PUZZLE_KEY == "none":
+        if secret.HASH_PUZZLE_KEY == 'none':
             return puzzle_key
-        elif secret.HASH_PUZZLE_KEY == "key_only":
+        elif secret.HASH_PUZZLE_KEY == 'key_only':
             assert puzzle_key in self.puzzle_key_to_hash
             return self.puzzle_key_to_hash[puzzle_key]
-        elif secret.HASH_PUZZLE_KEY == "key_and_team":
+        elif secret.HASH_PUZZLE_KEY == 'key_and_team':
             assert (team_id, puzzle_key) in self.team_and_key_to_hash
             return self.team_and_key_to_hash[(team_id, puzzle_key)]
 
@@ -217,16 +248,16 @@ class Game(WithGameLifecycle):
             else:
                 return -1, None
         # 这里顺带一起判断是否存在
-        if secret.HASH_PUZZLE_KEY == "none":
+        if secret.HASH_PUZZLE_KEY == 'none':
             if hashed_key not in self.puzzles.puzzle_by_key:
                 return -1, None
             return team_id, hashed_key
-        elif secret.HASH_PUZZLE_KEY == "key_only":
+        elif secret.HASH_PUZZLE_KEY == 'key_only':
             puzzle_key = self.hash_to_puzzle_key.get(hashed_key, None)
             if puzzle_key is None:
                 return -1, None
             return team_id, puzzle_key
-        elif secret.HASH_PUZZLE_KEY == "key_and_team":
+        elif secret.HASH_PUZZLE_KEY == 'key_and_team':
             rst = self.hash_to_team_and_key.get(hashed_key, None)
             if rst is None:
                 return -1, None

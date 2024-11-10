@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Optional, Dict, Set, List
+
+from typing import TYPE_CHECKING, Dict, List, Optional, Set
 
 from src.store import HintStore, HintStoreModel
-from . import WithGameLifecycle
+
+from .base import WithGameLifecycle
+
 
 if TYPE_CHECKING:
     from . import Game
@@ -34,11 +37,11 @@ class Hints(WithGameLifecycle):
 
         def sorter(x: Hint) -> tuple[int, int, int]:
             type_id = -1
-            if x.model.type == "BASIC":
+            if x.model.type == 'BASIC':
                 type_id = 1
-            elif x.model.type == "NORMAL":
+            elif x.model.type == 'NORMAL':
                 type_id = 2
-            elif x.model.type == "ADVANCE":
+            elif x.model.type == 'ADVANCE':
                 type_id = 3
 
             return type_id, x.model.id, x.model.effective_after_ts
@@ -107,7 +110,7 @@ class Hint(WithGameLifecycle):
         return base_cost
 
     def describe_type(self) -> str:
-        return HintStore.HintType.dict().get(self.model.type, "未知")
+        return HintStore.HintType.dict().get(self.model.type, '未知')
 
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
         pass

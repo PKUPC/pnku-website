@@ -72,6 +72,11 @@ docker run -d \
     registry.your.domain/namespace/pnku:latest
 ```
 
+这里用 `--add-host=host.docker.internal:host-gateway` 让容器可以在内部用 `host.docker.internal` 访问宿主机上的服务，例如数据库。需要注意的是，使用这种方式访问数据库并不是本地访问，而是通过网络访问，因此需要更改数据库的 `bind-address`（默认可能为`127.0.0.1`），数据库用户也需要设置合适的 `host`。一般直接设置 `bind-address = 0.0.0.0`，数据库用户为 `'username'@'%'` 即可（但是不建议直接在公网暴露数据库端口）。
+
+当然，你也可以直接在容器里跑数据库，自行配置好 `docker` 中的网络环境即可。
+
+
 #### 反向代理
 
 容器中启动了一个 nginx，并且配置好了负载均衡和缓存，可以在外部再使用你喜欢的工具做一个反向代理，配置 https、http2 等功能。

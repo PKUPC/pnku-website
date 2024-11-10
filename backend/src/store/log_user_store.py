@@ -1,7 +1,8 @@
 import time
+
 from typing import Any
 
-from sqlalchemy import BigInteger, String, Text, Integer, JSON
+from sqlalchemy import JSON, BigInteger, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from . import Table

@@ -1,17 +1,26 @@
 from __future__ import annotations
 
 import time
+
 from typing import TYPE_CHECKING, Optional
 
 from src import secret
-from src.adhoc import TeamGameStatus, StaffTeamGameStatus
-from src.store import SubmissionEvent, GameStartEvent, StaffModifyApEvent, BuyNormalHintEvent, StaffModifySpApEvent
-from src.store import TeamStore
-from . import WithGameLifecycle
+from src.adhoc import StaffTeamGameStatus, TeamGameStatus
+from src.store import (
+    BuyNormalHintEvent,
+    GameStartEvent,
+    StaffModifyApEvent,
+    StaffModifySpApEvent,
+    SubmissionEvent,
+    TeamStore,
+)
+
 from .. import utils
+from .base import WithGameLifecycle
+
 
 if TYPE_CHECKING:
-    from . import WithGameLifecycle, Game, Submission, Puzzle, User, TeamEvent
+    from . import Game, Puzzle, Submission, TeamEvent, User
 
 
 class Teams(WithGameLifecycle):
@@ -42,13 +51,13 @@ class Teams(WithGameLifecycle):
     def _add_team_name_and_key_hash(self, team: Team) -> None:
         self.team_name_set.add(team.model.team_name)
         for puzzle_key in self.game.puzzles.puzzle_by_key:
-            if secret.HASH_PUZZLE_KEY == "key_and_team":
+            if secret.HASH_PUZZLE_KEY == 'key_and_team':
                 key_hash = utils.calc_sha1(secret.PUZZLE_KEY_HASH_SALT + str((team.model.id, puzzle_key)))
                 while key_hash in self.game.hash_to_team_and_key:
                     key_hash = utils.calc_sha1(key_hash)
                 self.game.team_and_key_to_hash[(team.model.id, puzzle_key)] = key_hash
                 self.game.hash_to_team_and_key[key_hash] = (team.model.id, puzzle_key)
-            elif secret.HASH_PUZZLE_KEY == "key_only":
+            elif secret.HASH_PUZZLE_KEY == 'key_only':
                 key_hash = utils.calc_sha1(secret.PUZZLE_KEY_HASH_SALT + puzzle_key)
                 while key_hash in self.game.hash_to_puzzle_key:
                     key_hash = utils.calc_sha1(key_hash)
@@ -179,7 +188,7 @@ class Team(WithGameLifecycle):
 
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
         match reloading_type:
-            case "all":
+            case 'all':
                 self.passed_puzzles = set()
                 self.success_submissions = []
                 self.passed_submission_by_puzzle_key = {}
@@ -199,14 +208,14 @@ class Team(WithGameLifecycle):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool = False) -> None:
         if not is_reloading:
-            self.game.log("info", "team.on_team_event", f"team#{self.model.id} got {event.model.info.type} event.")
+            self.game.log('info', 'team.on_team_event', f'team#{self.model.id} got {event.model.info.type} event.')
 
         match event.model.info:
             case SubmissionEvent(submission_id=submission_id):
                 submission = self.game.submissions_by_id[submission_id]
                 self.submissions.append(submission)
                 self.game_status.on_submission(submission, is_reloading)
-                if submission.result.type == "pass":
+                if submission.result.type == 'pass':
                     self.passed_puzzles.add((submission.puzzle, submission))
                     self.success_submissions.append(submission)
                     self.passed_submission_by_puzzle_key[submission.puzzle.model.key] = submission
@@ -222,19 +231,21 @@ class Team(WithGameLifecycle):
                     origin_key = submission.puzzle.model.key
                     hash_key = self.game.hash_puzzle_key(self.model.id, origin_key)
                     event_user = self.game.users.user_by_id[event.model.user_id]
-                    self.game.worker.emit_ws_message({
-                        "type": "normal",
-                        "to_users": [x for x in self.member_ids if x != event.model.user_id],
-                        "payload": {
-                            "type": "teammate_action",
-                            "action": "submission",
-                            "puzzle_key": hash_key,
-                            "message": (
-                                f"你的队友 {event_user.model.user_info.nickname} 在题目 {submission.puzzle.model.title}"
-                                f"中提交了答案。提交结果：{submission.result.describe_status()}。"
-                            ),
+                    self.game.worker.emit_ws_message(
+                        {
+                            'type': 'normal',
+                            'to_users': [x for x in self.member_ids if x != event.model.user_id],
+                            'payload': {
+                                'type': 'teammate_action',
+                                'action': 'submission',
+                                'puzzle_key': hash_key,
+                                'message': (
+                                    f'你的队友 {event_user.model.user_info.nickname} 在题目 {submission.puzzle.model.title}'
+                                    f'中提交了答案。提交结果：{submission.result.describe_status()}。'
+                                ),
+                            },
                         }
-                    })
+                    )
 
             case GameStartEvent():
                 # gaming 是一个根据 team event 决定的状态
@@ -244,43 +255,43 @@ class Team(WithGameLifecycle):
                 self.game_start_time = event.model.created_at // 1000
                 self.game_status.team_start_game(event.model.created_at // 1000, is_reloading)
                 if not is_reloading:
-                    self.game.worker.emit_ws_message({
-                        "type": "normal",
-                        "to_users": self.member_ids,
-                        "payload": {
-                            "type": "game_start"
-                        }
-                    })
+                    self.game.worker.emit_ws_message(
+                        {'type': 'normal', 'to_users': self.member_ids, 'payload': {'type': 'game_start'}}
+                    )
             case StaffModifyApEvent():
                 event.ap_change = event.model.info.ap_change
                 self.ap_change_event.append(event)
                 self.ap_change += event.ap_change
                 if not is_reloading:
-                    self.game.worker.emit_ws_message({
-                        "type": "normal",
-                        "to_users": self.member_ids,
-                        "payload": {
-                            "type": "staff_action",
-                            "action": "modify_ap",
-                            "message": (
-                                f"工作人员{'增加' if event.ap_change > 0 else '扣除'}了你们队伍的注意力。原因是：{event.model.info.reason}"
-                            ),
+                    self.game.worker.emit_ws_message(
+                        {
+                            'type': 'normal',
+                            'to_users': self.member_ids,
+                            'payload': {
+                                'type': 'staff_action',
+                                'action': 'modify_ap',
+                                'message': (
+                                    f"工作人员{'增加' if event.ap_change > 0 else '扣除'}了你们队伍的注意力。原因是：{event.model.info.reason}"
+                                ),
+                            },
                         }
-                    })
+                    )
             case StaffModifySpApEvent():
                 self.spap_change += event.model.info.spap_change
                 if not is_reloading:
-                    self.game.worker.emit_ws_message({
-                        "type": "normal",
-                        "to_users": self.member_ids,
-                        "payload": {
-                            "type": "staff_action",
-                            "action": "modify_spap",
-                            "message": (
-                                f"工作人员{'增加' if event.model.info.spap_change > 0 else '扣除'}了你们队伍的注意力。原因是：{event.model.info.reason}"
-                            ),
+                    self.game.worker.emit_ws_message(
+                        {
+                            'type': 'normal',
+                            'to_users': self.member_ids,
+                            'payload': {
+                                'type': 'staff_action',
+                                'action': 'modify_spap',
+                                'message': (
+                                    f"工作人员{'增加' if event.model.info.spap_change > 0 else '扣除'}了你们队伍的注意力。原因是：{event.model.info.reason}"
+                                ),
+                            },
                         }
-                    })
+                    )
             case BuyNormalHintEvent(hint_id=hint_id):
                 if hint_id in self.game.hints.hint_by_id:
                     hint = self.game.hints.hint_by_id[hint_id]
@@ -293,21 +304,23 @@ class Team(WithGameLifecycle):
                         hash_key = self.game.hash_puzzle_key(self.model.id, origin_key)
                         event_user = self.game.users.user_by_id[event.model.user_id]
                         puzzle = self.game.puzzles.puzzle_by_key[origin_key]
-                        self.game.worker.emit_ws_message({
-                            "type": "normal",
-                            "to_users": [x for x in self.member_ids if x != event.model.user_id],
-                            "payload": {
-                                "type": "teammate_action",
-                                "action": "buy_normal_hint",
-                                "puzzle_key": hash_key,
-                                "message": (
-                                    f"你的队友 {event_user.model.user_info.nickname} 花费了 {-event.ap_change} 注意力"
-                                    f"购买了题目 {puzzle.model.title} 的提示。"
-                                ),
+                        self.game.worker.emit_ws_message(
+                            {
+                                'type': 'normal',
+                                'to_users': [x for x in self.member_ids if x != event.model.user_id],
+                                'payload': {
+                                    'type': 'teammate_action',
+                                    'action': 'buy_normal_hint',
+                                    'puzzle_key': hash_key,
+                                    'message': (
+                                        f'你的队友 {event_user.model.user_info.nickname} 花费了 {-event.ap_change} 注意力'
+                                        f'购买了题目 {puzzle.model.title} 的提示。'
+                                    ),
+                                },
                             }
-                        })
+                        )
                 else:
-                    self.game.log("debug", "team.on_team_event", f"skip hint#{hint_id}: hint not exists")
+                    self.game.log('debug', 'team.on_team_event', f'skip hint#{hint_id}: hint not exists')
 
         self.team_events.append(event)
 
@@ -318,9 +331,9 @@ class Team(WithGameLifecycle):
     def status(self) -> str:
         # 注意！ 不应当用 team.store.status 了，之后会被移除
         if self.gaming:
-            return "gaming"
+            return 'gaming'
         if self.preparing:
-            return "preparing"
+            return 'preparing'
         return self.model.status  # TODO: 未来会被移除
 
     def on_store_reload(self, store: TeamStore) -> None:
@@ -328,7 +341,7 @@ class Team(WithGameLifecycle):
         self.on_store_update(store)
 
     def on_store_update(self, store: TeamStore) -> None:
-        self.game.worker.log("debug", "TeamState", f"team#{self.model.id} on_store_update")
+        self.game.worker.log('debug', 'TeamState', f'team#{self.model.id} on_store_update')
         # 从 normal 切换到其他状态
         # 需要更新排行榜
         if self.model.ban_status != store.ban_status:
@@ -386,8 +399,9 @@ class Team(WithGameLifecycle):
         minute_from_game_begin = cur_min - cur_ap_policy[0][0]
 
         self.game.log(
-            "debug", "get_default_ap_by_timestamp_s",
-            f"[minute_from_game_begin={minute_from_game_begin} action_points={ap}]"
+            'debug',
+            'get_default_ap_by_timestamp_s',
+            f'[minute_from_game_begin={minute_from_game_begin} action_points={ap}]',
         )
         return ap
 
@@ -411,21 +425,25 @@ class Team(WithGameLifecycle):
         for team_event in self.ap_change_event:
             cur_default_ts = self.get_default_ap_by_timestamp_s(team_event.model.created_at // 1000)
             t_total_change += team_event.ap_change
-            rst.append({
-                "timestamp_ms": team_event.model.created_at,
-                "change": team_event.ap_change,
-                "cur_ap": t_total_change + cur_default_ts,
-                "info": team_event.describe_cost(),
-            })
+            rst.append(
+                {
+                    'timestamp_ms': team_event.model.created_at,
+                    'change': team_event.ap_change,
+                    'cur_ap': t_total_change + cur_default_ts,
+                    'info': team_event.describe_cost(),
+                }
+            )
         ap, timestamp_s = self.get_ap_default_and_timestamp_s()
         t_total_change += ap
 
-        rst.append({
-            "timestamp_ms": timestamp_s * 1000,
-            "change": ap,
-            "cur_ap": t_total_change,
-            "info": "随时间增长自动增长的注意力。",
-        })
+        rst.append(
+            {
+                'timestamp_ms': timestamp_s * 1000,
+                'change': ap,
+                'cur_ap': t_total_change,
+                'info': '随时间增长自动增长的注意力。',
+            }
+        )
 
         return rst
 
@@ -465,19 +483,23 @@ class Team(WithGameLifecycle):
     @property
     def member_info_list(self) -> list[dict[str, str]]:
         leader_email = self.leader.model.user_info.email
-        rst = [{
-            "nickname": self.leader.model.user_info.nickname,
-            "avatar_url": f"https://cravatar.cn/avatar/{utils.calc_md5(leader_email)}?d=mp",
-            "type": "leader",
-        }]
+        rst = [
+            {
+                'nickname': self.leader.model.user_info.nickname,
+                'avatar_url': f'https://cravatar.cn/avatar/{utils.calc_md5(leader_email)}?d=mp',
+                'type': 'leader',
+            }
+        ]
         for member in self.members:
             if member != self.leader:
                 member_email = member.model.user_info.email
-                rst.append({
-                    "nickname": member.model.user_info.nickname,
-                    "avatar_url": f"https://cravatar.cn/avatar/{utils.calc_md5(member_email)}?d=mp",
-                    "type": "member",
-                })
+                rst.append(
+                    {
+                        'nickname': member.model.user_info.nickname,
+                        'avatar_url': f'https://cravatar.cn/avatar/{utils.calc_md5(member_email)}?d=mp',
+                        'type': 'member',
+                    }
+                )
 
         return rst
 
@@ -488,17 +510,17 @@ class Team(WithGameLifecycle):
     def get_disp_list(self) -> list[dict[str, str]]:
         rst = []
         if self.preparing:
-            rst.append({"text": "未开始游戏", "color": "blue"})
+            rst.append({'text': '未开始游戏', 'color': 'blue'})
         elif self.gaming:
-            rst.append({"text": "已开始游戏", "color": "blue"})
+            rst.append({'text': '已开始游戏', 'color': 'blue'})
         # 是否完赛
         if self.game_status.finished:
-            rst.append({"text": "已完赛", "color": "green"})
+            rst.append({'text': '已完赛', 'color': 'green'})
         # 是否封禁
         if self.model.ban_status == TeamStore.BanStatus.BANNED.name:
-            rst.append({"text": "已封禁", "color": "red"})
+            rst.append({'text': '已封禁', 'color': 'red'})
         elif self.model.ban_status == TeamStore.BanStatus.HIDDEN.name:
-            rst.append({"text": "在排行榜隐藏", "color": "orange"})
+            rst.append({'text': '在排行榜隐藏', 'color': 'orange'})
         else:
             pass
         # 额外的状态
@@ -516,7 +538,6 @@ class Team(WithGameLifecycle):
 
 
 class StaffTeam(Team):
-
     def __init__(self, game: Game, store: TeamStore):
         super().__init__(game, store)
         self.is_staff_team = True
@@ -525,7 +546,7 @@ class StaffTeam(Team):
 
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
         match reloading_type:
-            case "all":
+            case 'all':
                 self.passed_puzzles = set()
                 self.success_submissions = []
                 self.passed_submission_by_puzzle_key = {}
@@ -546,7 +567,7 @@ class StaffTeam(Team):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool = False) -> None:
         if not is_reloading:
-            self.game.log("info", "team.on_team_event", f"team#{self.model.id} got {event.model.info.type} event.")
+            self.game.log('info', 'team.on_team_event', f'team#{self.model.id} got {event.model.info.type} event.')
 
         match event.model.info:
             case SubmissionEvent(submission_id=submission_id):
@@ -562,12 +583,18 @@ class StaffTeam(Team):
 
     def get_disp_list(self) -> list[dict[str, str]]:
         super_rst = super().get_disp_list()
-        return [{"text": "不存在的队伍！", "color": "magenta"}] + super_rst
+        return [{'text': '不存在的队伍！', 'color': 'magenta'}] + super_rst
 
 
 STAFF_TEAM_STORE = TeamStore(
-    id=0, created_at=0, updated_at=0, team_name="工作人员",
-    team_info="kinami 问这里该写点什么，JC 建议是直接把能想到的关键词都堆上去，Winfrid 说要来点名人名言，所以：\n鸣谢榆木华！",
+    id=0,
+    created_at=0,
+    updated_at=0,
+    team_name='工作人员',
+    team_info='kinami 问这里该写点什么，JC 建议是直接把能想到的关键词都堆上去，Winfrid 说要来点名人名言，所以：\n鸣谢榆木华！',
     leader_id=1,
-    team_secret="Winfrid saikou!", status="NORMAL", ban_status="HIDDEN", extra_info={}
+    team_secret='Winfrid saikou!',
+    status='NORMAL',
+    ban_status='HIDDEN',
+    extra_info={},
 )

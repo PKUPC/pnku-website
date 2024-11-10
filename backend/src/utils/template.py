@@ -1,10 +1,12 @@
 import re
-from typing import Dict, Any
+
+from typing import Any, Dict
 
 import bleach
 import jinja2
 import markdown
-from bleach_allowlist import markdown_tags, markdown_attrs
+
+from bleach_allowlist import markdown_attrs, markdown_tags
 from markdown.extensions import Extension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.fenced_code import FencedCodeExtension
@@ -42,15 +44,18 @@ class LinkTargetExtension(Extension):
 #                                    'add-link-to-img-processor', 100)
 
 
-markdown_processor = markdown.Markdown(extensions=[
-    FencedCodeExtension(),
-    CodeHiliteExtension(guess_lang=False, use_pygments=True, noclasses=True),
-    MarkdownInHtmlExtension(),
-    TableExtension(),
-    SaneListExtension(),
-    LinkTargetExtension(),
-    # AddLinkToImgExtension(),
-], output_format='html')
+markdown_processor = markdown.Markdown(
+    extensions=[
+        FencedCodeExtension(),
+        CodeHiliteExtension(guess_lang=False, use_pygments=True, noclasses=True),
+        MarkdownInHtmlExtension(),
+        TableExtension(),
+        SaneListExtension(),
+        LinkTargetExtension(),
+        # AddLinkToImgExtension(),
+    ],
+    output_format='html',
+)
 
 
 def render_template(template_str: str, args: Dict[str, Any]) -> str:
@@ -60,7 +65,7 @@ def render_template(template_str: str, args: Dict[str, Any]) -> str:
         autoescape=True,
         auto_reload=False,
     )
-    env.globals["media_wrapper"] = media_wrapper
+    env.globals['media_wrapper'] = media_wrapper
     md_str = env.get_template('index.md').render(**args)
 
     # md to str

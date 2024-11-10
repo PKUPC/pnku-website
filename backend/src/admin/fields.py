@@ -1,13 +1,14 @@
 import datetime
 import json
+
 from typing import Any, Dict, List
 
 import flask_admin.form
 import wtforms
+
 from markupsafe import Markup
 
-from .. import store
-from .. import utils
+from .. import store, utils
 
 
 def timestamp_s_formatter(_view: Any, _context: Any, model: Any, name: str) -> str:
@@ -64,29 +65,29 @@ class AceInput(wtforms.widgets.TextArea):
         self.unique_id: str = utils.gen_random_str(8)
 
     def script_body(self) -> str:
-        return f'''
+        return f"""
             editor.session.setValue(textarea.value.trim());
             editor.session.on('change', ()=>{'{'}
                 textarea.value = editor.session.getValue();
             {'}'});
             textarea.value = editor.session.getValue();
-        '''
+        """
 
     def __call__(self, field: wtforms.fields.StringField, **kwargs: Any) -> Markup:
-        filed_value = ""
+        filed_value = ''
         if field.data is not None:
             if isinstance(field.data, dict) or isinstance(field.data, list):
                 filed_value = json.dumps(field.data, ensure_ascii=False)
             elif isinstance(field.data, str):
                 filed_value = str(field.data)
             else:
-                print("[WARNING] unknown field.data type")
+                print('[WARNING] unknown field.data type')
                 filed_value = str(field.data)
 
-        return Markup(f'''
-            <textarea {wtforms.widgets.html_params(name=field.name, id=field.id, **kwargs)} data-ace-id={self.unique_id} readonly>{Markup.escape(filed_value)}</textarea> 
+        return Markup(f"""
+            <textarea {wtforms.widgets.html_params(name=field.name, id=field.id, **kwargs)} data-ace-id={self.unique_id} readonly>{Markup.escape(filed_value)}</textarea>
             <div class="ace-editor" id="{self.unique_id}"></div>
-            
+
             <script>
                 (()=>{'{'}
                     let textarea = document.querySelector('[data-ace-id="{self.unique_id}"]');
@@ -98,7 +99,7 @@ class AceInput(wtforms.widgets.TextArea):
                     {self.script_body()}
                 {'}'})();
             </script>
-        ''')
+        """)
 
 
 class SyntaxHighlightInput(AceInput):
@@ -107,10 +108,10 @@ class SyntaxHighlightInput(AceInput):
         self.lang = lang
 
     def script_body(self) -> str:
-        return f'''
+        return f"""
             editor.session.setMode("ace/mode/{self.lang}");
             {super().script_body()}
-        '''
+        """
 
 
 class JsonFormattedInput(SyntaxHighlightInput):
@@ -118,10 +119,10 @@ class JsonFormattedInput(SyntaxHighlightInput):
         super().__init__('json')
 
     def script_body(self) -> str:
-        return f'''
+        return f"""
             {super().script_body()}
             editor.session.setValue(JSON.stringify(JSON.parse(textarea.value), null, "\t"));
-        '''
+        """
 
 
 class JsonListInputWithSnippets(SyntaxHighlightInput):
@@ -130,7 +131,7 @@ class JsonListInputWithSnippets(SyntaxHighlightInput):
         super().__init__('json')
 
     def script_body(self) -> str:
-        return f'''
+        return f"""
             editor.session.setMode("ace/mode/json");
             try {'{'}
                 let val = JSON.parse(textarea.value);
@@ -142,22 +143,22 @@ class JsonListInputWithSnippets(SyntaxHighlightInput):
                 textarea.value = editor.session.getValue();
             {'}'});
             textarea.value = editor.session.getValue();
-        '''
+        """
 
     def __call__(self, field: wtforms.fields.StringField, **kwargs: Any) -> Markup:
         base_markup = super().__call__(field, **kwargs)
 
         snippets = [
-            f'''
+            f"""
                 <button type="button" onclick="append_snippet(editor_{self.unique_id}, '{Markup.escape(v)}');">+{Markup.escape(k)}</button>
-            '''
+            """
             for k, v in self.snippets.items()
         ]
 
-        return base_markup + Markup(f'''
+        return base_markup + Markup(f"""
             <script>
                 function append_snippet(editor, s) {'{'}
-                    let obj = eval(editor.getValue()); 
+                    let obj = eval(editor.getValue());
                     obj.push(JSON.parse(s));
                     editor.setValue(JSON.stringify(obj, null, "\t"));
                     editor.navigateFileEnd();
@@ -166,7 +167,7 @@ class JsonListInputWithSnippets(SyntaxHighlightInput):
                 {'}'}
             </script>
             {"".join(snippets)}
-        ''')
+        """)
 
 
 class JsonObjectInputWithSingleSnippet(SyntaxHighlightInput):
@@ -175,7 +176,7 @@ class JsonObjectInputWithSingleSnippet(SyntaxHighlightInput):
         super().__init__('json')
 
     def script_body(self) -> str:
-        return f'''
+        return f"""
             editor.session.setMode("ace/mode/json");
             try {'{'}
                 let val = JSON.parse(textarea.value);
@@ -187,19 +188,19 @@ class JsonObjectInputWithSingleSnippet(SyntaxHighlightInput):
                 textarea.value = editor.session.getValue();
             {'}'});
             textarea.value = editor.session.getValue();
-        '''
+        """
 
     def __call__(self, field: wtforms.fields.StringField, **kwargs: Any) -> Markup:
         base_markup = super().__call__(field, **kwargs)
 
         snippets = [
-            f'''
+            f"""
                 <button type="button" onclick="use_snippet(editor_{self.unique_id}, '{Markup.escape(v)}');">{Markup.escape(k)}</button>
-            '''
+            """
             for k, v in self.snippets.items()
         ]
 
-        return base_markup + Markup(f'''
+        return base_markup + Markup(f"""
             <script>
                 function use_snippet(editor, s) {'{'}
                     let obj = JSON.parse(s);
@@ -210,7 +211,7 @@ class JsonObjectInputWithSingleSnippet(SyntaxHighlightInput):
                 {'}'}
             </script>
             {"".join(snippets)}
-        ''')
+        """)
 
 
 class MarkdownField(wtforms.fields.TextAreaField):

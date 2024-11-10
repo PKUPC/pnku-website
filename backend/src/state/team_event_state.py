@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..store import TeamEventStore, StaffModifyApEvent, BuyNormalHintEvent
+from ..store import BuyNormalHintEvent, StaffModifyApEvent, TeamEventStore
+
 
 if TYPE_CHECKING:
     from . import Game
@@ -27,9 +28,9 @@ class TeamEvent:
         match self.model.info:
             case StaffModifyApEvent():
                 if self.ap_change < 0:
-                    desc = f"工作人员扣除了注意力，原因是："
+                    desc = '工作人员扣除了注意力，原因是：'
                 else:
-                    desc = f"工作人员发放了注意力，原因是："
+                    desc = '工作人员发放了注意力，原因是：'
                 desc += self.model.info.reason
                 return desc
             case BuyNormalHintEvent(hint_id=hint_id):
@@ -37,13 +38,15 @@ class TeamEvent:
                 hint = self.game.hints.hint_by_id[hint_id]
                 puzzle = self.game.puzzles.puzzle_by_key[hint.model.puzzle_key]
                 user = self.game.users.user_by_id.get(self.model.user_id, None)
-                user_name = user.model.user_info.nickname if user is not None else "未知"
+                user_name = user.model.user_info.nickname if user is not None else '未知'
                 # 『 』
-                desc = f"玩家 {user_name} 购买了题目《{puzzle.model.title}》的提示，提示类型为『{hint.describe_type()}』，"
-                desc += f"提示标题为：\"{hint.model.question}\""
+                desc = (
+                    f'玩家 {user_name} 购买了题目《{puzzle.model.title}》的提示，提示类型为『{hint.describe_type()}』，'
+                )
+                desc += f'提示标题为："{hint.model.question}"'
                 return desc
             case _:
-                assert False, "wrong team event type"
+                assert False, 'wrong team event type'
 
     def ap_change_or_zero(self) -> int:
         # TODO

@@ -1,18 +1,19 @@
 import time
+
 from enum import Enum
 
-from sqlalchemy import BigInteger, Text, String, Integer
+from sqlalchemy import BigInteger, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from . import Table
 from .. import utils
+from . import Table
 
 
 class AnnouncementStore(Table):
     __tablename__ = 'announcement'
 
     class Category(Enum):
-        GENERAL = "通用"
+        GENERAL = '通用'
 
         @classmethod
         def name_list(cls) -> list[str]:
