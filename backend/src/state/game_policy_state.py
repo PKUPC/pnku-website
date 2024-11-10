@@ -5,9 +5,12 @@ import time
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List
 
-# noinspection PyUnresolvedReferences
-from ..store import GamePolicyStore, GamePolicyStoreModel, PolicyModel
 from .base import WithGameLifecycle
+
+
+if TYPE_CHECKING:
+    from ..store import GamePolicyStore, GamePolicyStoreModel, PolicyModel
+    from . import Game, Team
 
 
 class GamePolicy(WithGameLifecycle):
@@ -118,8 +121,3 @@ class GamePolicy(WithGameLifecycle):
     @property
     def puzzle_passed_display(self) -> list[int]:
         return self.cur_policy_modal.puzzle_passed_display
-
-
-if TYPE_CHECKING:
-    from ..store import *
-    from . import *
