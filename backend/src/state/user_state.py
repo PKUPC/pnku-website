@@ -12,7 +12,8 @@ from .team_state import Team
 
 
 if TYPE_CHECKING:
-    from ..store import *
+    from src.store import UserStore
+
     from . import Game
 
 

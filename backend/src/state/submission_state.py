@@ -6,8 +6,9 @@ from ..utils import clean_submission
 
 
 if TYPE_CHECKING:
-    from ..store import *
-    from . import Game, Puzzle, Team
+    from src.store import SubmissionStore
+
+    from . import Game, Puzzle, Team, User
 
 
 class SubmissionResult:
@@ -92,8 +93,3 @@ class Submission:
 
     def __repr__(self) -> str:
         return f'[Sub#{self.store.id} U#{self.user.model.id}' f'Puzzle={self.store.puzzle_key!r} Flag={self.result}]'
-
-
-if TYPE_CHECKING:
-    from ..store import *
-    from . import Game, User

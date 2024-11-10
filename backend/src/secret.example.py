@@ -96,7 +96,7 @@ GLITTER_EVENT_SOCKET_ADDR = 'ipc://event.sock'
 N_WORKERS = 1
 
 SANIC_DEBUG = DEBUG_MODE
-WORKER_API_SERVER_KWARGS = lambda idx0: {  # will be passed to `Sanic.run`
+WORKER_API_SERVER_KWARGS = lambda idx0: {  # will be passed to `Sanic.run` # noqa: E731
     'host': '127.0.0.1',
     'port': 10010 + idx0,
     'debug': False,

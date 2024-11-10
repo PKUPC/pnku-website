@@ -174,13 +174,13 @@ from . import game, message, puzzle, special, staff, team, ticket, upload, user
 
 
 bp = Blueprint.group(  # type: ignore[has-type]
-    team.bp,
-    message.bp,
-    puzzle.bp,
-    staff.bp,
-    game.bp,
-    user.bp,
-    special.bp,
+    team.bp,  # type: ignore[has-type]
+    message.bp,  # type: ignore[has-type]
+    puzzle.bp,  # type: ignore[has-type]
+    staff.bp,  # type: ignore[has-type]
+    game.bp,  # type: ignore[has-type]
+    user.bp,  # type: ignore[has-type]
+    special.bp,  # type: ignore[has-type]
     ticket.bp,  # type: ignore[has-type]
     upload.bp,  # type: ignore[has-type]
     url_prefix='',

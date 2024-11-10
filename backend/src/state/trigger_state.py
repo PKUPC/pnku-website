@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 
 if TYPE_CHECKING:
-    from ..store import *
+    from src.store import TriggerStore
+
     from . import Game
 
 
