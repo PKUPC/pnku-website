@@ -1,11 +1,11 @@
-from typing import Any, List, Optional
+from typing import Any, List
 
 from flask import current_app, flash
 
 from src import store
 from src.admin import fields
-from src.logic import glitter
 from src.logic.reducer import Reducer
+
 from .base_view import BaseView
 
 
@@ -16,7 +16,7 @@ def _flag_match_formatter(_view: Any, _context: Any, model: store.SubmissionStor
     if sub is None:
         return '???'
 
-    return f"{sub.result.type}: {sub.result.info}"
+    return f'{sub.result.type}: {sub.result.info}'
 
 
 def _flag_override_formatter(_view: Any, _context: Any, model: store.SubmissionStore, _name: str) -> str:

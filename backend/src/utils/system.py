@@ -2,11 +2,13 @@ import asyncio
 import os
 import time
 import traceback
+
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, Dict, Iterator, Literal, Union
 
 import psutil
+
 
 LogLevel = Literal['debug', 'wish', 'info', 'warning', 'error', 'critical', 'success']
 
@@ -16,8 +18,9 @@ def get_traceback(e: Exception) -> str:
 
 
 @contextmanager
-def log_slow(logger: Callable[[LogLevel, str, str], None], module: str, func: str, threshold: float = 0.3) \
-        -> Iterator[None]:
+def log_slow(
+    logger: Callable[[LogLevel, str, str], None], module: str, func: str, threshold: float = 0.3
+) -> Iterator[None]:
     t1 = time.monotonic()
     try:
         yield
@@ -42,25 +45,21 @@ def sys_status() -> Dict[str, Union[int, float]]:
     vmem = psutil.virtual_memory()
     smem = psutil.swap_memory()
     disk = psutil.disk_usage('/')
-    G = 1024 ** 3
+    G = 1024**3
 
     cpu_count = psutil.cpu_count(logical=False)
     return {
         'process': len(psutil.pids()),
-
         'n_cpu': cpu_count if cpu_count is not None else 0,
         'load_1': load_1,
         'load_5': load_5,
         'load_15': load_15,
-
         'ram_total': vmem.total / G,
         'ram_used': vmem.used / G,
         'ram_free': vmem.available / G,
-
         'swap_total': smem.total / G,
         'swap_used': smem.used / G,
         'swap_free': smem.free / G,
-
         'disk_total': disk.total / G,
         'disk_used': disk.used / G,
         'disk_free': disk.free / G,

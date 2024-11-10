@@ -4,14 +4,23 @@ from typing import TYPE_CHECKING
 
 from ..utils import clean_submission
 
+
 if TYPE_CHECKING:
-    from . import Game, Puzzle, Team
     from ..store import *
+    from . import Game, Puzzle, Team
 
 
 class SubmissionResult:
-    def __init__(self, sub_type: str, sub_info: str, *, trigger_value: str = "", extra: str = "",
-                 pass_after_meta: bool = False, pass_after_finished: bool = False) -> None:
+    def __init__(
+        self,
+        sub_type: str,
+        sub_info: str,
+        *,
+        trigger_value: str = '',
+        extra: str = '',
+        pass_after_meta: bool = False,
+        pass_after_finished: bool = False,
+    ) -> None:
         self.type = sub_type
         self.info = sub_info
         self.trigger_value = trigger_value
@@ -21,30 +30,30 @@ class SubmissionResult:
 
     def describe_status(self) -> str:
         match self.type:
-            case "wrong":
-                return "答案错误"
-            case "pass":
-                return "答案正确"
-            case "multipass":
-                return "答案正确"
-            case "milestone":
-                return "里程碑"
-            case "staff_wrong":
-                return "答案错误"
-            case "staff_pass":
-                return "答案正确"
+            case 'wrong':
+                return '答案错误'
+            case 'pass':
+                return '答案正确'
+            case 'multipass':
+                return '答案正确'
+            case 'milestone':
+                return '里程碑'
+            case 'staff_wrong':
+                return '答案错误'
+            case 'staff_pass':
+                return '答案正确'
             case _:
-                return ""
+                return ''
 
     def __repr__(self) -> str:
-        return f"SubmissionResult[{self.type}, {self.info}, {self.trigger_value}, {self.extra}]"
+        return f'SubmissionResult[{self.type}, {self.info}, {self.trigger_value}, {self.extra}]'
 
 
 class Submission:
     constructed_ids: set[int] = set()
 
     def __init__(self, game: Game, store: SubmissionStore):
-        assert store.id not in Submission.constructed_ids, f"{store.id} or {Submission.constructed_ids}"
+        assert store.id not in Submission.constructed_ids, f'{store.id} or {Submission.constructed_ids}'
         Submission.constructed_ids.add(store.id)
 
         self.game: Game = game
@@ -61,8 +70,9 @@ class Submission:
 
         self.cleaned_content = clean_submission(store.content)
 
-        self.result: SubmissionResult = self.team.game_status.test_submission(self.store.puzzle_key,
-                                                                              self.cleaned_content)
+        self.result: SubmissionResult = self.team.game_status.test_submission(
+            self.store.puzzle_key, self.cleaned_content
+        )
         self.finished = False
 
     @property
@@ -76,17 +86,14 @@ class Submission:
         # 检查是否是在游戏结束后的提交
         if self.store.created_at > self.game.game_end_ts * 1000:
             return 0
-        if self.result.type == "pass":
+        if self.result.type == 'pass':
             return 1
         return 0
 
     def __repr__(self) -> str:
-        return (
-            f'[Sub#{self.store.id} U#{self.user.model.id}'
-            f'Puzzle={self.store.puzzle_key!r} Flag={self.result}]'
-        )
+        return f'[Sub#{self.store.id} U#{self.user.model.id}' f'Puzzle={self.store.puzzle_key!r} Flag={self.result}]'
 
 
 if TYPE_CHECKING:
-    from . import Game, User
     from ..store import *
+    from . import Game, User

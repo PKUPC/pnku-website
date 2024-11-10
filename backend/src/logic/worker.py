@@ -2,17 +2,19 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Optional, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Optional
 
 import zmq
+
 from sanic.request import Request
 from zmq.asyncio import Socket
 
+from .. import secret, utils
 from . import glitter
 from .base import StateContainerBase
 from .glitter import WorkerHeartbeatReq
-from .. import secret
-from .. import utils
+
 
 if TYPE_CHECKING:
     pass
@@ -55,8 +57,11 @@ class Worker(StateContainerBase):
                     glitter.WorkerHelloReq(client=self.process_name, protocol_ver=glitter.PROTOCOL_VER)
                 ).call(self.action_socket)
             except Exception as e:
-                self.log('error', 'reducer.before_run',
-                         f'exception during handshake, will try again: {utils.get_traceback(e)}')
+                self.log(
+                    'error',
+                    'reducer.before_run',
+                    f'exception during handshake, will try again: {utils.get_traceback(e)}',
+                )
                 await asyncio.sleep(self.RECOVER_INTERVAL_S)
             else:
                 if hello_res.result is not None:
@@ -65,7 +70,7 @@ class Worker(StateContainerBase):
 
                 break
 
-        self.log('debug', 'worker.sync_with_reducer', f'begin sync')
+        self.log('debug', 'worker.sync_with_reducer', 'begin sync')
 
         while True:
             try:
@@ -75,33 +80,37 @@ class Worker(StateContainerBase):
                     if event.type == glitter.EventType.SYNC:
                         break
 
-                self.log('info', 'worker.sync_with_reducer',
-                         f'got sync data, tick={event.data}, count={event.state_counter}')
+                self.log(
+                    'info', 'worker.sync_with_reducer', f'got sync data, tick={event.data}, count={event.state_counter}'
+                )
                 self.state_counter = event.state_counter
                 await self.init_game(event.data)
 
                 async with self.state_counter_cond:
                     self.state_counter_cond.notify_all()
             except Exception as e:
-                self.log('error', 'worker.sync_with_reducer',
-                         f'exception during sync, will try again: {utils.get_traceback(e)}')
+                self.log(
+                    'error',
+                    'worker.sync_with_reducer',
+                    f'exception during sync, will try again: {utils.get_traceback(e)}',
+                )
                 await asyncio.sleep(self.RECOVER_INTERVAL_S)
             else:
                 break
 
-        self.log('debug', 'worker.sync_with_reducer', f'game state reconstructed')
+        self.log('debug', 'worker.sync_with_reducer', 'game state reconstructed')
 
         if throttled:
             await asyncio.sleep(self.RECOVER_THROTTLE_S)
         self.game_dirty = False
 
     async def _before_run(self) -> None:
-        self.log("debug", "worker.before_run", "before_run")
+        self.log('debug', 'worker.before_run', 'before_run')
         await super()._before_run()
 
         # reduce the possibility of losing initial event_socket packets
         # (we are still sound in this case, but some time is wasted waiting for next SYNC)
-        await asyncio.sleep(.2)
+        await asyncio.sleep(0.2)
 
         await self._sync_with_reducer(throttled=False)
 
@@ -116,19 +125,28 @@ class Worker(StateContainerBase):
                 await self._sync_with_reducer()
                 continue
             except Exception as e:
-                self.log('error', 'worker.mainloop',
-                         f'exception during event receive, will recover: {utils.get_traceback(e)}')
+                self.log(
+                    'error',
+                    'worker.mainloop',
+                    f'exception during event receive, will recover: {utils.get_traceback(e)}',
+                )
                 await self._sync_with_reducer()
                 continue
 
             # in rare cases when zeromq reaches high-water-mark, we may lose packets!
             if event.state_counter not in [self.state_counter, self.state_counter + 1]:
                 if event.state_counter < self.state_counter:
-                    self.log('warning', 'worker.mainloop',
-                             f'state counter mismatch, maybe reducer restarted, will recover: worker {self.state_counter} reducer {event.state_counter}')
+                    self.log(
+                        'warning',
+                        'worker.mainloop',
+                        f'state counter mismatch, maybe reducer restarted, will recover: worker {self.state_counter} reducer {event.state_counter}',
+                    )
                 else:
-                    self.log('error', 'worker.mainloop',
-                             f'state counter mismatch, maybe lost event, will recover: worker {self.state_counter} reducer {event.state_counter}')
+                    self.log(
+                        'error',
+                        'worker.mainloop',
+                        f'state counter mismatch, maybe lost event, will recover: worker {self.state_counter} reducer {event.state_counter}',
+                    )
                 await self._sync_with_reducer()
             else:
                 self.state_counter = event.state_counter
@@ -164,8 +182,9 @@ class Worker(StateContainerBase):
                     cond = self.state_counter_cond.wait_for(lambda: self.state_counter >= rep.state_counter)
                     await asyncio.wait_for(cond, glitter.CALL_TIMEOUT_MS / 1000)
             except asyncio.TimeoutError:
-                self.log('error', 'worker.perform_action',
-                         f'state sync timeout: {self.state_counter} -> {rep.state_counter}')
+                self.log(
+                    'error', 'worker.perform_action', f'state sync timeout: {self.state_counter} -> {rep.state_counter}'
+                )
                 raise RuntimeError('timed out syncing state with reducer')
 
             self.log('debug', 'worker.perform_action', f'state counter synced to {self.state_counter}')
@@ -174,8 +193,9 @@ class Worker(StateContainerBase):
 
     async def process_event(self, event: glitter.Event) -> None:
         if event.type != glitter.EventType.SYNC:
-            self.log('debug', 'worker.process_event',
-                     f'got event {event.type} {event.data} (count={event.state_counter})')
+            self.log(
+                'debug', 'worker.process_event', f'got event {event.type} {event.data} (count={event.state_counter})'
+            )
         await super().process_event(event)
 
     async def send_heartbeat(self) -> None:
@@ -184,12 +204,12 @@ class Worker(StateContainerBase):
         self.last_heartbeat_time = time.time()
 
         try:
-            await asyncio.wait_for(self.perform_action(WorkerHeartbeatReq(
-                client=self.process_name,
-                telemetry=self.collect_telemetry()
-            )), self.HEARTBEAT_TIMEOUT_S)
+            await asyncio.wait_for(
+                self.perform_action(WorkerHeartbeatReq(client=self.process_name, telemetry=self.collect_telemetry())),
+                self.HEARTBEAT_TIMEOUT_S,
+            )
 
             # periodically wake up ws so it has opportunity to quit if ws is closed
-            self.emit_ws_message({"type": "heartbeat_sent", "payload": {}})
+            self.emit_ws_message({'type': 'heartbeat_sent', 'payload': {}})
         except Exception as e:
             self.log('error', 'worker.mainloop', f'heartbeat error, will ignore: {utils.get_traceback(e)}')

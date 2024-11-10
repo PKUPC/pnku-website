@@ -8,8 +8,6 @@ from src.logic.reducer import Reducer
 class DebugView(BaseView):  # type: ignore[misc]
     @expose('/')
     def index(self) -> ResponseReturnValue:
-        reducer: Reducer = current_app.config['reducer_obj']
-
         return self.render('debug.html')  # type: ignore[no-any-return]
 
     @expose('/get_puzzles_state')
@@ -17,13 +15,13 @@ class DebugView(BaseView):  # type: ignore[misc]
         reducer: Reducer = current_app.config['reducer_obj']
 
         puzzle_structure = reducer._game.puzzles.puzzles_by_structure
-        rst = ""
+        rst = ''
         for category in puzzle_structure:
-            rst += category + ":\n"
+            rst += category + ':\n'
             for subcategory in puzzle_structure[category]:
-                rst += f"    {subcategory}:\n"
+                rst += f'    {subcategory}:\n'
                 for puzzle in puzzle_structure[category][subcategory]:
-                    rst += f"        {puzzle.model.key}: {puzzle.model.sorting_index} | {puzzle.model.title}\n"
+                    rst += f'        {puzzle.model.key}: {puzzle.model.sorting_index} | {puzzle.model.title}\n'
 
         resp = make_response(rst, 200)
         resp.mimetype = 'text/plain'
