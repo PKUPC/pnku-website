@@ -99,6 +99,21 @@ export function archiveWish({ endpoint, payload }) {
                     let puzzleTriggers = data.default;
                     let cleanedSub = cleanSubmission(payload.content);
                     if (payload.puzzle_key === 'day2_01') resolve(day201.checkAndUpdate(cleanedSub));
+                    if (payload.puzzle_key === 'day2_meta') {
+                        if (cleanedSub.length >= 3 && "梦中的".repeat(36).includes(cleanedSub)) {
+                            resolve({
+                                status: 'success',
+                                title: '答案正确',
+                                message: '答案正确！',
+                            });
+                        } else {
+                            resolve({
+                                status: 'error',
+                                title: '答案错误',
+                                message: '答案错误！你没有得到任何信息！',
+                            });
+                        }
+                    }
                     if (payload.puzzle_key === 'day3_20') resolve(day320.checkAndUpdate(cleanedSub));
                     if (payload.puzzle_key === 'day3_premeta') {
                         if (
