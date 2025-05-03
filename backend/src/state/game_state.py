@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src import secret
+from src import adhoc, secret
 from src.store import GameStartEvent, PuzzleActionEvent, SubmissionEvent
 
 from .announcement_state import Announcements
 from .base import WithGameLifecycle
-from .board_state import Board, FirstBloodBoard, ScoreBoard, SpeedRunBoard
 from .game_policy_state import GamePolicy
 from .hint_state import Hints
 from .message_state import Messages
@@ -21,6 +20,7 @@ from .user_state import Users
 
 
 if TYPE_CHECKING:
+    from src.adhoc.boards import Board
     from src.logic.base import StateContainerBase
     from src.store import (
         AnnouncementStore,
@@ -86,17 +86,9 @@ class Game(WithGameLifecycle):
         self.hints: Hints = Hints(self, hint_stores)
         self.team_events: list[TeamEvent] = [TeamEvent(self, x) for x in team_event_stores]
 
-        self.boards: dict[str, Board] = (
-            {
-                'score_board': ScoreBoard('score_board', '排名', None, self),
-                'first_blood': FirstBloodBoard('first_blood', '一血榜', None, self),
-                'speed_run': SpeedRunBoard(
-                    'speed_run', '速通榜', '本榜仅供参考！注：由于开赛时服务器出现问题，前 5 题是直接公开的。', self
-                ),
-            }
-            if (use_boards and not secret.PLAYGROUND_MODE)
-            else {}
-        )
+        self.boards: dict[str, Board] = {}
+        if use_boards and not secret.PLAYGROUND_MODE:
+            self.boards = adhoc.boards.get_boards(self)
 
         self.n_corr_submission: int = 0
 

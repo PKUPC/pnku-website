@@ -1,4 +1,4 @@
-from . import areas, constants
+from . import areas, boards, constants
 from .areas import *
 from .constants import *
 from .fsm import StaffTeamGameStatus, TeamGameStatus, TeamPuzzleStatus

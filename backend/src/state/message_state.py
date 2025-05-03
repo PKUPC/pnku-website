@@ -145,12 +145,10 @@ class Messages(WithGameLifecycle):
     def on_staff_read_message(self, team_id: int, last_msg_id: int) -> None:
         assert team_id in self.message_by_team_id
         self.message_by_team_id[team_id].staff_read(last_msg_id)
-        pass
 
     def on_player_read_message(self, team_id: int, last_msg_id: int) -> None:
         assert team_id in self.message_by_team_id
         self.message_by_team_id[team_id].player_read(last_msg_id)
-        pass
 
     def get_msg_list(self, team_id: int, start_id: int) -> list[MessageStore] | None:
         if team_id not in self.message_by_team_id:
