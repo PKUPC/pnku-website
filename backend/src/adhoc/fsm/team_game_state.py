@@ -44,6 +44,12 @@ class TeamGameStatus:
         # 接受到的 Puzzle Actions
         self.puzzle_actions: dict[str, list[PuzzleActionEvent]] = {}
 
+        # 一些游戏相关逻辑
+        # TODO: 这些是从最早的版本继承而来的，需要进一步确定能否精简
+        self.submissions: list[Submission] = []
+        self.passed_puzzles: set[tuple[Puzzle, Submission]] = set()
+        self.success_submissions: list[Submission] = []
+
         # 游戏状态
         self.finished: bool = False  # 完赛标记
         self.finished_timestamp_s: int = -1
@@ -82,12 +88,15 @@ class TeamGameStatus:
         return self.puzzle_status_by_key[puzzle_key].visible
 
     def on_submission(self, submission: Submission, is_reloading: bool) -> None:
+        self.submissions.append(submission)
         match submission.result.type:
             case 'pass':
                 # 这里需要考虑多解的题的处理
                 assert submission.puzzle.model.key not in self.passed_puzzle_keys
                 puzzle_key = submission.puzzle.model.key
                 self.passed_puzzle_keys[submission.puzzle.model.key] = int(submission.store.created_at / 1000)
+                self.passed_puzzles.add((submission.puzzle, submission))
+                self.success_submissions.append(submission)
 
                 if puzzle_key.startswith('day1'):
                     if puzzle_key == 'day1_meta':

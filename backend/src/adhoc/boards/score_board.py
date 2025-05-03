@@ -101,7 +101,7 @@ class ScoreBoard(Board):
                             sub.store.created_at,
                             sub.gained_score(),
                         ]
-                        for sub in team.success_submissions
+                        for sub in team.game_status.success_submissions
                         if sub.store.created_at <= board_end_ts * 1000
                     ],
                 }
