@@ -30,7 +30,7 @@ class StaffTeamGameStatus(TeamGameStatus):
     def on_submission(self, submission: Submission, is_reloading: bool) -> None:
         # 和普通队伍不同的是，staff 队伍不需要解锁谜题，所以所有解锁相关的都不需要处理
         # 顺便，staff 队伍的 submission type 也都跟普通队伍区分开，用于做一些特殊处理
-
+        self.submissions.append(submission)
         self.puzzle_status_by_key[submission.puzzle.model.key].on_submission(submission, is_reloading)
         # staff 重复提交答案的问题
         self.puzzle_status_by_key[submission.puzzle.model.key].submission_set.clear()

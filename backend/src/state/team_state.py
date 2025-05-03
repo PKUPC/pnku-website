@@ -20,7 +20,7 @@ from .base import WithGameLifecycle
 
 
 if TYPE_CHECKING:
-    from . import Game, Puzzle, Submission, TeamEvent, User
+    from . import Game, Submission, TeamEvent, User
 
 
 class Teams(WithGameLifecycle):
@@ -140,10 +140,6 @@ class Team(WithGameLifecycle):
         self.leader: User = None  # type: ignore[assignment]
 
         # 以下是游戏相关的信息
-        self.passed_puzzles: set[tuple[Puzzle, Submission]] = set()
-        self.passed_submission_by_puzzle_key: dict[str, Submission] = {}
-        self.success_submissions: list[Submission] = []
-        self.submissions: list[Submission] = []
         self.last_success_submission_by_board: dict[str, Submission | None] = {}
 
         # 我们这里先简单的把分数设置为过的题目的数量
@@ -189,10 +185,6 @@ class Team(WithGameLifecycle):
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
         match reloading_type:
             case 'all':
-                self.passed_puzzles = set()
-                self.success_submissions = []
-                self.passed_submission_by_puzzle_key = {}
-                self.submissions = []
                 self.last_success_submission_by_board = {}
                 self.total_score = 0
                 self.score_by_board = {}
@@ -213,12 +205,8 @@ class Team(WithGameLifecycle):
         match event.model.info:
             case SubmissionEvent(submission_id=submission_id):
                 submission = self.game.submissions_by_id[submission_id]
-                self.submissions.append(submission)
                 self.game_status.on_submission(submission, is_reloading)
                 if submission.result.type == 'pass':
-                    self.passed_puzzles.add((submission.puzzle, submission))
-                    self.success_submissions.append(submission)
-                    self.passed_submission_by_puzzle_key[submission.puzzle.model.key] = submission
                     for _, board in self.game.boards.items():
                         if submission.puzzle.on_simple_board(board.key):
                             self.last_success_submission_by_board[board.key] = submission
@@ -355,7 +343,7 @@ class Team(WithGameLifecycle):
         self.total_score = 0
         self.score_by_board = {}
 
-        for puzzle, submission in self.passed_puzzles:
+        for puzzle, submission in self.game_status.passed_puzzles:
             score = submission.gained_score()
             for board in self.game.boards:
                 board_key = self.game.boards[board].key
@@ -375,7 +363,7 @@ class Team(WithGameLifecycle):
         self.total_score += score
 
     def get_submissions_by_puzzle_key(self, puzzle_key: str) -> list[Submission]:
-        return [x for x in self.submissions if x.store.puzzle_key == puzzle_key]
+        return [x for x in self.game_status.submissions if x.store.puzzle_key == puzzle_key]
 
     def get_default_ap_by_timestamp_s(self, timestamp_s: int) -> int:
         cur_ap_policy = self.game.policy.calc_ap_increase_policy_by_team(self)
@@ -457,11 +445,11 @@ class Team(WithGameLifecycle):
 
     @property
     def last_success_submission(self) -> Optional[Submission]:
-        return self.success_submissions[-1] if len(self.success_submissions) > 0 else None
+        return self.game_status.success_submissions[-1] if len(self.game_status.success_submissions) > 0 else None
 
     @property
     def last_submission(self) -> Optional[Submission]:
-        return self.submissions[-1] if len(self.submissions) > 0 else None
+        return self.game_status.submissions[-1] if len(self.game_status.submissions) > 0 else None
 
     @property
     def leader_and_members(self) -> list[str]:
@@ -547,10 +535,6 @@ class StaffTeam(Team):
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
         match reloading_type:
             case 'all':
-                self.passed_puzzles = set()
-                self.success_submissions = []
-                self.passed_submission_by_puzzle_key = {}
-                self.submissions = []
                 self.last_success_submission_by_board = {}
                 self.total_score = 0
                 self.score_by_board = {}
@@ -572,7 +556,6 @@ class StaffTeam(Team):
         match event.model.info:
             case SubmissionEvent(submission_id=submission_id):
                 submission = self.game.submissions_by_id[submission_id]
-                self.submissions.append(submission)
                 self.game_status.on_submission(submission, is_reloading)
 
         self.team_events.append(event)

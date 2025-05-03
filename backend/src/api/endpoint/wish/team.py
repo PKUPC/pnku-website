@@ -471,7 +471,7 @@ async def get_submission_history(req: Request, worker: Worker, user: Optional[Us
                     'info': sub.result.info,
                     'timestamp_s': int(sub.store.created_at / 1000),
                 }
-                for idx, sub in enumerate(user.team.submissions)
+                for idx, sub in enumerate(user.team.game_status.submissions)
             ][::-1],
             'passed_submissions': [
                 {
@@ -479,7 +479,7 @@ async def get_submission_history(req: Request, worker: Worker, user: Optional[Us
                     'gained_score': sub.gained_score(),
                     # "finished": sub.finished,
                 }
-                for sub in user.team.success_submissions
+                for sub in user.team.game_status.success_submissions
             ],
         }
     }
