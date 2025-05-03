@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import obfuscator from 'rollup-plugin-obfuscator';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { compression } from 'vite-plugin-compression2';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import svgr from 'vite-plugin-svgr';
@@ -19,7 +19,8 @@ function getCurrentTimeFormatted() {
 
 process.env.VITE_APP_BUILD_INFO = getCurrentTimeFormatted();
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, process.cwd(), '');
     return {
         root: '.',
         publicDir: 'public',
@@ -155,20 +156,20 @@ export default defineConfig(() => {
             port: 3333,
             proxy: {
                 '/service/': {
-                    target: 'http://127.0.0.1:10010',
+                    target: env.DEV_BACKEND_URL,
                     changeOrigin: true,
                     ws: true,
                 },
                 '/media/': {
-                    target: 'http://127.0.0.1:10010',
+                    target: env.DEV_BACKEND_URL,
                     changeOrigin: true,
                 },
                 '/m/': {
-                    target: 'http://127.0.0.1:10010',
+                    target: env.DEV_BACKEND_URL,
                     changeOrigin: true,
                 },
                 '/t/': {
-                    target: 'http://127.0.0.1:10010',
+                    target: env.DEV_BACKEND_URL,
                     changeOrigin: true,
                 },
             },
