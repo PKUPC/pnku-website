@@ -25,6 +25,21 @@ TBD
 python -m mypy.dmypy run
 ```
 
+### ruff 格式化与检查
+```bash
+# 提交前应确保运行过下面两个命令
+# 格式化
+ruff format
+# 代码风格检查并修复
+ruff check --fix
+
+# ci 中会使用下面的命令检查
+# 代码风格检查
+ruff check
+# 格式检查
+ruff format --check
+```
+
 TBD
 
 ## License
