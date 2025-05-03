@@ -2,16 +2,12 @@ from __future__ import annotations
 
 import time
 
-from typing import TYPE_CHECKING, Any, Dict, Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 from sqlalchemy import JSON, BigInteger, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
-
-if TYPE_CHECKING:
-    # noinspection PyUnresolvedReferences
-    pass
 from . import Table
 
 
@@ -79,7 +75,7 @@ class TeamEventStore(Table):
     team_id: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # 所有其他需要的信息都放在这里
-    info: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    info: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
 
     EXTRA_SNIPPETS = {
         'game_start': """{}""",
