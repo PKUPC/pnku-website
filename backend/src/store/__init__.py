@@ -11,7 +11,7 @@ from .game_policy_store import GamePolicyStore, GamePolicyStoreModel, PolicyMode
 from .hint_store import HintStore, HintStoreModel
 from .log_store import LogStore
 from .log_user_store import LogUserStore
-from .message_store import MessageStore
+from .message_store import MessageModel, MessageStore
 from .puzzle_store import PuzzleStore, PuzzleStoreModel
 from .submission_store import SubmissionStore
 from .team_event_store import (
@@ -24,7 +24,7 @@ from .team_event_store import (
     TeamEventStore,
 )
 from .team_store import TeamStore
-from .ticket_message_store import TicketMessageStore
+from .ticket_message_store import TicketMessageModel, TicketMessageStore
 from .ticket_store import ManualHintModel, TicketStore, TicketStoreModel
 from .trigger_store import TriggerStore
 from .user_store import UserStore
