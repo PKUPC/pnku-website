@@ -2,18 +2,33 @@ from __future__ import annotations
 
 import time
 
-from typing import TYPE_CHECKING
+from typing import Any, Literal
 
-from sqlalchemy import BigInteger, Integer, String, Text
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from sqlalchemy import JSON, BigInteger, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.utils.enum import EnumWrapper
 
-
-if TYPE_CHECKING:
-    # noinspection PyUnresolvedReferences
-    pass
 from . import Table
+
+
+class TicketMessageExtra(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    effective_after_ts: int | None = Field(default=None)
+
+
+class TicketMessageModel(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    created_at: int
+    ticket_id: int
+    user_id: int
+    direction: Literal['TO_PLAYER', 'TO_STAFF']
+    content_type: Literal['TEXT']
+    content: str
+    extra: TicketMessageExtra = Field(default=TicketMessageExtra())
 
 
 class TicketMessageStore(Table):
@@ -38,5 +53,24 @@ class TicketMessageStore(Table):
     content_type: Mapped[str] = mapped_column(String(32), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
 
+    extra: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+
     def __repr__(self) -> str:
         return f'[User#{self.user_id}][Ticket#{self.ticket_id}]'
+
+    def validated_model(self) -> TicketMessageModel:
+        """
+        assert model is validated
+        """
+        try:
+            model = TicketMessageModel.model_validate(self)
+        except ValidationError:
+            assert False
+        return model
+
+    def validate(self) -> tuple[bool, ValidationError | None]:
+        try:
+            _model = TicketMessageModel.model_validate(self)
+        except ValidationError as e:
+            return False, e
+        return True, None
