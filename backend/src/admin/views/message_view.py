@@ -1,8 +1,16 @@
+from typing import Any
+
+import flask_admin
+
 from src import store
 from src.admin import fields
 
 from ...logic import glitter
 from .base_view import BaseView
+
+
+class MessageExtraField(flask_admin.form.JSONField):  # type: ignore[misc]
+    widget = fields.JsonFormattedInput()
 
 
 class MessageView(BaseView):
@@ -30,6 +38,16 @@ class MessageView(BaseView):
         'direction': [(x, x) for x in store.MessageStore.DIRECTION.TYPE_SET],
         'content_type': [(x, x) for x in store.MessageStore.CONTENT_TYPE.TYPE_SET],
     }
+
+    form_overrides = {
+        'extra': MessageExtraField,
+    }
+
+    def on_model_change(self, form: Any, model: store.MessageStore, is_created: bool) -> None:
+        rst, e = model.validate()
+        if not rst:
+            assert e is not None
+            raise e
 
     def after_model_touched(self, model: store.MessageStore) -> None:
         self.emit_event(glitter.EventType.UPDATE_MESSAGE, model.id)

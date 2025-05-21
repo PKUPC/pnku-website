@@ -2,16 +2,33 @@ from __future__ import annotations
 
 import time
 
-from typing import TYPE_CHECKING
+from typing import Any, Literal
 
-from sqlalchemy import BigInteger, Boolean, Integer, String, Text
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from sqlalchemy import JSON, BigInteger, Boolean, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-
-if TYPE_CHECKING:
-    # noinspection PyUnresolvedReferences
-    pass
 from . import Table
+
+
+class MessageExtra(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    effective_after_ts: int | None = Field(default=None)
+
+
+class MessageModel(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    created_at: int
+    team_id: int
+    user_id: int
+    direction: Literal['to_user', 'to_staff']
+    content_type: Literal['text']
+    content: str
+    player_unread: bool
+    staff_unread: bool
+    extra: MessageExtra = Field(default=MessageExtra())
 
 
 class MessageStore(Table):
@@ -35,6 +52,8 @@ class MessageStore(Table):
     # 对于数据库存储来说，更新的时候可以考虑将历史的 **应当已读** 的信息都更新了
     player_unread: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     staff_unread: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+    extra: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
 
     class DIRECTION:
         TO_STAFF: str = 'to_staff'
@@ -62,3 +81,20 @@ class MessageStore(Table):
                 f'[User#{self.user_id} ask Staff content={self.content}'
                 f'su={self.staff_unread} pu={self.player_unread}]'
             )
+
+    def validated_model(self) -> MessageModel:
+        """
+        assert model is validated
+        """
+        try:
+            model = MessageModel.model_validate(self)
+        except ValidationError:
+            assert False
+        return model
+
+    def validate(self) -> tuple[bool, ValidationError | None]:
+        try:
+            _model = MessageModel.model_validate(self)
+        except ValidationError as e:
+            return False, e
+        return True, None
