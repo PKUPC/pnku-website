@@ -6,10 +6,7 @@ from sanic.request import Request
 
 from src import utils
 from src.state import User
-
-
-if TYPE_CHECKING:
-    pass
+from src.store.user_store import EmailLoginPropertyModel
 
 
 class UserJWTError(Exception):
@@ -39,7 +36,7 @@ def get_cur_user(req: Request) -> User | None:
             if user is not None and user.check_login() is not None:
                 return None
 
-            if user is not None and user.model.login_properties.type == 'email':
+            if user is not None and isinstance(user.model.login_properties, EmailLoginPropertyModel):
                 if info.get('jwt_salt', '') != user.model.login_properties.jwt_salt:
                     return None
 
