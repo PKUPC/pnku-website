@@ -31,7 +31,7 @@ app.config.REQUEST_MAX_SIZE = 1024 * 1024 * (1 + secret.REQUEST_MAX_SIZE_MB)
 def get_http_client(_req: Request) -> httpx.AsyncClient:
     return httpx.AsyncClient(
         http2=True,
-        proxies=secret.OAUTH_HTTP_PROXIES,  # type: ignore[arg-type]
+        mounts=secret.OAUTH_HTTP_MOUNTS,
         timeout=secret.OAUTH_HTTP_TIMEOUT,
     )
 

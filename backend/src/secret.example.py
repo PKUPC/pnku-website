@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import httpx
 import pathlib
-
 from typing import TYPE_CHECKING, Literal
 
 
@@ -143,9 +143,9 @@ FRONTEND_AUTH_ERROR_URL = '/login/error'
 BACKEND_HOSTNAME = 'localhost'  # used for oauth redirects
 BACKEND_SCHEME = 'http'  # used for oauth redirects
 
-OAUTH_HTTP_PROXIES = {
-    # will be passed to `httpx.AsyncClient`, see https://www.python-httpx.org/advanced/#http-proxying
-    'all://*github.com': None,  # 'http://127.0.0.1:xxxx',
+OAUTH_HTTP_MOUNTS: dict[str, httpx.AsyncBaseTransport | None] = {
+    # will be passed to `httpx.AsyncClient`, see https://www.python-httpx.org/advanced/transports/#routing
+    'all://*github.com': None, # httpx.AsyncHTTPTransport(proxy='http://127.0.0.1:7890'),
 }
 
 
