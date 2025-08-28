@@ -35,7 +35,6 @@ class Worker(StateContainerBase):
         self.action_socket.setsockopt(zmq.SNDTIMEO, glitter.CALL_TIMEOUT_MS)
         self.action_socket.setsockopt(zmq.REQ_RELAXED, 1)
         self.event_socket.setsockopt(zmq.RCVTIMEO, glitter.SYNC_TIMEOUT_MS)
-        self.event_socket.setsockopt(zmq.SNDTIMEO, glitter.SYNC_TIMEOUT_MS)
 
         self.action_socket.connect(secret.GLITTER_ACTION_SOCKET_ADDR)
         self.event_socket.connect(secret.GLITTER_EVENT_SOCKET_ADDR)
@@ -110,7 +109,7 @@ class Worker(StateContainerBase):
 
         # reduce the possibility of losing initial event_socket packets
         # (we are still sound in this case, but some time is wasted waiting for next SYNC)
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(0.4)
 
         await self._sync_with_reducer(throttled=False)
 
@@ -118,9 +117,8 @@ class Worker(StateContainerBase):
         self.log('success', 'worker.mainloop', 'started to receive events')
         while True:
             try:
-                cond = glitter.Event.next(self.event_socket)
-                event = await asyncio.wait_for(cond, glitter.SYNC_TIMEOUT_MS / 1000)
-            except asyncio.exceptions.TimeoutError as e:
+                event = await glitter.Event.next(self.event_socket)
+            except zmq.error.Again as e:
                 self.log('warning', 'worker.mainloop', f'event receive timeout, will recover: {utils.get_traceback(e)}')
                 await self._sync_with_reducer()
                 continue

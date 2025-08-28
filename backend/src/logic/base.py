@@ -480,7 +480,7 @@ class StateContainerBase(ABC):
         if level in secret.STDOUT_LOG_LEVEL:
             print(log_str)
         if level in secret.STDERR_LOG_LEVEL:
-            print(log_str, sys.stderr)
+            print(log_str, file=sys.stderr)
 
         if level in secret.DB_LOG_LEVEL:
             with self.SqlSession() as session:
