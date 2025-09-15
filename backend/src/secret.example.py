@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-import httpx
 import pathlib
+
 from typing import TYPE_CHECKING, Literal
+
+import httpx
 
 
 if TYPE_CHECKING:
@@ -145,7 +147,7 @@ BACKEND_SCHEME = 'http'  # used for oauth redirects
 
 OAUTH_HTTP_MOUNTS: dict[str, httpx.AsyncBaseTransport | None] = {
     # will be passed to `httpx.AsyncClient`, see https://www.python-httpx.org/advanced/transports/#routing
-    'all://*github.com': None, # httpx.AsyncHTTPTransport(proxy='http://127.0.0.1:7890'),
+    'all://*github.com': None,  # httpx.AsyncHTTPTransport(proxy='http://127.0.0.1:7890'),
 }
 
 
