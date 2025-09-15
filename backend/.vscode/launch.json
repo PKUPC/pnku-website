@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Reducer",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "run_reducer_admin.py",
+      "console": "internalConsole",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    {
+      "name": "Run Worker",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "run_worker_api.py",
+      "console": "internalConsole",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Run Reducer and Worker",
+      "configurations": [
+        "Run Reducer",
+        "Run Worker"
+      ]
+    }
+  ]
+}
