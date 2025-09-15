@@ -85,6 +85,9 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
+case-sensitive = true
+combine-as-imports = true
+force-wrap-aliases = true
 known-first-party = ["src"]
 lines-after-imports = 2
 lines-between-types = 1
