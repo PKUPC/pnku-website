@@ -4,14 +4,14 @@ TBD
 
 ## 开发
 
-使用 python 3.11 开发，使用 poetry 管理项目。
+使用 python 3.11 开发，使用 [uv](https://docs.astral.sh/uv/) 管理项目。
 
 ### 依赖
 
-- 安装依赖：`poetry install`
-- 更新依赖：`poetry update`
-- 导出部署时需要的依赖：`poetry export -f requirements.txt --output requirements.txt --without-hashes`
-- 导出包含 `dev` 的依赖：`poetry export -f requirements.txt --output requirements-dev.txt --without-hashes --with dev
+- 安装依赖：`uv sync`
+- 更新依赖：`uv lock --upgrade`
+- 导出部署时需要的依赖：`uv export --format requirements.txt --no-dev --no-hashes > requirements.txt`
+- 导出包含 `dev` 的依赖：`uv export --format requirements.txt --no-hashes > requirements-dev.txt
 `
 
 ### 运行

@@ -1,74 +1,171 @@
-aiofiles==24.1.0 ; python_version >= "3.11" and python_version < "4.0"
-aiosmtplib==3.0.2 ; python_version >= "3.11" and python_version < "4.0"
-annotated-types==0.7.0 ; python_version >= "3.11" and python_version < "4.0"
-anyio==4.10.0 ; python_version >= "3.11" and python_version < "4.0"
-bleach-allowlist==1.0.3 ; python_version >= "3.11" and python_version < "4.0"
-bleach==6.2.0 ; python_version >= "3.11" and python_version < "4.0"
-blinker==1.9.0 ; python_version >= "3.11" and python_version < "4.0"
-certifi==2025.8.3 ; python_version >= "3.11" and python_version < "4.0"
-cffi==1.17.1 ; python_version >= "3.11" and python_version < "4.0" and (implementation_name == "pypy" or platform_python_implementation != "PyPy")
-click==8.2.1 ; python_version >= "3.11" and python_version < "4.0"
-colorama==0.4.6 ; python_version >= "3.11" and python_version < "4.0" and platform_system == "Windows"
-cryptography==45.0.6 ; python_version >= "3.11" and python_version < "4.0"
-dnspython==2.7.0 ; python_version >= "3.11" and python_version < "4.0"
-email-validator==2.3.0 ; python_version >= "3.11" and python_version < "4.0"
-flask-admin==1.6.1 ; python_version >= "3.11" and python_version < "4.0"
-flask-sqlalchemy==3.1.1 ; python_version >= "3.11" and python_version < "4.0"
-flask==2.3.3 ; python_version >= "3.11" and python_version < "4.0"
-gevent==25.5.1 ; python_version >= "3.11" and python_version < "4.0"
-greenlet==3.2.4 ; python_version >= "3.11" and platform_python_implementation == "CPython" and python_version < "4.0" or python_version >= "3.11" and python_version < "3.14" and (platform_machine == "aarch64" or platform_machine == "ppc64le" or platform_machine == "x86_64" or platform_machine == "amd64" or platform_machine == "AMD64" or platform_machine == "win32" or platform_machine == "WIN32")
-h11==0.16.0 ; python_version >= "3.11" and python_version < "4.0"
-h2==4.3.0 ; python_version >= "3.11" and python_version < "4.0"
-hpack==4.1.0 ; python_version >= "3.11" and python_version < "4.0"
-html5tagger==1.3.0 ; python_version >= "3.11" and python_version < "4.0"
-httpcore==1.0.9 ; python_version >= "3.11" and python_version < "4.0"
-httptools==0.6.4 ; python_version >= "3.11" and python_version < "4.0"
-httpx[http2]==0.28.1 ; python_version >= "3.11" and python_version < "4.0"
-hyperframe==6.1.0 ; python_version >= "3.11" and python_version < "4.0"
-idna==3.10 ; python_version >= "3.11" and python_version < "4.0"
-itsdangerous==2.2.0 ; python_version >= "3.11" and python_version < "4.0"
-jinja2==3.1.6 ; python_version >= "3.11" and python_version < "4.0"
-markdown==3.8.2 ; python_version >= "3.11" and python_version < "4.0"
-markupsafe==3.0.2 ; python_version >= "3.11" and python_version < "4.0"
-multidict==6.6.4 ; python_version >= "3.11" and python_version < "4.0"
-mypy-extensions==1.1.0 ; python_version >= "3.11" and python_version < "4.0"
-mypy==1.17.1 ; python_version >= "3.11" and python_version < "4.0"
-pathspec==0.12.1 ; python_version >= "3.11" and python_version < "4.0"
-psutil==6.1.1 ; python_version >= "3.11" and python_version < "4.0"
-pycparser==2.22 ; python_version >= "3.11" and python_version < "4.0" and (implementation_name == "pypy" or platform_python_implementation != "PyPy")
-pydantic-core==2.33.2 ; python_version >= "3.11" and python_version < "4.0"
-pydantic==2.11.7 ; python_version >= "3.11" and python_version < "4.0"
-pyjwt==2.10.1 ; python_version >= "3.11" and python_version < "4.0"
-pymysql==1.1.2 ; python_version >= "3.11" and python_version < "4.0"
-pytz==2025.2 ; python_version >= "3.11" and python_version < "4.0"
-pyyaml==6.0.2 ; python_version >= "3.11" and python_version < "4.0"
-pyzmq==26.4.0 ; python_version >= "3.11" and python_version < "4.0"
-ruff==0.7.4 ; python_version >= "3.11" and python_version < "4.0"
-sanic-ext==24.12.0 ; python_version >= "3.11" and python_version < "4.0"
-sanic-routing==23.12.0 ; python_version >= "3.11" and python_version < "4.0"
-sanic[ext]==25.3.0 ; python_version >= "3.11" and python_version < "4.0"
-setuptools==80.9.0 ; python_version >= "3.11" and python_version < "4.0"
-sniffio==1.3.1 ; python_version >= "3.11" and python_version < "4.0"
-sqlalchemy==2.0.43 ; python_version >= "3.11" and python_version < "4.0"
-tracerite==1.1.3 ; python_version >= "3.11" and python_version < "4.0"
-types-aiofiles==24.1.0.20250822 ; python_version >= "3.11" and python_version < "4.0"
-types-bleach==6.2.0.20250809 ; python_version >= "3.11" and python_version < "4.0"
-types-cffi==1.17.0.20250822 ; python_version >= "3.11" and python_version < "4.0"
-types-cryptography==3.3.23.2 ; python_version >= "3.11" and python_version < "4.0"
-types-html5lib==1.1.11.20250809 ; python_version >= "3.11" and python_version < "4.0"
-types-markdown==3.8.0.20250809 ; python_version >= "3.11" and python_version < "4.0"
-types-psutil==6.1.0.20241221 ; python_version >= "3.11" and python_version < "4.0"
-types-pyopenssl==24.1.0.20240722 ; python_version >= "3.11" and python_version < "4.0"
-types-pytz==2024.2.0.20241221 ; python_version >= "3.11" and python_version < "4.0"
-types-setuptools==80.9.0.20250822 ; python_version >= "3.11" and python_version < "4.0"
-types-wtforms==3.2.1.20250809 ; python_version >= "3.11" and python_version < "4.0"
-typing-extensions==4.15.0 ; python_version >= "3.11" and python_version < "4.0"
-typing-inspection==0.4.1 ; python_version >= "3.11" and python_version < "4.0"
-ujson==5.11.0 ; sys_platform != "win32" and implementation_name == "cpython" and python_version >= "3.11" and python_version < "4.0"
-uvloop==0.21.0 ; sys_platform != "win32" and implementation_name == "cpython" and python_version >= "3.11" and python_version < "4.0"
-webencodings==0.5.1 ; python_version >= "3.11" and python_version < "4.0"
-websockets==15.0.1 ; python_version >= "3.11" and python_version < "4.0"
-werkzeug==3.1.3 ; python_version >= "3.11" and python_version < "4.0"
-wtforms==3.1.2 ; python_version >= "3.11" and python_version < "4.0"
-zope-event==5.1.1 ; python_version >= "3.11" and python_version < "4.0"
-zope-interface==7.2 ; python_version >= "3.11" and python_version < "4.0"
+# This file was autogenerated by uv via the following command:
+#    uv export --format requirements.txt --no-hashes
+aiofiles==24.1.0
+    # via sanic
+aiosmtplib==3.0.2
+    # via backend
+annotated-types==0.7.0
+    # via pydantic
+anyio==4.10.0
+    # via httpx
+bleach==6.2.0
+    # via backend
+bleach-allowlist==1.0.3
+    # via backend
+blinker==1.9.0
+    # via flask
+certifi==2025.8.3
+    # via
+    #   httpcore
+    #   httpx
+cffi==2.0.0 ; implementation_name == 'pypy' or platform_python_implementation != 'PyPy'
+    # via
+    #   cryptography
+    #   gevent
+    #   pyzmq
+click==8.3.0
+    # via flask
+colorama==0.4.6 ; sys_platform == 'win32'
+    # via click
+cryptography==46.0.1
+    # via types-pyopenssl
+dnspython==2.8.0
+    # via email-validator
+email-validator==2.3.0
+    # via backend
+flask==2.3.3
+    # via
+    #   backend
+    #   flask-admin
+    #   flask-sqlalchemy
+flask-admin==1.6.1
+    # via backend
+flask-sqlalchemy==3.1.1
+    # via backend
+gevent==25.9.1
+    # via backend
+greenlet==3.2.4 ; platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64' or platform_python_implementation == 'CPython'
+    # via
+    #   gevent
+    #   sqlalchemy
+h11==0.16.0
+    # via httpcore
+h2==4.3.0
+    # via httpx
+hpack==4.1.0
+    # via h2
+html5tagger==1.3.0
+    # via
+    #   sanic
+    #   tracerite
+httpcore==1.0.9
+    # via httpx
+httptools==0.6.4
+    # via sanic
+httpx==0.28.1
+    # via backend
+hyperframe==6.1.0
+    # via h2
+idna==3.10
+    # via
+    #   anyio
+    #   email-validator
+    #   httpx
+itsdangerous==2.2.0
+    # via flask
+jinja2==3.1.6
+    # via flask
+markdown==3.9
+    # via backend
+markupsafe==3.0.2
+    # via
+    #   jinja2
+    #   types-wtforms
+    #   werkzeug
+    #   wtforms
+multidict==6.6.4
+    # via sanic
+mypy==1.18.2
+mypy-extensions==1.1.0
+    # via mypy
+pathspec==0.12.1
+    # via mypy
+psutil==6.1.1
+    # via backend
+pycparser==2.23 ; (implementation_name != 'PyPy' and platform_python_implementation != 'PyPy') or (implementation_name == 'pypy' and platform_python_implementation == 'PyPy')
+    # via cffi
+pydantic==2.11.9
+    # via backend
+pydantic-core==2.33.2
+    # via pydantic
+pyjwt==2.10.1
+    # via backend
+pymysql==1.1.2
+    # via backend
+pytz==2025.2
+    # via backend
+pyyaml==6.0.2
+    # via sanic-ext
+pyzmq==26.4.0
+    # via backend
+ruff==0.13.1
+sanic==25.3.0
+    # via backend
+sanic-ext==24.12.0
+    # via sanic
+sanic-routing==23.12.0
+    # via sanic
+setuptools==80.9.0
+    # via
+    #   sanic
+    #   zope-event
+    #   zope-interface
+sniffio==1.3.1
+    # via anyio
+sqlalchemy==2.0.43
+    # via flask-sqlalchemy
+tracerite==1.1.3
+    # via sanic
+types-aiofiles==24.1.0.20250822
+types-bleach==6.2.0.20250809
+types-cffi==1.17.0.20250915
+    # via types-pyopenssl
+types-cryptography==3.3.23.2
+types-html5lib==1.1.11.20250917
+    # via types-bleach
+types-markdown==3.9.0.20250906
+types-psutil==6.1.0.20241221
+types-pyopenssl==24.1.0.20240722
+types-pytz==2024.2.0.20241221
+types-setuptools==80.9.0.20250822
+    # via types-cffi
+types-wtforms==3.2.1.20250809
+typing-extensions==4.15.0
+    # via
+    #   anyio
+    #   mypy
+    #   pydantic
+    #   pydantic-core
+    #   sanic
+    #   sqlalchemy
+    #   typing-inspection
+typing-inspection==0.4.1
+    # via pydantic
+ujson==5.11.0 ; implementation_name == 'cpython' and sys_platform != 'win32'
+    # via sanic
+uvloop==0.21.0 ; implementation_name == 'cpython' and sys_platform != 'win32'
+    # via sanic
+webencodings==0.5.1
+    # via bleach
+websockets==15.0.1
+    # via sanic
+werkzeug==3.1.3
+    # via flask
+wtforms==3.1.2
+    # via
+    #   backend
+    #   flask-admin
+zope-event==6.0
+    # via gevent
+zope-interface==8.0
+    # via gevent
