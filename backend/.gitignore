@@ -1,14 +1,12 @@
 .idea
 
 __pycache__
-/venv/
-/migrations/
 
-/.dmypy.json
 /.mypy_cache
+/.ruff_cache
+/.venv
+/.dmypy.json
 
 /src/secret.py
 /src/custom.py
-
-/data/
-/test/
+/local*/
