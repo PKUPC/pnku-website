@@ -166,7 +166,7 @@ class JsonListInputWithSnippets(SyntaxHighlightInput):
                     editor.focus();
                 {'}'}
             </script>
-            {"".join(snippets)}
+            {''.join(snippets)}
         """)
 
 
@@ -210,7 +210,7 @@ class JsonObjectInputWithSingleSnippet(SyntaxHighlightInput):
                     editor.focus();
                 {'}'}
             </script>
-            {"".join(snippets)}
+            {''.join(snippets)}
         """)
 
 

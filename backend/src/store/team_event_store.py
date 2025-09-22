@@ -86,7 +86,7 @@ class TeamEventStore(Table):
     }
 
     def __repr__(self) -> str:
-        return f"Event#{self.id} type=\"{self.info['type']}\" info={self.info}"
+        return f'Event#{self.id} type="{self.info["type"]}" info={self.info}'
 
     def validated_model(self) -> TeamEventStoreModel:
         """

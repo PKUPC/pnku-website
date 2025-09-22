@@ -35,8 +35,8 @@ class PuzzleView(BaseView):
         'actions': lambda _v, _c, model, _n: '；'.join([f'[{a["type"]}] {a["name"]}' for a in model.actions]),
         'triggers': lambda _v, _c, model, _n: '；'.join([f'{f["type"]}: {f["value"]}' for f in model.triggers]),
         'puzzle_metadata': lambda _v, _c, model, _n: (
-            f"type: {model.puzzle_metadata.get('type', 'unknown')}; "
-            f"author: {model.puzzle_metadata.get('author', 'unknown')}"
+            f'type: {model.puzzle_metadata.get("type", "unknown")}; '
+            f'author: {model.puzzle_metadata.get("author", "unknown")}'
         ),
     }
     column_descriptions = {
