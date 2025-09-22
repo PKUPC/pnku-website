@@ -259,7 +259,7 @@ class Team(WithGameLifecycle):
                                 'type': 'staff_action',
                                 'action': 'modify_ap',
                                 'message': (
-                                    f"工作人员{'增加' if event.ap_change > 0 else '扣除'}了你们队伍的注意力。原因是：{event.model.info.reason}"
+                                    f'工作人员{"增加" if event.ap_change > 0 else "扣除"}了你们队伍的注意力。原因是：{event.model.info.reason}'
                                 ),
                             },
                         }
@@ -275,7 +275,7 @@ class Team(WithGameLifecycle):
                                 'type': 'staff_action',
                                 'action': 'modify_spap',
                                 'message': (
-                                    f"工作人员{'增加' if event.model.info.spap_change > 0 else '扣除'}了你们队伍的注意力。原因是：{event.model.info.reason}"
+                                    f'工作人员{"增加" if event.model.info.spap_change > 0 else "扣除"}了你们队伍的注意力。原因是：{event.model.info.reason}'
                                 ),
                             },
                         }

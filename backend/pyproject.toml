@@ -28,8 +28,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "mypy>=1.11.1,<2.0",
-    "ruff>=0.7.3,<1.0",
+    "mypy>=1.18,<2.0",
+    "ruff>=0.13,<1.0",
     "types-aiofiles>=24.1.0.20240626,<25.0.0",
     "types-bleach>=6.1.0.20240331,<7.0.0",
     "types-cryptography>=3.3.23.2,<4.0.0",

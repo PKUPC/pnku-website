@@ -28,7 +28,7 @@ def _user_nickname_formatter(_view: Any, _context: Any, model: store.UserStore, 
     user = reducer.game_nocheck.users.user_by_id.get(model.id, None)
 
     if user is None:
-        return '[NONE]' + f"{model.user_info.get('nickname', 'NONE')}"
+        return '[NONE]' + f'{model.user_info.get("nickname", "NONE")}'
 
     return f'{user.model.user_info.nickname}'
 

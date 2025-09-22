@@ -78,8 +78,7 @@ class MessageStore(Table):
             )
         else:
             return (
-                f'[User#{self.user_id} ask Staff content={self.content}'
-                f'su={self.staff_unread} pu={self.player_unread}]'
+                f'[User#{self.user_id} ask Staff content={self.content}su={self.staff_unread} pu={self.player_unread}]'
             )
 
     def validated_model(self) -> MessageModel:
