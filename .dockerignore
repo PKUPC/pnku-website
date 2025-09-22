@@ -8,5 +8,10 @@
 frontend/node_modules
 frontend/build
 
+backend/.mypy_cache
+backend/.ruff_cache
+backend/.venv
+backend/.dmypy.json
+
 backend/src/custom.py
 backend/src/secret.py
