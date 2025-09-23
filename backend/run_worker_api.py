@@ -1,8 +1,6 @@
 import logging
 import multiprocessing
 
-from typing import List
-
 from src import utils
 
 
@@ -23,7 +21,7 @@ def process(idx0: int) -> None:
 
 if __name__ == '__main__':
     utils.fix_zmq_asyncio_windows()
-    ps: List[multiprocessing.Process] = []
+    ps: list[multiprocessing.Process] = []
 
     for i in range(src.secret.N_WORKERS):
         p = multiprocessing.Process(target=process, args=(i,))

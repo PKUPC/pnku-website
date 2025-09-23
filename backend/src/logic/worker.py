@@ -44,7 +44,7 @@ class Worker(StateContainerBase):
         self.state_counter_cond: asyncio.Condition = asyncio.Condition()
 
         self.last_heartbeat_time: float = 0
-        self._heartbeat_task: Optional[asyncio.Task[None]] = None
+        self._heartbeat_task: asyncio.Task[None] | None = None
 
     async def _sync_with_reducer(self, *, throttled: bool = True) -> None:
         self.game_dirty = True
@@ -179,7 +179,7 @@ class Worker(StateContainerBase):
                 async with self.state_counter_cond:
                     cond = self.state_counter_cond.wait_for(lambda: self.state_counter >= rep.state_counter)
                     await asyncio.wait_for(cond, glitter.CALL_TIMEOUT_MS / 1000)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 self.log(
                     'error', 'worker.perform_action', f'state sync timeout: {self.state_counter} -> {rep.state_counter}'
                 )

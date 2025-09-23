@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any
 
 from src.store import AnnouncementStore
 
@@ -29,11 +29,11 @@ class Announcements:
         self.list_by_time = self.list[:]
         self.list_by_time = sorted(self.list_by_time, key=lambda x: (-x.store.publish_at))
 
-    def on_store_reload(self, stores: List[AnnouncementStore]) -> None:
+    def on_store_reload(self, stores: list[AnnouncementStore]) -> None:
         self.list = [Announcement(self._game, x) for x in stores]
         self._sort_list()
 
-    def on_store_update(self, announcement_id: int, new_store: Optional[AnnouncementStore]) -> None:
+    def on_store_update(self, announcement_id: int, new_store: AnnouncementStore | None) -> None:
         other_announcements = [x for x in self.list if x.store.id != announcement_id]
 
         if new_store is None:  # delete
@@ -85,7 +85,7 @@ class Announcement:
             )
             return '<i>（模板渲染失败）</i>'
 
-    def describe_json(self, user: Optional[User]) -> Dict[str, Any]:
+    def describe_json(self, user: User | None) -> dict[str, Any]:
         return {
             'id': self.store.id,
             'category': AnnouncementStore.Category.dict()[self.store.category],

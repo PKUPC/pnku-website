@@ -19,7 +19,7 @@ bp: Blueprint = Blueprint('wish-upload', url_prefix='/wish/upload')
 @bp.route('/upload_image', ['POST'])
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def upload_image(req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def upload_image(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 
@@ -77,7 +77,7 @@ async def upload_image(req: Request, worker: Worker, user: Optional[User]) -> di
 @bp.route('/get_uploaded_images', ['POST'])
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_uploaded_images(req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_uploaded_images(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 

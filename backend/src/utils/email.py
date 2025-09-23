@@ -1,7 +1,6 @@
 from email.header import Header
 from email.message import Message
 from email.mime.text import MIMEText
-from typing import Tuple, Union
 
 import aiosmtplib
 
@@ -43,7 +42,7 @@ _HTML_TEMPLATE = """
 # (554, 'Reject by behaviour spamANTISPAM_BAT[01201311R2268S1430114234, maildocker-behaviorspam033045086103]: too frequently sending')
 
 
-async def send_email(massage: Message) -> Tuple[bool, Union[None, str]]:
+async def send_email(massage: Message) -> tuple[bool, None | str]:
     try:
         await aiosmtplib.send(
             massage,
@@ -66,7 +65,7 @@ async def send_email(massage: Message) -> Tuple[bool, Union[None, str]]:
     return True, None
 
 
-async def send_reg_email(password: str, to: str) -> Tuple[bool, Union[None, str]]:
+async def send_reg_email(password: str, to: str) -> tuple[bool, None | str]:
     # msg = MIMEText(password, "plain", "utf-8")
     msg = MIMEText(
         _HTML_TEMPLATE.format(

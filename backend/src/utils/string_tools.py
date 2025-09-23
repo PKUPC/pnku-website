@@ -3,7 +3,8 @@ import random
 import secrets
 import time
 
-from typing import Callable, Union
+from collections.abc import Callable
+from typing import Union
 
 import pytz
 
@@ -15,7 +16,7 @@ def gen_random_str(length: int = 32, *, crypto: bool = False) -> str:
     return ''.join([choice(alphabet) for _ in range(length)])
 
 
-def format_timestamp(timestamp_s: Union[float, int]) -> str:
+def format_timestamp(timestamp_s: float | int) -> str:
     date = datetime.datetime.fromtimestamp(timestamp_s, pytz.timezone('Asia/Shanghai'))
     t = date.strftime('%Y-%m-%d %H:%M:%S')
     if isinstance(timestamp_s, float):

@@ -6,7 +6,7 @@ import pickle
 
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Any, List, Literal, Optional
+from typing import Any, Literal
 
 from zmq.asyncio import Socket
 
@@ -252,7 +252,7 @@ CALL_TIMEOUT_MS = 5000
 
 
 class Action:
-    _lock: Optional[asyncio.Lock] = None
+    _lock: asyncio.Lock | None = None
 
     def __init__(self, req: ActionReq):
         self.req: ActionReq = req
@@ -282,7 +282,7 @@ class Action:
     # server
 
     @classmethod
-    async def listen(cls, sock: Socket) -> Optional[Action]:
+    async def listen(cls, sock: Socket) -> Action | None:
         pkt = await sock.recv_multipart()
         try:
             assert len(pkt) == 2, 'action req packet should contain one part'
@@ -331,7 +331,7 @@ class Event:
     # server
 
     async def send(self, sock: Socket) -> None:
-        data: List[bytes] = [
+        data: list[bytes] = [
             self.type.value,
             str(self.state_counter).encode('utf-8'),
             str(self.data).encode('utf-8'),

@@ -1,7 +1,6 @@
 import re
 
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 from sanic import Blueprint, HTTPResponse, Request, response
 
@@ -29,7 +28,7 @@ def etagged_response(req: Request, etag: str, html_body: str) -> HTTPResponse:
         return response.html(html_body, headers={'ETag': etag})
 
 
-_cache: Dict[Tuple[str, Optional[str], int], Tuple[int, str]] = {}
+_cache: dict[tuple[str, str | None, int], tuple[int, str]] = {}
 
 PUBLIC_TEMPLATE = ['introduction', 'faq', 'tools', 'endoftime']
 if secret.DEBUG_MODE:
@@ -40,7 +39,7 @@ if secret.DEBUG_MODE:
 TEMPLATE_AFTER_GAME_START = {'day1_intro'}
 
 
-def check_template_permission(filename: str, worker: Worker, user: Optional[User]) -> bool:
+def check_template_permission(filename: str, worker: Worker, user: User | None) -> bool:
     # 写给 admin 看的信息
     if filename == 'admin_doc':
         return user is not None and secret.IS_ADMIN(user.model.id)
@@ -80,7 +79,7 @@ def is_safe_path(path: str) -> bool:
 
 
 @bp.route('/<filename:path>')
-async def get_template(req: Request, filename: str, worker: Worker, user: Optional[User]) -> HTTPResponse:
+async def get_template(req: Request, filename: str, worker: Worker, user: User | None) -> HTTPResponse:
     if worker.game is None:
         return response.text('服务暂时不可用', status=403)
 

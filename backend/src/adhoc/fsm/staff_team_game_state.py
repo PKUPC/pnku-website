@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Hashable
+from collections.abc import Hashable
+from typing import TYPE_CHECKING, Any
 
 from src.store import PuzzleActionEvent
 

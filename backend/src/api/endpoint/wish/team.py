@@ -4,7 +4,7 @@
 
 import time
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 from sanic import Blueprint, Request
@@ -32,7 +32,7 @@ class CreateTeamParam(BaseModel):
 @validate(json=CreateTeamParam)
 @wish_response
 @wish_checker(['user_login'])
-async def create_team(req: Request, body: CreateTeamParam, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def create_team(req: Request, body: CreateTeamParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     if worker.game_nocheck.is_game_end():
         return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
@@ -103,7 +103,7 @@ class UpdateTeamInfoParam(BaseModel):
 @validate(json=UpdateTeamInfoParam)
 @wish_response
 @wish_checker(['player_in_team'])
-async def update_team(req: Request, body: UpdateTeamInfoParam, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def update_team(req: Request, body: UpdateTeamInfoParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
 
     if worker.game_nocheck.is_game_end():
@@ -189,8 +189,8 @@ class UpdateExtraTeamInfoParam(BaseModel):
 @wish_response
 @wish_checker(['player_in_team'])
 async def update_extra_team_info(
-    req: Request, body: UpdateExtraTeamInfoParam, worker: Worker, user: Optional[User]
-) -> Dict[str, Any]:
+    req: Request, body: UpdateExtraTeamInfoParam, worker: Worker, user: User | None
+) -> dict[str, Any]:
     assert user is not None
 
     if worker.game_nocheck.is_game_end():
@@ -268,7 +268,7 @@ class JoinTeamParam(BaseModel):
 @validate(json=JoinTeamParam)
 @wish_response
 @wish_checker(['user_login'])
-async def join_team(req: Request, body: JoinTeamParam, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def join_team(req: Request, body: JoinTeamParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert worker.game is not None
 
@@ -322,7 +322,7 @@ async def join_team(req: Request, body: JoinTeamParam, worker: Worker, user: Opt
 @bp.route('/leave_team', ['POST'])
 @wish_response
 @wish_checker(['player_in_team'])
-async def leave_team(req: Request, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def leave_team(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 
@@ -364,7 +364,7 @@ class RemoveUserParam(BaseModel):
 @validate(json=RemoveUserParam)
 @wish_response
 @wish_checker(['player_in_team'])
-async def remove_user(req: Request, body: RemoveUserParam, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def remove_user(req: Request, body: RemoveUserParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 
@@ -405,7 +405,7 @@ class ChangeLeaderParam(BaseModel):
 @validate(json=ChangeLeaderParam)
 @wish_response
 @wish_checker(['player_in_team'])
-async def change_leader(req: Request, body: ChangeLeaderParam, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def change_leader(req: Request, body: ChangeLeaderParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
     if worker.game_nocheck.is_game_end():
@@ -438,7 +438,7 @@ async def change_leader(req: Request, body: ChangeLeaderParam, worker: Worker, u
 @bp.route('/get_ap_change_history', ['POST'])
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_ap_change_history(req: Request, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def get_ap_change_history(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     if user.model.group == 'staff':
         return {'status': 'error', 'title': 'NOT_IMPLEMENT', 'message': 'staff 暂时无法调用这个接口'}
@@ -453,7 +453,7 @@ async def get_ap_change_history(req: Request, worker: Worker, user: Optional[Use
 @bp.route('/get_submission_history', ['POST'])
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_submission_history(req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_submission_history(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     if user.model.group == 'staff':
         return {'status': 'error', 'title': 'NOT_IMPLEMENT', 'message': 'staff 暂时无法调用这个接口'}
@@ -492,7 +492,7 @@ async def get_submission_history(req: Request, worker: Worker, user: Optional[Us
 @bp.route('/get_puzzle_statistics', ['POST'])
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_puzzle_statistics(req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_puzzle_statistics(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     if user.model.group == 'staff':
         return {'status': 'error', 'title': 'NOT_IMPLEMENT', 'message': 'staff 暂时无法调用这个接口'}

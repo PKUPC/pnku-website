@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import time
 
-from typing import TYPE_CHECKING, Hashable
+from collections.abc import Hashable
+from typing import TYPE_CHECKING
 
 from ..team_puzzle_status import TeamPuzzleStatus
 

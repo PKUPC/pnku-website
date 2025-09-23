@@ -26,7 +26,7 @@ class SendMsgParam(BaseModel):
 @validate(json=SendMsgParam)
 @wish_response
 @wish_checker(['player_in_team', 'intro_unlock'])
-async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 
@@ -122,7 +122,7 @@ class ReadMsgParam(BaseModel):
 @validate(json=ReadMsgParam)
 @wish_response
 @wish_checker(['player_in_team'])
-async def read_message(req: Request, body: ReadMsgParam, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def read_message(req: Request, body: ReadMsgParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 

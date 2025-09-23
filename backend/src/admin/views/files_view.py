@@ -1,4 +1,4 @@
-from typing import Any, Type
+from typing import Any
 
 from flask_admin.babel import lazy_gettext
 from flask_admin.form import SecureForm
@@ -21,7 +21,7 @@ class FilesView(FileAdmin):
     form_base_class = SecureForm
     edit_template = 'edit_ace.html'
 
-    def get_edit_form(self) -> Type[Any]:
+    def get_edit_form(self) -> type[Any]:
         class EditForm(self.form_base_class):  # type: ignore[name-defined, misc]
             content = fields.PythonField(lazy_gettext('Content'), (validators.InputRequired(),))
 

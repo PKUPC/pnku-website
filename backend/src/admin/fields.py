@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from typing import Any, Dict, List
+from typing import Any
 
 import flask_admin.form
 import wtforms
@@ -33,7 +33,7 @@ class TimestampSField(wtforms.fields.IntegerField):
         else:
             return ''
 
-    def process_formdata(self, valuelist: List[str]) -> None:
+    def process_formdata(self, valuelist: list[str]) -> None:
         if valuelist:
             self.data = int(datetime.datetime.fromisoformat(valuelist[0]).timestamp())
         else:
@@ -53,7 +53,7 @@ class TimestampMsField(wtforms.fields.IntegerField):
         else:
             return ''
 
-    def process_formdata(self, valuelist: List[str]) -> None:
+    def process_formdata(self, valuelist: list[str]) -> None:
         if valuelist:
             self.data = int(datetime.datetime.fromisoformat(valuelist[0]).timestamp() * 1000)
         else:
@@ -126,7 +126,7 @@ class JsonFormattedInput(SyntaxHighlightInput):
 
 
 class JsonListInputWithSnippets(SyntaxHighlightInput):
-    def __init__(self, snippets: Dict[str, str]):
+    def __init__(self, snippets: dict[str, str]):
         self.snippets = snippets
         super().__init__('json')
 
@@ -171,7 +171,7 @@ class JsonListInputWithSnippets(SyntaxHighlightInput):
 
 
 class JsonObjectInputWithSingleSnippet(SyntaxHighlightInput):
-    def __init__(self, snippets: Dict[str, str]):
+    def __init__(self, snippets: dict[str, str]):
         self.snippets = snippets
         super().__init__('json')
 

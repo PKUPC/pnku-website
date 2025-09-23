@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Hashable
 from functools import lru_cache
-from typing import TYPE_CHECKING, Hashable, Literal
+from typing import TYPE_CHECKING, Literal
 
 from src import utils
 from src.adhoc import gen_puzzles_by_structure

@@ -1,6 +1,7 @@
 import json
 
-from typing import Any, Hashable
+from collections.abc import Hashable
+from typing import Any
 
 from sanic import Blueprint, HTTPResponse, Request, response
 

@@ -1,6 +1,7 @@
 import logging
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 
 CbMethod = Callable[[Any, Any], Any] | Callable[[Any, Any, Any], Any]

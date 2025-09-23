@@ -42,7 +42,7 @@ def get_worker(req: Request) -> Worker:
 
 app.ext.add_dependency(Worker, get_worker)
 app.ext.add_dependency(httpx.AsyncClient, get_http_client)
-app.ext.add_dependency(Optional[User], get_cur_user)
+app.ext.add_dependency(User | None, get_cur_user)
 
 
 @app.before_server_start

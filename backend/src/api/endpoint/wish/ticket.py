@@ -27,7 +27,7 @@ class RequestHintParam(BaseModel):
 @validate(json=RequestHintParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def request_hint(req: Request, body: RequestHintParam, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def request_hint(req: Request, body: RequestHintParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 
@@ -119,7 +119,7 @@ class GetHintListParam(BaseModel):
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
 async def get_manual_hints(
-    req: Request, body: GetHintListParam, worker: Worker, user: Optional[User]
+    req: Request, body: GetHintListParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
@@ -200,7 +200,7 @@ class GetTicketDetailParam(BaseModel):
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
 async def get_ticket_detail(
-    req: Request, body: GetTicketDetailParam, worker: Worker, user: Optional[User]
+    req: Request, body: GetTicketDetailParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
@@ -273,7 +273,7 @@ class SendMessageParam(BaseModel):
 @validate(json=SendMessageParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def send_message(req: Request, body: SendMessageParam, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def send_message(req: Request, body: SendMessageParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert worker.game is not None
     assert user.team is not None
@@ -347,7 +347,7 @@ class SetTicketStatusParam(BaseModel):
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
 async def set_ticket_status(
-    req: Request, body: SetTicketStatusParam, worker: Worker, user: Optional[User]
+    req: Request, body: SetTicketStatusParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
     assert worker.game is not None

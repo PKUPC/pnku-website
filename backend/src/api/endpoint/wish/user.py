@@ -28,7 +28,7 @@ class UpdateProfileParam:
 @wish_response
 @wish_checker(['user_login'])
 async def update_profile(
-    req: Request, body: UpdateProfileParam, worker: Worker, user: Optional[User]
+    req: Request, body: UpdateProfileParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
 
@@ -70,7 +70,7 @@ class ChangePasswordParam(BaseModel):
 @wish_response
 @wish_checker(['user_login'])
 async def change_password(
-    req: Request, body: ChangePasswordParam, worker: Worker, user: Optional[User]
+    req: Request, body: ChangePasswordParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
 

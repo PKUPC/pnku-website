@@ -1,7 +1,6 @@
 import time
 
 from collections import deque
-from typing import Deque, Dict
 
 import httpx
 
@@ -13,7 +12,7 @@ class Pusher:
     THROTTLE_N = 5
 
     def __init__(self) -> None:
-        self.chan_history: Dict[str, Deque[float]] = {}
+        self.chan_history: dict[str, deque[float]] = {}
 
     async def push_message(self, msg: str, chan: str) -> None:
         print('push message', chan)

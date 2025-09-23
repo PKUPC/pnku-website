@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -18,17 +18,17 @@ class Trigger:
     TICK_GAME_START = 1000
     TICK_GAME_END = 9000
 
-    def __init__(self, game: Game, stores: List[TriggerStore]):
+    def __init__(self, game: Game, stores: list[TriggerStore]):
         self._game: Game = game
-        self._stores: List[TriggerStore] = []
-        self.trigger_by_tick: Dict[int, TriggerStore] = {}
+        self._stores: list[TriggerStore] = []
+        self.trigger_by_tick: dict[int, TriggerStore] = {}
 
         self.board_begin_ts: int = 0
         self.board_end_ts: int = 0
 
         self.on_store_reload(stores)
 
-    def on_store_reload(self, stores: List[TriggerStore]) -> None:
+    def on_store_reload(self, stores: list[TriggerStore]) -> None:
         self._stores = sorted(stores, key=lambda s: s.timestamp_s)
         self.trigger_by_tick = {s.tick: s for s in self._stores}
 
@@ -48,7 +48,7 @@ class Trigger:
             self._game.log('error', 'trigger.on_store_reload', 'trigger_board_end not found, estimating a time for it')
             self.board_end_ts = self._stores[-1].timestamp_s if len(self._stores) > 0 else int(time.time()) + 600
 
-    def get_tick_at_time(self, timestamp_s: int) -> Tuple[int, int]:  # (current tick, timestamp when it expires)
+    def get_tick_at_time(self, timestamp_s: int) -> tuple[int, int]:  # (current tick, timestamp when it expires)
         assert timestamp_s < self.TS_INF_S, 'you are in the future'
 
         if not self._stores:
@@ -66,7 +66,7 @@ class Trigger:
         assert self._stores[idx].timestamp_s < expires  # always true because timestamp is unique and sorted
         return self._stores[idx].tick, expires
 
-    def describe_cur_tick(self) -> Tuple[str, Optional[int], Optional[str]]:
+    def describe_cur_tick(self) -> tuple[str, int | None, str | None]:
         # return: (cur_trigger_name, next_trigger_timestamp_s, next_trigger_name)
         cur_trigger = None
         next_trigger = None

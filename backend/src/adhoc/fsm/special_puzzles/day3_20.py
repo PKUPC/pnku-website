@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Hashable
+from collections.abc import Hashable
+from typing import TYPE_CHECKING
 
 from src import secret, utils
 from src.state.submission_state import SubmissionResult
