@@ -40,7 +40,7 @@ jobs:
         uses: actions/setup-python@v6
         if: steps.backend-check.outputs.has_changes == 'true'
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       
       - run: echo ${{ steps.setup-python.outputs.python-version }}
 
