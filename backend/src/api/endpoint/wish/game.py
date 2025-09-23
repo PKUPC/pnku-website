@@ -34,9 +34,7 @@ class GetAreaDetailParam(BaseModel):
 @validate(json=GetAreaDetailParam)
 @wish_response
 @wish_checker(['player_in_team'])
-async def get_area_detail(
-    req: Request, body: GetAreaDetailParam, worker: Worker, user: User | None
-) -> dict[str, Any]:
+async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff or user.team is not None
 
