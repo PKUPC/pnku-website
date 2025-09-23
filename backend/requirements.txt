@@ -2,11 +2,11 @@
 #    uv export --format requirements.txt --no-dev --no-hashes
 aiofiles==24.1.0
     # via sanic
-aiosmtplib==3.0.2
+aiosmtplib==4.0.2
     # via backend
 annotated-types==0.7.0
     # via pydantic
-anyio==4.10.0
+anyio==4.11.0
     # via httpx
 bleach==6.2.0
     # via backend
@@ -30,12 +30,12 @@ dnspython==2.8.0
     # via email-validator
 email-validator==2.3.0
     # via backend
-flask==2.3.3
+flask==3.1.2
     # via
     #   backend
     #   flask-admin
     #   flask-sqlalchemy
-flask-admin==1.6.1
+flask-admin==2.0.0a4
     # via backend
 flask-sqlalchemy==3.1.1
     # via backend
@@ -71,17 +71,21 @@ idna==3.10
 itsdangerous==2.2.0
     # via flask
 jinja2==3.1.6
-    # via flask
+    # via
+    #   flask
+    #   flask-admin
 markdown==3.9
     # via backend
 markupsafe==3.0.2
     # via
+    #   flask
+    #   flask-admin
     #   jinja2
     #   werkzeug
     #   wtforms
 multidict==6.6.4
     # via sanic
-psutil==6.1.1
+psutil==7.1.0
     # via backend
 pycparser==2.23 ; (implementation_name == 'pypy' and platform_python_implementation != 'CPython') or (implementation_name != 'PyPy' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (implementation_name == 'pypy' and sys_platform != 'win32')
     # via cffi
@@ -97,7 +101,7 @@ pytz==2025.2
     # via backend
 pyyaml==6.0.2
     # via sanic-ext
-pyzmq==26.4.0
+pyzmq==27.1.0
     # via backend
 sanic==25.3.0
     # via backend
@@ -135,11 +139,11 @@ webencodings==0.5.1
 websockets==15.0.1
     # via sanic
 werkzeug==3.1.3
-    # via flask
-wtforms==3.1.2
     # via
-    #   backend
+    #   flask
     #   flask-admin
+wtforms==3.2.1
+    # via flask-admin
 zope-event==6.0
     # via gevent
 zope-interface==8.0
