@@ -27,9 +27,7 @@ class UpdateProfileParam:
 @validate(json=UpdateProfileParam)
 @wish_response
 @wish_checker(['user_login'])
-async def update_profile(
-    req: Request, body: UpdateProfileParam, worker: Worker, user: User | None
-) -> dict[str, Any]:
+async def update_profile(req: Request, body: UpdateProfileParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
 
     if worker.game_nocheck.is_game_end():
@@ -69,9 +67,7 @@ class ChangePasswordParam(BaseModel):
 @validate(json=ChangePasswordParam)
 @wish_response
 @wish_checker(['user_login'])
-async def change_password(
-    req: Request, body: ChangePasswordParam, worker: Worker, user: User | None
-) -> dict[str, Any]:
+async def change_password(req: Request, body: ChangePasswordParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
 
     if user.model.login_properties.type == 'manual':

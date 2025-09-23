@@ -59,9 +59,7 @@ class GetTeamDetailParam(BaseModel):
 @validate(json=GetTeamDetailParam)
 @wish_response
 @wish_checker(['user_is_staff'])
-async def get_team_detail(
-    req: Request, body: GetTeamDetailParam, worker: Worker, user: User | None
-) -> dict[str, Any]:
+async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff
 

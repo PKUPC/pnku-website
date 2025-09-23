@@ -118,9 +118,7 @@ class GetHintListParam(BaseModel):
 @validate(json=GetHintListParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_manual_hints(
-    req: Request, body: GetHintListParam, worker: Worker, user: User | None
-) -> dict[str, Any]:
+async def get_manual_hints(req: Request, body: GetHintListParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 

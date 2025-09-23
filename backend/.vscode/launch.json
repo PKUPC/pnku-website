@@ -20,6 +20,16 @@
       "env": {
         "PYTHONUNBUFFERED": "1"
       }
+    },
+    {
+      "name": "Run All",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "run_all.py",
+      "console": "internalConsole",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
     }
   ],
   "compounds": [

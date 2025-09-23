@@ -115,9 +115,7 @@ class GetSubmissionsParam(BaseModel):
 @validate(json=GetSubmissionsParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_submissions(
-    req: Request, body: GetSubmissionsParam, worker: Worker, user: User | None
-) -> dict[str, Any]:
+async def get_submissions(req: Request, body: GetSubmissionsParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 

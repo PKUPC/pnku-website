@@ -1,4 +1,3 @@
-import logging
 import time
 
 from collections.abc import Awaitable, Callable
@@ -14,28 +13,21 @@ from . import glitter
 from .utils import make_callback_decorator
 
 
-logger = logging.getLogger('checker')
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('[%(asctime)s] [checker] [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S %z')
-logging_handlers = utils.make_logging_handlers(formatter)
-for handler in logging_handlers:
-    logger.addHandler(handler)
-
-
 class Checker:
     on_action, action_listeners = make_callback_decorator('Checker')
 
     def __init__(self, game: Game) -> None:
         self.game = game
+        self.log = game.log
 
     async def check_action(self, req: glitter.ActionReq, http_req: Request | None = None) -> dict[str, str] | None:
         if isinstance(req, glitter.WorkerHeartbeatReq):
             return None
 
-        logger.info(f'Checking action {req.type}.')
+        self.log('info', 'checker.check_action', f'check action {req.type}')
 
         async def default(_self: Any, _req: glitter.ActionReq, _http_req: Request | None = None) -> None:
-            logger.info(f'Action {req.type} are not registered in Checker.')
+            self.log('info', 'checker.check_action', f'action {req.type} are not registered in Checker.')
             return None
 
         listener: Callable[[Any, glitter.ActionReq, Request | None], Awaitable[dict[str, str] | None]] = (
