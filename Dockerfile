@@ -13,27 +13,27 @@ COPY ./frontend/ ./
 
 RUN pnpm build
 
-FROM python:3.11-slim-bookworm
+FROM python:3.12-slim-bookworm
 
-COPY ./docker-assets/debian.sources /etc/apt/sources.list.d/debian.sources
+COPY --chmod=644 ./docker-assets/debian.sources /etc/apt/sources.list.d/debian.sources
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    nginx-extras libnginx-mod-http-brotli-filter libnginx-mod-http-brotli-static\
+    nginx-extras libnginx-mod-http-brotli-filter libnginx-mod-http-brotli-static \
+    cron logrotate procps \
     && rm -rf /var/lib/apt/lists/*
 
 RUN rm /etc/nginx/sites-enabled/default
-COPY ./docker-assets/nginx.conf /etc/nginx/
-
+COPY --chmod=644 ./docker-assets/nginx.conf /etc/nginx/
+COPY --chmod=644 ./docker-assets/logrotate.conf /etc/logrotate.d/nginx
 WORKDIR /app
 
-COPY ./docker-assets/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --chmod=755 ./docker-assets/entrypoint.sh /entrypoint.sh
 
 RUN mkdir -p /app/backend
-COPY ./backend/requirements.txt /app/backend/requirements.txt
+COPY --chmod=644 ./backend/requirements.txt /app/backend/requirements.txt
 RUN pip3 install -r /app/backend/requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
-COPY ./backend /app/backend
-COPY --from=frontend_builder /app/build /app/frontend-build
+COPY --chmod=644 ./backend /app/backend
+COPY --chmod=644 --from=frontend_builder /app/build /app/frontend-build
 
 ENTRYPOINT ["/entrypoint.sh"]
