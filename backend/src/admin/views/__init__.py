@@ -34,3 +34,25 @@ VIEWS = {
     'TicketMessageStore': TicketMessageView,
     'LogUserStore': LogUserView,
 }
+
+__all__ = [
+    'AnnouncementView',
+    'DebugView',
+    'FilesView',
+    'GamePolicyView',
+    'HintView',
+    'LogUserView',
+    'LogView',
+    'MessageView',
+    'PuzzleView',
+    'StatusView',
+    'SubmissionView',
+    'TeamEventView',
+    'TeamView',
+    'TemplateView',
+    'TicketMessageView',
+    'TicketView',
+    'TriggerView',
+    'UserView',
+    'VIEWS',
+]

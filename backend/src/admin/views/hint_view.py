@@ -3,7 +3,6 @@ from typing import Any
 import flask_admin
 
 from flask import current_app
-from flask_admin.form import rules
 from wtforms import Form
 
 from src import store

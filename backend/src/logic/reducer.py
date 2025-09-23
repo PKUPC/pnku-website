@@ -15,7 +15,15 @@ from zmq.asyncio import Socket
 
 from src import secret, utils
 from src.state import Announcements, Trigger
-from src.store import *
+from src.store import (
+    MessageStore,
+    SubmissionStore,
+    TeamEventStore,
+    TeamStore,
+    TicketMessageStore,
+    TicketStore,
+    UserStore,
+)
 
 from . import glitter
 from .base import StateContainerBase

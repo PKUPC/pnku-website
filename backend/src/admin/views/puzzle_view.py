@@ -1,6 +1,6 @@
 import json
 
-from typing import Any, Optional
+from typing import Any
 
 import flask_admin
 
@@ -15,7 +15,7 @@ from src import adhoc
 from src.admin import fields
 from src.logic import glitter
 from src.logic.reducer import Reducer
-from src.store import PuzzleStore, PuzzleStoreModel
+from src.store import PuzzleStore
 
 from .base_view import BaseView
 

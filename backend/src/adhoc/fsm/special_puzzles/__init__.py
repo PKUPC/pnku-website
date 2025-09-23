@@ -6,3 +6,15 @@ from .day2_meta import Day2Meta
 from .day3_20 import Day320Status
 from .day3_normal import Day3Normal
 from .day3_premeta import Day3PreMetaStatus
+
+
+__all__ = [
+    'Day201Status',
+    'Day202Status',
+    'Day203Status',
+    'Day206Status',
+    'Day2Meta',
+    'Day320Status',
+    'Day3Normal',
+    'Day3PreMetaStatus',
+]

@@ -4,7 +4,6 @@ import secrets
 import time
 
 from collections.abc import Callable
-from typing import Union
 
 import pytz
 
