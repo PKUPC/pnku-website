@@ -1,6 +1,6 @@
 import json
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import flask_admin
 
@@ -46,6 +46,12 @@ class PuzzleView(BaseView):
         'puzzle_metadata': '题目的其他元信息',
         'actions': '题面底部展示的动作列表',
     }
+
+    form_widget_args = {
+        'key': {
+            'readonly': True,
+        }
+    }
     form_overrides = {
         'content_template': fields.MarkdownField,
         'puzzle_metadata': fields.JsonField,
@@ -58,7 +64,7 @@ class PuzzleView(BaseView):
     }
 
     @staticmethod
-    def _export_puzzle(puzzle: PuzzleStoreModel) -> Dict[str, Any]:
+    def _export_puzzle(puzzle: PuzzleStore) -> dict[str, Any]:
         return {
             'key': puzzle.key,
             'title': puzzle.title,
@@ -73,7 +79,7 @@ class PuzzleView(BaseView):
         }
 
     @staticmethod
-    def _import_puzzle(data: Dict[str, Any], puzzle: PuzzleStore) -> None:
+    def _import_puzzle(data: dict[str, Any], puzzle: PuzzleStore) -> None:
         puzzle.key = data['key']
         puzzle.title = data['title']
         puzzle.category = data['category']
@@ -103,7 +109,7 @@ class PuzzleView(BaseView):
                 n_modified = 0
                 n_failed = 0
                 for puzzle_data in puzzles:
-                    puzzle: Optional[PuzzleStore] = session.execute(
+                    puzzle: PuzzleStore | None = session.execute(
                         select(PuzzleStore).where(PuzzleStore.key == puzzle_data['key'])
                     ).scalar()
 
@@ -144,10 +150,10 @@ class PuzzleView(BaseView):
             return redirect(url)
 
     @action('export', 'Export JSON')
-    def action_export(self, puzzle_ids: List[int]) -> ResponseReturnValue:
+    def action_export(self, puzzle_ids: list[int]) -> ResponseReturnValue:
         reducer: Reducer = current_app.config['reducer_obj']
         puzzles = [
-            self._export_puzzle(reducer.game_nocheck.puzzles.puzzle_by_id[int(ch_id)].model) for ch_id in puzzle_ids
+            self._export_puzzle(reducer.game_nocheck.puzzles.puzzle_by_id[int(ch_id)]._store) for ch_id in puzzle_ids
         ]
 
         resp = make_response(json.dumps(puzzles, indent=1, ensure_ascii=False), 200)

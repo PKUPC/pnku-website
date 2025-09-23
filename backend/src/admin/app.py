@@ -6,6 +6,7 @@ from typing import Any
 from flask import Flask, redirect, request
 from flask_admin import Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.theme import Bootstrap4Theme
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug import Response
 
@@ -84,8 +85,7 @@ with app.app_context():
         app,
         index_view=secured(StatusView)(name='Status', url=f'{secret.ADMIN_URL}/admin'),
         url=f'{secret.ADMIN_URL}/admin',
-        template_mode='bootstrap3',
-        base_template='base.html',
+        theme=Bootstrap4Theme(base_template='base.html', fluid=True),
     )
 
     admin.add_view(secured(DebugView)(name='Debug'))

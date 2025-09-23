@@ -37,8 +37,11 @@ class HintView(BaseView):
         'effective_after_ts': fields.timestamp_s_formatter,
     }
 
-    form_edit_rules = [rules.FieldSet(('enable', 'question', 'type', 'answer', 'effective_after_ts', 'extra'))]
-
+    form_widget_args = {
+        'puzzle_key': {
+            'readonly': True,
+        }
+    }
     form_overrides = {
         'effective_after_ts': fields.TimestampSField,
         'extra': HintExtraField,
