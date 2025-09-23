@@ -4,6 +4,7 @@ from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 from sanic import Blueprint, HTTPResponse, Request, response
+from sanic.blueprints import BlueprintGroup
 from sanic.models.handler_types import RouteHandler
 
 from src.custom import store_user_log
@@ -157,7 +158,7 @@ def wish_checker(
             retval_ = fn(req, *args, **kwargs)
             retval = (await retval_) if isawaitable(retval_) else retval_
 
-            return retval  # type: ignore[no-any-return]
+            return retval
 
         return wrapped
 
@@ -173,15 +174,15 @@ class BaseWishResponse(BaseModel):
 from . import game, message, puzzle, special, staff, team, ticket, upload, user
 
 
-bp = Blueprint.group(  # type: ignore[has-type]
-    team.bp,  # type: ignore[has-type]
-    message.bp,  # type: ignore[has-type]
-    puzzle.bp,  # type: ignore[has-type]
-    staff.bp,  # type: ignore[has-type]
-    game.bp,  # type: ignore[has-type]
-    user.bp,  # type: ignore[has-type]
-    special.bp,  # type: ignore[has-type]
-    ticket.bp,  # type: ignore[has-type]
-    upload.bp,  # type: ignore[has-type]
+bp: BlueprintGroup = Blueprint.group(
+    team.bp,
+    message.bp,
+    puzzle.bp,
+    staff.bp,
+    game.bp,
+    user.bp,
+    special.bp,
+    ticket.bp,
+    upload.bp,
     url_prefix='',
 )

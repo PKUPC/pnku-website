@@ -71,7 +71,7 @@ def fix_zmq_asyncio_windows() -> None:
     # zmq will work with proactor if tornado >= 6.1 can be found.
     # Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` or install 'tornado>=6.1' to avoid this error.
     try:
-        if isinstance(asyncio.get_event_loop_policy(), asyncio.WindowsProactorEventLoopPolicy):  # type: ignore  # known
-            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # type: ignore  # known
+        if isinstance(asyncio.get_event_loop_policy(), asyncio.WindowsProactorEventLoopPolicy):
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     except AttributeError:
         pass

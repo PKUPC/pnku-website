@@ -13,7 +13,7 @@ from src.store import MessageStore
 from . import wish_checker, wish_response
 
 
-bp = Blueprint('wish-message', url_prefix='/wish/message')
+bp: Blueprint = Blueprint('wish-message', url_prefix='/wish/message')
 
 
 class SendMsgParam(BaseModel):

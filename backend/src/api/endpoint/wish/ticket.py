@@ -15,7 +15,7 @@ from src.store import ManualHintModel, TicketMessageStore, TicketStore
 from . import wish_checker, wish_response
 
 
-bp = Blueprint('wish-ticket', url_prefix='/wish/ticket')
+bp: Blueprint = Blueprint('wish-ticket', url_prefix='/wish/ticket')
 
 
 class RequestHintParam(BaseModel):

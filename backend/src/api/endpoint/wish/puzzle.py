@@ -15,7 +15,7 @@ from src.store import HintStore
 from . import wish_checker, wish_response
 
 
-bp = Blueprint('wish-puzzle', url_prefix='/wish/puzzle')
+bp: Blueprint = Blueprint('wish-puzzle', url_prefix='/wish/puzzle')
 
 
 class SubmitParam(BaseModel):
