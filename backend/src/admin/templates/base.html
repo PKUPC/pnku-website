@@ -1,3 +1,7 @@
+{#
+    参考 https://github.com/pallets-eco/flask-admin/tree/v2.0.0a4/flask_admin/templates/bootstrap4/admin
+    很多内容是基于原来的模板改的
+#}
 {% extends 'admin/base.html' %}
 
 {% macro in_pre(model, column) %}
@@ -6,14 +10,31 @@
 
 {% macro status_label(model, column) %}
     {% set s = model[column] %}
-    <span class="label
-        label-{% if s=='critical' %}danger{% elif s=='error' %}warning{% elif s=='warning' %}primary{% elif s=='success' %}success{% else %}default{% endif %}
+    <span class="badge
+        badge-{% if s=='critical' %}danger{% elif s=='error' %}warning{% elif s=='warning' %}primary{% elif s=='success' %}success{% else %}secondary{% endif %}
     ">{{ s }}</span>
 {% endmacro %}
 
 {% block head_css %}
     {{ super() }}
     <style>
+        body {
+            font-size: 14px;
+            padding-top: 1rem;
+        }
+        a.list-group-item {
+            color: #555;
+        }
+        a.list-group-item:hover:not(.active) {
+            text-decoration: none;
+            background-color: #f0f0f0;
+        }
+        a.list-group-item.active:hover {
+            text-decoration: none;
+        }
+        a.list-group-item.disabled {
+            background-color: #e6e6e6;
+        }
         table.model-list tbody td>a.icon, table.model-list tbody td>form.icon button {
             padding: .25em .75em !important;
         }
@@ -24,6 +45,10 @@
     </style>
 {% endblock %}
 
+{#
+    https://github.com/pallets-eco/flask-admin/blob/v2.0.0a4/flask_admin/templates/bootstrap4/admin/layout.html
+    重写了 layout.html 中的 menu，用于支持左右分栏的页面
+#}
 {% macro menu(menu_root=None) %}
     {% if menu_root is none %}
         {% set menu_root = admin_view.admin.menu() %}
@@ -33,20 +58,23 @@
             {% set children = item.get_children() %}
             {% if children %}
                 {% set class_name = item.get_class_name() or '' %}
-                <a class="list-group-item disabled">
+                <a
+                    class="list-group-item disabled"
+                    style="padding: 0.6rem 1rem;"
+                >
                     {{ layout.menu_icon(item) }}{{ item.name }}
-                    <i class="glyphicon glyphicon-chevron-down small"></i>
+                    <i class="fa fa-chevron-down"></i>
                 </a>
                 {% for child in children %}
                     {% if child.is_category() %}
-                        {# not supported yet #}
+                        {# 暂时不支持多级嵌套 #}
                     {% else %}
                         {% set class_name = child.get_class_name() %}
                         <a
                             class="list-group-item{% if child.is_active(admin_view) %} active{% endif %}{% if class_name %} {{ class_name }}{% endif %}"
                             href="{{ child.get_url() }}"
                             {% if child.target %}target="{{ child.target }}"{% endif %}
-                            style="padding-left: 3em; padding-right: 0"
+                            style="padding-left: 2rem; padding-right: 1rem; padding-top: 0.6rem; padding-bottom: 0.6rem;"
                         >
                             {{ layout.menu_icon(child) }}{{ child.name }}
                         </a>
@@ -60,6 +88,7 @@
                     class="list-group-item{% if item.is_active(admin_view) %} active{% endif %}{% if class_name %} {{ class_name }}{% endif %}"
                     href="{{ item.get_url() }}"
                     {% if item.target %}target="{{ item.target }}"{% endif %}
+                    style="padding: 0.6rem 1rem;"
                 >
                     {{ layout.menu_icon(item) }}{{ item.name }}
                 </a>
@@ -68,6 +97,9 @@
     {% endfor %}
 {% endmacro %}
 
+{#
+    https://github.com/pallets-eco/flask-admin/blob/v2.0.0a4/flask_admin/templates/bootstrap4/admin/base.html
+#}
 {% block page_body %}
     <div class="container-fluid">
         <div class="row">

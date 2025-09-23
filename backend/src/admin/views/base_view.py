@@ -12,12 +12,12 @@ from src.logic.reducer import Reducer
 
 class BaseView(sqla.ModelView):  # type: ignore[misc]
     form_base_class = SecureForm
-    list_template = 'list.html'
     edit_template = 'edit_ace.html'
     create_template = 'create_ace.html'
     details_modal_template = 'details_break_word.html'
 
     page_size = 100
+    page_size_options = (20, 50, 100, 500)
     can_set_page_size = True
 
     @staticmethod
