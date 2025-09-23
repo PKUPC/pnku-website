@@ -15,7 +15,7 @@ from src.state import User
 from . import wish_checker, wish_response
 
 
-bp = Blueprint('wish-user', url_prefix='/wish/user')
+bp: Blueprint = Blueprint('wish-user', url_prefix='/wish/user')
 
 
 @dataclass

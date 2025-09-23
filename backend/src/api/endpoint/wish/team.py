@@ -19,7 +19,7 @@ from src.store import TeamStore
 from . import wish_checker, wish_response
 
 
-bp = Blueprint('wish-team', url_prefix='/wish/team')
+bp: Blueprint = Blueprint('wish-team', url_prefix='/wish/team')
 
 
 class CreateTeamParam(BaseModel):

@@ -9,7 +9,7 @@ import pytz
 
 
 def gen_random_str(length: int = 32, *, crypto: bool = False) -> str:
-    choice: Callable[[str], str] = secrets.choice if crypto else random.choice  # type: ignore[assignment]
+    choice: Callable[[str], str] = secrets.choice if crypto else random.choice
     alphabet = 'qwertyuiopasdfghjkzxcvbnmQWERTYUPASDFGHJKLZXCVBNM23456789'
 
     return ''.join([choice(alphabet) for _ in range(length)])

@@ -21,7 +21,7 @@ from . import wish_checker, wish_response
 if TYPE_CHECKING:
     from src.state import Team
 
-bp = Blueprint('wish-game', url_prefix='/wish/game')
+bp: Blueprint = Blueprint('wish-game', url_prefix='/wish/game')
 
 FALLBACK_CAT_COLOR = '#000000'
 

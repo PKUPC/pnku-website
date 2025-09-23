@@ -208,7 +208,7 @@ class Reducer(StateContainerBase):
 
         # 创建队伍时需要更新的信息
         self.state_counter += 1
-        tid: int = team.id  # type: ignore  # make pycharm happy
+        tid: int = team.id
         await self.emit_event(glitter.Event(glitter.EventType.CREATE_TEAM, self.state_counter, tid))
         return None
 
@@ -469,7 +469,7 @@ class Reducer(StateContainerBase):
             assert team_event.id is not None, 'created team_event not in db'
             session.commit()
             self.state_counter += 1
-        tid: int = team_event.id  # type: ignore  # make pycharm happy
+        tid: int = team_event.id
         # 理论上应当在添加完成 team event 之后读取结果，但是有点麻烦，因为没做 team_event_by_id
         # 先 test 应当是一样的
         submission_result = user.team.game_status.test_submission(req.puzzle_key, req.content)
@@ -506,7 +506,7 @@ class Reducer(StateContainerBase):
             session.commit()
             assert team_event.id is not None, CRITICAL_ERROR
             self.state_counter += 1
-        team_event_id: int = team_event.id  # type: ignore  # make pycharm happy
+        team_event_id: int = team_event.id
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
         return None
 
@@ -526,7 +526,7 @@ class Reducer(StateContainerBase):
             session.commit()
             assert team_event.id is not None, 'created team_event not in db'
             self.state_counter += 1
-        team_event_id: int = team_event.id  # type: ignore  # make pycharm happy
+        team_event_id: int = team_event.id
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
         return None
 
@@ -546,7 +546,7 @@ class Reducer(StateContainerBase):
             session.commit()
             assert team_event.id is not None, 'created team_event not in db'
             self.state_counter += 1
-        team_event_id: int = team_event.id  # type: ignore  # make pycharm happy
+        team_event_id: int = team_event.id
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
         return None
 
@@ -560,7 +560,7 @@ class Reducer(StateContainerBase):
             session.commit()
             self.state_counter += 1
 
-        team_event_id: int = team_event.id  # type: ignore  # make pycharm happy
+        team_event_id: int = team_event.id
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
         return None
 
@@ -730,7 +730,7 @@ class Reducer(StateContainerBase):
             session.commit()
             self.state_counter += 1
 
-        team_event_id: int = team_event.id  # type: ignore  # make pycharm happy
+        team_event_id: int = team_event.id
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
         return None
 
@@ -795,7 +795,7 @@ class Reducer(StateContainerBase):
         with self.SqlSession() as session:
             ticket: TicketStore | None = session.execute(
                 select(TicketStore).where(TicketStore.id == req.ticket_id)
-            ).scalar()  # type: ignore
+            ).scalar()
             assert ticket is not None, CRITICAL_ERROR
             ticket.status = req.status
             session.commit()

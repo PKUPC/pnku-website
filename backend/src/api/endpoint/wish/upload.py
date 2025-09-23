@@ -13,7 +13,7 @@ from src.state import User
 from . import wish_checker, wish_response
 
 
-bp = Blueprint('wish-upload', url_prefix='/wish/upload')
+bp: Blueprint = Blueprint('wish-upload', url_prefix='/wish/upload')
 
 
 @bp.route('/upload_image', ['POST'])

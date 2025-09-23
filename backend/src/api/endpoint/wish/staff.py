@@ -13,7 +13,7 @@ from src.state import Submission, Ticket, User
 from . import wish_checker, wish_response
 
 
-bp = Blueprint('wish-staff', url_prefix='/wish/staff')
+bp: Blueprint = Blueprint('wish-staff', url_prefix='/wish/staff')
 
 
 @bp.route('/get_game_info', ['POST'])

@@ -52,9 +52,7 @@ class Puzzles(WithGameLifecycle):
         self.game.need_reload_team_event = True
 
     def on_store_update(self, puzzle_id: int, new_store: PuzzleStore | None) -> None:
-        old_puzzle: Puzzle | None = (
-            [x for x in self.list if x.model.id == puzzle_id] + [None]  # type: ignore  # make pycharm happy
-        )[0]
+        old_puzzle: Puzzle | None = ([x for x in self.list if x.model.id == puzzle_id] + [None])[0]
         other_puzzles = [x for x in self.list if x.model.id != puzzle_id]
 
         if new_store is None:  # remove
