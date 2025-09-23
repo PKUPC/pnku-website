@@ -19,7 +19,7 @@ bp: Blueprint = Blueprint('wish-staff', url_prefix='/wish/staff')
 @bp.route('/get_game_info', ['POST'])
 @wish_response
 @wish_checker(['user_is_staff'])
-async def get_game_info(req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_game_info(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff
 
@@ -60,7 +60,7 @@ class GetTeamDetailParam(BaseModel):
 @wish_response
 @wish_checker(['user_is_staff'])
 async def get_team_detail(
-    req: Request, body: GetTeamDetailParam, worker: Worker, user: Optional[User]
+    req: Request, body: GetTeamDetailParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff
@@ -122,7 +122,7 @@ class VMe50Param(BaseModel):
 @validate(json=VMe50Param)
 @wish_response
 @wish_checker(['user_is_staff'])
-async def v_me_50(req: Request, body: VMe50Param, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def v_me_50(req: Request, body: VMe50Param, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff
 
@@ -176,7 +176,7 @@ async def v_me_50(req: Request, body: VMe50Param, worker: Worker, user: Optional
 @bp.route('/get_team_list', ['POST'])
 @wish_response
 @wish_checker(['user_is_staff'])
-async def get_team_list_staff(req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_team_list_staff(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff
 
@@ -205,7 +205,7 @@ class VMe100Param(BaseModel):
 @validate(json=VMe100Param)
 @wish_response
 @wish_checker(['user_is_staff'])
-async def v_me_100(req: Request, body: VMe100Param, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def v_me_100(req: Request, body: VMe100Param, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff
 
@@ -261,7 +261,7 @@ class GetSubmissionListParam(BaseModel):
 @wish_response
 @wish_checker(['user_is_staff'])
 async def get_submission_list(
-    req: Request, body: GetSubmissionListParam, worker: Worker, user: Optional[User]
+    req: Request, body: GetSubmissionListParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff
@@ -326,7 +326,7 @@ class GetTicketListParam(BaseModel):
 @validate(json=GetTicketListParam)
 @wish_response
 @wish_checker(['user_is_staff'])
-async def get_tickets(req: Request, body: GetTicketListParam, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_tickets(req: Request, body: GetTicketListParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff
 
@@ -386,7 +386,7 @@ class UpdateExtraTeamInfoParam(BaseModel):
 @wish_response
 @wish_checker(['user_is_staff'])
 async def update_extra_team_info(
-    req: Request, body: UpdateExtraTeamInfoParam, worker: Worker, user: Optional[User]
+    req: Request, body: UpdateExtraTeamInfoParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
 

@@ -1,4 +1,4 @@
-from typing import Hashable
+from collections.abc import Hashable
 
 
 _cache: dict[Hashable, float] = {}

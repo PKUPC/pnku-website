@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from flask import current_app, flash
 
@@ -20,7 +20,7 @@ def _flag_match_formatter(_view: Any, _context: Any, model: store.SubmissionStor
 
 
 def _flag_override_formatter(_view: Any, _context: Any, model: store.SubmissionStore, _name: str) -> str:
-    ret: List[str] = []
+    ret: list[str] = []
     # if model.score_override_or_null is not None:
     #     ret.append(f'[={model.score_override_or_null}]')
     # if model.precentage_override_or_null is not None:

@@ -6,8 +6,9 @@ import traceback
 
 # noinspection PyUnresolvedReferences
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import Any, Callable, Dict, Optional, Type, TypeVar
+from collections.abc import Callable
+from datetime import UTC, datetime, timezone
+from typing import Any, TypeVar
 
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
@@ -55,17 +56,17 @@ class StateContainerBase(ABC):
         self.game_dirty: bool = True
         self.debug_reinit = False
 
-        self._submission_stores: Dict[int, SubmissionStore] = {}
+        self._submission_stores: dict[int, SubmissionStore] = {}
 
-        self.ws_messages: Dict[int, Dict[str, Any]] = {}
+        self.ws_messages: dict[int, dict[str, Any]] = {}
         self.next_message_id: int = 1
         self.message_cond: asyncio.Condition = None  # type: ignore[assignment]
 
         self.state_counter: int = 1
-        self.custom_telemetry_data: Dict[str, Any] = {}
+        self.custom_telemetry_data: dict[str, Any] = {}
 
     @property
-    def game(self) -> Optional[Game]:
+    def game(self) -> Game | None:
         if self.game_dirty:
             return None
         return self._game
@@ -474,7 +475,7 @@ class StateContainerBase(ABC):
             self._game.need_updating_scoreboard = False
 
     def log(self, level: utils.LogLevel, module: str, message: str) -> None:
-        log_str = '[' + datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M:%S %z') + '] '
+        log_str = '[' + datetime.now(UTC).astimezone().strftime('%Y-%m-%d %H:%M:%S %z') + '] '
         log_str += f'[{self.process_name}] [{level.upper()}] [{module}]'
         log_str += f' {message}'
         if level in secret.STDOUT_LOG_LEVEL:
@@ -493,14 +494,14 @@ class StateContainerBase(ABC):
                 self.push_message(f'[{self.process_name}] [{level.upper()} {module}]\n{message}', f'log-{level}')
             )
 
-    def load_all_data(self, cls: Type[T]) -> list[T]:
+    def load_all_data(self, cls: type[T]) -> list[T]:
         """
         给定一个 Store 类，重新载入所有的数据
         """
         with self.SqlSession() as session:
             return list(session.execute(select(cls).order_by(cls.id)).scalars().all())
 
-    def load_one_data(self, cls: Type[T], data_id: int) -> Optional[T]:
+    def load_one_data(self, cls: type[T], data_id: int) -> T | None:
         """
         给定一个 Store 类和数据库中的主键 id，更新这个数据
         """
@@ -534,7 +535,7 @@ class StateContainerBase(ABC):
             self.game_dirty = False
             await asyncio.sleep(self.RECOVER_THROTTLE_S)
 
-    def emit_ws_message(self, msg: Dict[str, Any]) -> None:
+    def emit_ws_message(self, msg: dict[str, Any]) -> None:
         if not self.listening_ws_messages:
             return
 
@@ -555,7 +556,7 @@ class StateContainerBase(ABC):
 
         asyncio.get_event_loop().create_task(notify_waiters())
 
-    def collect_telemetry(self) -> Dict[str, Any]:
+    def collect_telemetry(self) -> dict[str, Any]:
         return {
             'state_counter': self.state_counter,
             'game_available': not self.game_dirty,

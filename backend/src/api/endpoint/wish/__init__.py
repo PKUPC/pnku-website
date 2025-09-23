@@ -1,6 +1,7 @@
+from collections.abc import Awaitable, Callable
 from functools import wraps
 from inspect import isawaitable
-from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Union
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 from sanic import Blueprint, HTTPResponse, Request, response
@@ -13,7 +14,7 @@ from src.state import User
 
 ACCEPTED_WISH_VERS = ['wish.2023.v6', 'wish.sp.2023.v1']
 
-WishHandler = Callable[..., Union[Dict[str, Any], Awaitable[Dict[str, Any]]]]
+WishHandler = Callable[..., dict[str, Any] | Awaitable[dict[str, Any]]]
 
 
 def wish_response(fn: WishHandler) -> RouteHandler:
@@ -85,7 +86,7 @@ def wish_checker(
 
     def decorator(fn: WishHandler) -> WishHandler:
         @wraps(fn)
-        async def wrapped(req: Request, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+        async def wrapped(req: Request, *args: Any, **kwargs: Any) -> dict[str, Any]:
             if 'worker' not in kwargs:
                 return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
             worker = kwargs['worker']
@@ -167,8 +168,8 @@ def wish_checker(
 
 class BaseWishResponse(BaseModel):
     status: str = Field(description='状态，可以是 success error info')
-    title: Optional[str] = Field(description='info 或 error 的种类或者用于显示的标题')
-    message: Optional[str] = Field(description='success info 或 error 的返回信息，info 和 error 必须要有')
+    title: str | None = Field(description='info 或 error 的种类或者用于显示的标题')
+    message: str | None = Field(description='success info 或 error 的返回信息，info 和 error 必须要有')
 
 
 from . import game, message, puzzle, special, staff, team, ticket, upload, user

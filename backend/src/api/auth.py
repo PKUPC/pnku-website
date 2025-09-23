@@ -1,6 +1,7 @@
+from collections.abc import Awaitable, Callable
 from functools import wraps
 from inspect import isawaitable
-from typing import Any, Awaitable, Callable, Dict, Tuple, Union
+from typing import Any
 from urllib.parse import quote
 
 import httpx
@@ -18,8 +19,8 @@ from ..store import UserStore
 
 LOGIN_MAX_AGE_S = 86400 * 30
 
-AuthResponse = Union[User, Tuple[str, Dict[str, Any], str]]
-AuthHandler = Callable[..., Union[AuthResponse, Awaitable[AuthResponse]]]
+AuthResponse = User | tuple[str, dict[str, Any], str]
+AuthHandler = Callable[..., AuthResponse | Awaitable[AuthResponse]]
 
 
 class AuthError(Exception):
@@ -49,7 +50,7 @@ def _login(req: Request, worker: Worker, user: User) -> HTTPResponse:
 
 
 async def _register_or_login(
-    req: Request, worker: Worker, login_key: str, properties: Dict[str, Any], group: str
+    req: Request, worker: Worker, login_key: str, properties: dict[str, Any], group: str
 ) -> HTTPResponse:
     if worker.game is None:
         worker.log('warning', 'api.auth.register_or_login', 'game is not available')
@@ -81,7 +82,7 @@ async def _register_or_login(
 
 
 async def _register_or_reset(
-    req: Request, worker: Worker, email: str, properties: Dict[str, Any], group: str
+    req: Request, worker: Worker, email: str, properties: dict[str, Any], group: str
 ) -> HTTPResponse:
     """
     使用邮箱进行注册，注册的时候生成一个随机字符串作为密码
@@ -198,7 +199,7 @@ async def _register_or_reset(
 
 
 async def _login_with_email(
-    req: Request, worker: Worker, login_key: str, properties: Dict[str, Any], group: str
+    req: Request, worker: Worker, login_key: str, properties: dict[str, Any], group: str
 ) -> HTTPResponse:
     if worker.game is None:
         worker.log('warning', 'api.auth.login_with_email', 'game is not available')
@@ -288,13 +289,13 @@ def auth_response(fn: AuthHandler) -> RouteHandler:
     return wrapped
 
 
-def build_url(url: str, query: Dict[str, str]) -> str:
+def build_url(url: str, query: dict[str, str]) -> str:
     assert '?' not in url, 'url should not contain query string part'
     query_str = '&'.join(f'{quote(k)}={quote(v)}' for k, v in query.items())
     return f'{url}?{query_str}'
 
 
-def oauth2_redirect(url: str, params: Dict[str, str], redirect_url: str) -> HTTPResponse:
+def oauth2_redirect(url: str, params: dict[str, str], redirect_url: str) -> HTTPResponse:
     assert '://' in redirect_url, 'redirect url should be absolute'
 
     state = utils.gen_random_str(32)

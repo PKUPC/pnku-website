@@ -80,6 +80,7 @@ select = [
     "W", # pycodestyle warning
     "F", # pyflakes
     "I", # isort
+    "UP", # pyupgrade
 ]
 ignore = [
     "E501", # Line too long

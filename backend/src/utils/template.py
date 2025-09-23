@@ -1,6 +1,6 @@
 import re
 
-from typing import Any, Dict
+from typing import Any
 
 import bleach
 import jinja2
@@ -58,7 +58,7 @@ markdown_processor = markdown.Markdown(
 )
 
 
-def render_template(template_str: str, args: Dict[str, Any]) -> str:
+def render_template(template_str: str, args: dict[str, Any]) -> str:
     # jinja2 to md
     env = jinja2.Environment(
         loader=jinja2.DictLoader({'index.md': template_str}),

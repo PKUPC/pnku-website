@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING
 
 from sanic import HTTPResponse
 
@@ -20,17 +20,17 @@ if TYPE_CHECKING:
 class Users(WithGameLifecycle):
     constructed: bool = False
 
-    def __init__(self, game: Game, stores: List[UserStore]):
+    def __init__(self, game: Game, stores: list[UserStore]):
         assert not Users.constructed, 'Users State 只能有一个实例'
         Users.constructed = True
         self.game: Game = game
-        self._stores: List[UserStore] = []
-        self.staff_ids: Set[int] = set()
+        self._stores: list[UserStore] = []
+        self.staff_ids: set[int] = set()
 
-        self.list: List[User] = []
-        self.user_by_id: Dict[int, User] = {}
-        self.user_by_login_key: Dict[str, User] = {}
-        self.user_by_auth_token: Dict[str, User] = {}
+        self.list: list[User] = []
+        self.user_by_id: dict[int, User] = {}
+        self.user_by_login_key: dict[str, User] = {}
+        self.user_by_auth_token: dict[str, User] = {}
 
         self.on_store_reload(stores)
 
@@ -44,14 +44,14 @@ class Users(WithGameLifecycle):
         self._update_aux_dicts()
         self.staff_ids = set(x.model.id for x in self.list if x.model.group == 'staff')
 
-    def on_create_team(self, user_id: int, store: Optional[UserStore]) -> None:
+    def on_create_team(self, user_id: int, store: UserStore | None) -> None:
         assert store is not None
         assert user_id in self.user_by_id
         assert self.user_by_id[user_id].team is not None
         assert self.user_by_id[user_id].team.model.leader_id == user_id  # type: ignore  # safe
         self.user_by_id[user_id].on_store_reload(store)
 
-    def on_join_team(self, user_id: int, store: Optional[UserStore]) -> None:
+    def on_join_team(self, user_id: int, store: UserStore | None) -> None:
         assert store is not None and user_id in self.user_by_id
         target_user = self.user_by_id[user_id]
         target_user.on_store_reload(store)
@@ -61,7 +61,7 @@ class Users(WithGameLifecycle):
         if self.game.teams.team_by_id[store.team_id].total_score > 0:
             self.game.clear_boards_render_cache()
 
-    def on_leave_team(self, user_id: int, store: Optional[UserStore]) -> None:
+    def on_leave_team(self, user_id: int, store: UserStore | None) -> None:
         assert store is not None and user_id in self.user_by_id
         assert store.team_id is None
         target_user = self.user_by_id[user_id]
@@ -71,9 +71,9 @@ class Users(WithGameLifecycle):
         target_user.on_store_reload(store)
         target_user.team = None
 
-    def on_store_update(self, id: int, new_store: Optional[UserStore]) -> None:
+    def on_store_update(self, id: int, new_store: UserStore | None) -> None:
         # noinspection PyTypeChecker
-        old_user: Optional[User] = ([x for x in self.list if x.model.id == id] + [None])[0]
+        old_user: User | None = ([x for x in self.list if x.model.id == id] + [None])[0]
         other_users = [x for x in self.list if x.model.id != id]
 
         if new_store is None:  # remove
@@ -97,7 +97,7 @@ class Users(WithGameLifecycle):
 
 
 class User(WithGameLifecycle):
-    constructed_ids: Set[int] = set()
+    constructed_ids: set[int] = set()
 
     def __init__(self, game: Game, store: UserStore):
         assert store.id not in User.constructed_ids
@@ -153,12 +153,12 @@ class User(WithGameLifecycle):
             self.team = staff_team
             staff_team.members.append(self)
 
-    def check_login(self) -> Optional[Tuple[str, str]]:
+    def check_login(self) -> tuple[str, str] | None:
         if not self.model.enabled:
             return 'USER_DISABLED', '账号不允许登录'
         return None
 
-    def check_status(self) -> Optional[Tuple[str, str]]:
+    def check_status(self) -> tuple[str, str] | None:
         """
         基本的用户信息检查，之后会考虑替换掉其他的check，检查以下信息：
         - 是否 enable
@@ -175,7 +175,7 @@ class User(WithGameLifecycle):
         #     return 'USER_BANNED', '此用户组被禁止参赛'
         return None
 
-    def check_update_profile(self) -> Optional[Tuple[str, str]]:
+    def check_update_profile(self) -> tuple[str, str] | None:
         """
         用户当前是否能修改信息
         判断：是否登录、是否阅读了参赛须知、是否被 ban 了
@@ -188,12 +188,12 @@ class User(WithGameLifecycle):
         #     return 'USER_BANNED', '此用户组被禁止参赛'
         return None
 
-    def check_play_game(self) -> Optional[Tuple[str, str]]:
+    def check_play_game(self) -> tuple[str, str] | None:
         if self.check_update_profile() is not None:
             return self.check_update_profile()
         return None
 
-    def get_teammate_ids(self) -> List[int]:
+    def get_teammate_ids(self) -> list[int]:
         """
         获取队友的 id（不包含自己）
         如果没有组队则返回空列表

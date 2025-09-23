@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import JSON, Integer, String, Text
@@ -54,7 +54,7 @@ class PuzzleStoreModel(BaseModel):
     triggers: list[TriggerModel]
 
     @classmethod
-    def check_submitted_word(cls, word: str) -> Optional[Tuple[str, str]]:
+    def check_submitted_word(cls, word: str) -> tuple[str, str] | None:
         if len(word) > cls.MAX_TRIGGER_LEN:
             return 'ANSWER_LEN', '提交的答案过长'
         return None
@@ -95,7 +95,7 @@ class PuzzleStore(Table):
     puzzle_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     actions: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False)
     # 用户输入后会起作用的词，可以用来实现里程碑功能
-    triggers: Mapped[List[Dict[str, Any]]] = mapped_column(JSON, nullable=False)
+    triggers: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False)
 
     # 剪切板信息
     clipboard: Mapped[list[dict[str, Any]] | None] = mapped_column(JSON, nullable=False)

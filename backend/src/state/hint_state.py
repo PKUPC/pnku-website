@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 
-from typing import TYPE_CHECKING, Dict, List, Optional, Set
+from typing import TYPE_CHECKING
 
 from src.store import HintStore, HintStoreModel
 
@@ -22,7 +22,7 @@ class Hints(WithGameLifecycle):
         self.game: Game = game
 
         self.list: list[Hint] = []
-        self.hint_by_id: Dict[int, Hint] = {}
+        self.hint_by_id: dict[int, Hint] = {}
 
         # 游戏逻辑相关，hint 分为所有人可见的和特定队伍可见的，分开管理
         self.hint_by_key: dict[str, list[Hint]] = {}
@@ -56,8 +56,8 @@ class Hints(WithGameLifecycle):
             self.hint_by_key.setdefault(hint.model.puzzle_key, [])
             self.hint_by_key[hint.model.puzzle_key].append(hint)
 
-    def on_store_update(self, hint_id: int, new_store: Optional[HintStore]) -> None:
-        old_hint_list: List[Hint] = [x for x in self.list if x.model.id == hint_id]
+    def on_store_update(self, hint_id: int, new_store: HintStore | None) -> None:
+        old_hint_list: list[Hint] = [x for x in self.list if x.model.id == hint_id]
 
         if len(old_hint_list) == 0:  # add
             assert new_store is not None
@@ -80,7 +80,7 @@ class Hints(WithGameLifecycle):
 
 
 class Hint(WithGameLifecycle):
-    constructed_ids: Set[int] = set()
+    constructed_ids: set[int] = set()
 
     def __init__(self, game: Game, store: HintStore):
         assert store.id not in Hint.constructed_ids

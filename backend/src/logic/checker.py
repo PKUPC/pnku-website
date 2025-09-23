@@ -1,7 +1,8 @@
 import logging
 import time
 
-from typing import Any, Awaitable, Callable
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from sanic.request import Request
 

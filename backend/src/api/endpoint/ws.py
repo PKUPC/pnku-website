@@ -2,7 +2,7 @@ import json
 
 from collections import Counter
 from copy import deepcopy
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
 from sanic import Blueprint, Request
 from sanic.server.websockets.impl import WebsocketImplProtocol
@@ -21,7 +21,7 @@ bp = Blueprint('ws', url_prefix='/ws')
 
 MAX_DEVICES_PER_USER = 10
 
-online_uids: Dict[int, int] = Counter()
+online_uids: dict[int, int] = Counter()
 
 
 @bp.websocket('/push')

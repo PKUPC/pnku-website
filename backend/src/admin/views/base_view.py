@@ -21,7 +21,7 @@ class BaseView(sqla.ModelView):  # type: ignore[misc]
     can_set_page_size = True
 
     @staticmethod
-    def emit_event(event_type: glitter.EventType, id: Optional[int] = None) -> None:
+    def emit_event(event_type: glitter.EventType, id: int | None = None) -> None:
         loop: asyncio.AbstractEventLoop = current_app.config['reducer_loop']
         reducer: Reducer = current_app.config['reducer_obj']
 

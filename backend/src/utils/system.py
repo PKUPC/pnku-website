@@ -3,9 +3,10 @@ import os
 import time
 import traceback
 
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Callable, Dict, Iterator, Literal, Union
+from typing import Literal
 
 import psutil
 
@@ -31,7 +32,7 @@ def log_slow(
 
 
 @contextmanager
-def chdir(wd: Union[str, Path]) -> Iterator[None]:
+def chdir(wd: str | Path) -> Iterator[None]:
     cur_dir = os.getcwd()
     try:
         os.chdir(wd)
@@ -40,7 +41,7 @@ def chdir(wd: Union[str, Path]) -> Iterator[None]:
         os.chdir(cur_dir)
 
 
-def sys_status() -> Dict[str, Union[int, float]]:
+def sys_status() -> dict[str, int | float]:
     load_1, load_5, load_15 = psutil.getloadavg()
     vmem = psutil.virtual_memory()
     smem = psutil.swap_memory()

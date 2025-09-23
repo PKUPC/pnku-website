@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any
 
 from .base import WithGameLifecycle
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class GamePolicy(WithGameLifecycle):
-    def __init__(self, game: Game, stores: List[GamePolicyStore]):
+    def __init__(self, game: Game, stores: list[GamePolicyStore]):
         self.game: Game = game
         self.stores: list[GamePolicyStore] = []
         self.models: list[GamePolicyStoreModel] = []
@@ -103,7 +103,7 @@ class GamePolicy(WithGameLifecycle):
         return rst
 
     @property
-    def board_setting(self) -> Dict[str, Any]:
+    def board_setting(self) -> dict[str, Any]:
         """
         排行榜设置
         """

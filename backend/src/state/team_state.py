@@ -64,7 +64,7 @@ class Teams(WithGameLifecycle):
                 self.game.puzzle_key_to_hash[puzzle_key] = key_hash
                 self.game.hash_to_puzzle_key[key_hash] = puzzle_key
 
-    def on_create_team(self, team_id: int, store: Optional[TeamStore]) -> None:
+    def on_create_team(self, team_id: int, store: TeamStore | None) -> None:
         assert store is not None and team_id == store.id and team_id not in self.team_by_id
         new_team = Team(self.game, store)
         # 和用户绑定
@@ -78,7 +78,7 @@ class Teams(WithGameLifecycle):
 
         self.game.need_updating_scoreboard = True
 
-    def on_update_team_info(self, team_id: int, store: Optional[TeamStore]) -> None:
+    def on_update_team_info(self, team_id: int, store: TeamStore | None) -> None:
         assert store is not None
         # 只需要更换对应 Team 对象的 store 即可
         assert team_id in self.team_by_id
@@ -88,7 +88,7 @@ class Teams(WithGameLifecycle):
         self.team_by_id[team_id].on_store_update(store)
         self.game.need_updating_scoreboard = True
 
-    def on_dissolve_team(self, team_id: int, store: Optional[TeamStore]) -> None:
+    def on_dissolve_team(self, team_id: int, store: TeamStore | None) -> None:
         assert store is not None
         assert team_id in self.team_by_id
         # 这个时候应该对象已经被清空了
@@ -103,7 +103,7 @@ class Teams(WithGameLifecycle):
 
         self.game.need_updating_scoreboard = True
 
-    def on_change_team_leader(self, team_id: int, store: Optional[TeamStore]) -> None:
+    def on_change_team_leader(self, team_id: int, store: TeamStore | None) -> None:
         assert store is not None
         assert team_id in self.team_by_id
         self.team_by_id[team_id].on_store_update(store)
@@ -444,11 +444,11 @@ class Team(WithGameLifecycle):
         return self.game.policy.cur_policy_modal.default_spap + self.spap_change
 
     @property
-    def last_success_submission(self) -> Optional[Submission]:
+    def last_success_submission(self) -> Submission | None:
         return self.game_status.success_submissions[-1] if len(self.game_status.success_submissions) > 0 else None
 
     @property
-    def last_submission(self) -> Optional[Submission]:
+    def last_submission(self) -> Submission | None:
         return self.game_status.submissions[-1] if len(self.game_status.submissions) > 0 else None
 
     @property

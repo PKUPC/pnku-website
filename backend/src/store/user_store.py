@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 
-from typing import TYPE_CHECKING, Any, Dict, Literal, Optional
+from typing import TYPE_CHECKING, Any, Literal
 
 import sqlalchemy
 
@@ -94,14 +94,14 @@ class UserStore(Table):
     updated_at: Mapped[int] = mapped_column(BigInteger, nullable=False, default=lambda: int(1000 * time.time()))
 
     login_key: Mapped[str] = mapped_column(String(192), nullable=False, unique=True)
-    login_properties: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    login_properties: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
 
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     group: Mapped[str] = mapped_column(String(32), nullable=False)
 
-    team_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('team.id'), nullable=True)
+    team_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('team.id'), nullable=True)
     _team = relationship('TeamStore', back_populates='_members', foreign_keys=[team_id])
-    user_info: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    user_info: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
 
     @hybrid_property
     def nickname(self):

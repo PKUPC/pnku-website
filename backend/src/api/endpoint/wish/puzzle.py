@@ -1,6 +1,6 @@
 import time
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 from sanic import Blueprint, Request
@@ -27,7 +27,7 @@ class SubmitParam(BaseModel):
 @validate(json=SubmitParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def submit_answer(req: Request, body: SubmitParam, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def submit_answer(req: Request, body: SubmitParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 
@@ -116,7 +116,7 @@ class GetSubmissionsParam(BaseModel):
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
 async def get_submissions(
-    req: Request, body: GetSubmissionsParam, worker: Worker, user: Optional[User]
+    req: Request, body: GetSubmissionsParam, worker: Worker, user: User | None
 ) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
@@ -197,7 +197,7 @@ class GetDetailParam(BaseModel):
 @validate(json=GetDetailParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 
@@ -288,7 +288,7 @@ class GetHintsParam(BaseModel):
 @validate(json=GetHintsParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 
@@ -365,7 +365,7 @@ class BuyHintParam(BaseModel):
 @validate(json=BuyHintParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     if worker.game_nocheck.is_game_end():
         return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}

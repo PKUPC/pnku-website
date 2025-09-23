@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import time
 
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, Field
 from sanic import Blueprint, Request
@@ -35,8 +35,8 @@ class GetAreaDetailParam(BaseModel):
 @wish_response
 @wish_checker(['player_in_team'])
 async def get_area_detail(
-    req: Request, body: GetAreaDetailParam, worker: Worker, user: Optional[User]
-) -> Dict[str, Any]:
+    req: Request, body: GetAreaDetailParam, worker: Worker, user: User | None
+) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff or user.team is not None
 
@@ -74,7 +74,7 @@ async def get_area_detail(
 @bp.route('/get_puzzle_list', ['POST'])
 @wish_response
 @wish_checker(['player_in_team'])
-async def get_puzzle_list(req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_puzzle_list(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.is_staff or user.team is not None
 
@@ -106,7 +106,7 @@ TEMPLATE_LIST = [
 
 @bp.route('/game_info', ['POST'])
 @wish_response
-async def game_info(_req: Request, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     if worker.game is None:
         return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
 
@@ -219,7 +219,7 @@ async def game_info(_req: Request, worker: Worker, user: Optional[User]) -> Dict
 @bp.route('/get_announcements', ['POST'])
 @wish_response
 @wish_checker(['user_login'])
-async def get_announcements(_req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_announcements(_req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert worker.game is not None
 
@@ -247,7 +247,7 @@ async def get_announcements(_req: Request, worker: Worker, user: Optional[User])
 
 @bp.route('/get_schedule', ['POST'])
 @wish_response
-async def get_schedule(_req: Request, worker: Worker) -> Dict[str, Any]:
+async def get_schedule(_req: Request, worker: Worker) -> dict[str, Any]:
     if worker.game is None:
         return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
 
@@ -277,7 +277,7 @@ class GetBoardParam(BaseModel):
 @validate(json=GetBoardParam)
 @wish_response
 @wish_checker(['player_in_team'])
-async def get_board(req: Request, body: GetBoardParam, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def get_board(req: Request, body: GetBoardParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
 
     board_key = body.board_key
@@ -365,7 +365,7 @@ async def get_board(req: Request, body: GetBoardParam, worker: Worker, user: Opt
 @bp.route('/team_ap_detail', ['POST'])
 @wish_response
 @wish_checker(['player_in_team'])
-async def get_team_ap_detail(_req: Request, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def get_team_ap_detail(_req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     if user.is_staff:
         return {
@@ -390,7 +390,7 @@ class GameStartParam(BaseModel):
 @validate(json=GameStartParam)
 @wish_response
 @wish_checker(['player_in_team'])
-async def game_start(req: Request, body: GameStartParam, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def game_start(req: Request, body: GameStartParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None and user.team is not None
 
     if not worker.game_nocheck.is_intro_unlock() and not user.is_staff:
@@ -438,7 +438,7 @@ async def game_start(req: Request, body: GameStartParam, worker: Worker, user: O
 @bp.route('/get_team_list', ['POST'])
 @wish_response
 @wish_checker(['user_login'])
-async def get_team_list(_req: Request, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
+async def get_team_list(_req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert worker.game is not None
 
@@ -470,7 +470,7 @@ async def get_team_list(_req: Request, worker: Worker, user: Optional[User]) -> 
 @bp.route('/get_story_list', ['POST'])
 @wish_response
 @wish_checker(['player_in_team', 'game_start'])
-async def get_story_list(req: Request, worker: Worker, user: Optional[User]) -> dict[str, Any]:
+async def get_story_list(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     assert user.team is not None
 

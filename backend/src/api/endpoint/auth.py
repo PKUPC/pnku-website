@@ -108,7 +108,7 @@ class AuthSuParam:
 @bp.route('/su', ['POST'])
 @validate(query=AuthSuParam)
 @auth_response
-async def auth_su(_req: Request, query: AuthSuParam, worker: Worker, user: Optional[User]) -> AuthResponse:
+async def auth_su(_req: Request, query: AuthSuParam, worker: Worker, user: User | None) -> AuthResponse:
     if user is None or not secret.IS_ADMIN(user.model.id):
         raise AuthError('没有权限')
     if worker.game is None:
