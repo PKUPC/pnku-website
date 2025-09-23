@@ -25,3 +25,12 @@ def get_area_info(area: str, user: User, worker: Worker) -> dict[str, Any]:
             return get_simple_area(area, user, worker)
         case _:
             assert False, 'never area info case!'
+
+
+__all__ = [
+    'get_unlock_areas_info',
+    'gen_puzzle_structure',
+    'gen_puzzle_structure_by_puzzle',
+    'get_simple_area',
+    'get_area_info',
+]

@@ -21,7 +21,7 @@ def process(idx0: int) -> None:
 
 def start_worker_api() -> list[multiprocessing.Process]:
     ps: list[multiprocessing.Process] = []
-    for i in range(src.secret.N_WORKERS):
+    for i in range(secret.N_WORKERS):
         p = multiprocessing.Process(target=process, args=(i,))
         ps.append(p)
         p.start()

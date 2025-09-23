@@ -1,7 +1,7 @@
 import os
 import uuid
 
-from typing import Any, Optional
+from typing import Any
 
 from sanic import Blueprint, Request
 

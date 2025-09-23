@@ -1,6 +1,6 @@
 import asyncio
 
-from typing import Any, Optional
+from typing import Any
 
 from flask import current_app
 from flask_admin.contrib import fileadmin, sqla

@@ -1,34 +1,16 @@
 import asyncio
 import os
-import time
 import traceback
 
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Literal
 
 import psutil
 
 
-LogLevel = Literal['debug', 'wish', 'info', 'warning', 'error', 'critical', 'success']
-
-
 def get_traceback(e: Exception) -> str:
     return repr(e) + '\n' + ''.join(traceback.format_exception(type(e), e, e.__traceback__))
-
-
-@contextmanager
-def log_slow(
-    logger: Callable[[LogLevel, str, str], None], module: str, func: str, threshold: float = 0.3
-) -> Iterator[None]:
-    t1 = time.monotonic()
-    try:
-        yield
-    finally:
-        t2 = time.monotonic()
-        if t2 - t1 > threshold:
-            logger('warning', module, f'took {t2 - t1:.2f}s to {func}')
 
 
 @contextmanager
