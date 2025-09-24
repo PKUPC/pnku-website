@@ -7,10 +7,10 @@ import { format_ts } from '@/utils.ts';
 const timeAgoFormat = buildFormatter({
     prefixAgo: null,
     prefixFromNow: '',
-    suffixAgo: (_val: never, delta: number) => {
+    suffixAgo: (_val: number, delta: number) => {
         return delta < 59500 ? '刚刚' : '前';
     },
-    suffixFromNow: (_val: never, delta: number) => {
+    suffixFromNow: (_val: number, delta: number) => {
         return -delta < 59500 ? '1 分钟之内' : '后';
     },
     seconds: '\u200b', // ZWSP, not '' because TimeAgo will fall back to default

@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import obfuscator from 'rollup-plugin-obfuscator';
 import { defineConfig, loadEnv } from 'vite';
-import { compression } from 'vite-plugin-compression2';
+import { compression, defineAlgorithm } from 'vite-plugin-compression2';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import svgr from 'vite-plugin-svgr';
 import zlib from 'zlib';
@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
         root: '.',
         publicDir: 'public',
         build: {
-            target: ['es2015', 'firefox78', 'chrome79', 'safari13'],
+            target: ['es2022', 'firefox128', 'chrome111', 'safari16.4'],
             outDir: 'build',
             assetsInlineLimit: 8192,
             sourcemap: process.env.GENERATE_SOURCEMAP === 'true',
@@ -134,21 +134,17 @@ export default defineConfig(({ mode }) => {
             compression({
                 include: /\.*$/,
                 exclude: /\.(png|jpg|jpeg|webp|mp3|ogg|webm)$/i,
-                algorithm: 'brotliCompress',
-                compressionOptions: {
-                    params: {
-                        [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
-                        [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
-                    },
-                },
-            }),
-            compression({
-                include: /\.*$/,
-                exclude: /\.(png|jpg|jpeg|webp|mp3|ogg|webm)$/i,
-                algorithm: 'gzip',
-                compressionOptions: {
-                    level: zlib.constants.Z_BEST_COMPRESSION,
-                },
+                algorithms: [
+                    defineAlgorithm('brotliCompress', {
+                        params: {
+                            [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+                            [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+                        },
+                    }),
+                    defineAlgorithm('gzip', {
+                        level: zlib.constants.Z_BEST_COMPRESSION,
+                    }),
+                ],
             }),
         ],
         server: {
