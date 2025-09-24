@@ -7,12 +7,18 @@ import { format_ts } from '@/utils.ts';
 
 const Line = lazy(() => import('@/components/lazy/Line'));
 
+type PointItem = {
+    timestamp_s: number;
+    score: number;
+    idx0: string;
+};
+
 export default function PassedPlot({ passedSubmissions }: { passedSubmissions: Wish.Team.TeamPassedSubmission[] }) {
-    const points: { timestamp_s: number; score: number; idx0: string }[] = [];
+    const points: PointItem[] = [];
 
     const timeRange = [
         passedSubmissions[0].timestamp_s,
-        passedSubmissions[passedSubmissions.length - 1].timestamp_s + 60 * 5,
+        passedSubmissions[passedSubmissions.length - 1].timestamp_s + 60,
     ];
 
     let totalScore = 0;
@@ -29,23 +35,70 @@ export default function PassedPlot({ passedSubmissions }: { passedSubmissions: W
         <AppErrorBoundary>
             <Suspense fallback={<Loading />}>
                 <Line
-                    height={350}
+                    height={250}
                     data={points}
                     xField="timestamp_s"
                     yField="score"
                     seriesField="idx0"
+                    colorField="idx0"
                     stepType="hv"
-                    legend={{
-                        layout: 'horizontal',
-                        position: 'top',
-                    }}
-                    meta={{
-                        timestamp_s: {
-                            type: 'linear',
-                            minLimit: timeRange[0],
-                            maxLimit: timeRange[1],
-                            formatter: (x: number) => format_ts(x),
+                    axis={{
+                        x: {
+                            labelFormatter: (x: number) => format_ts(x),
+                            grid: false,
                         },
+                        y: {
+                            gridLineDash: [0, 0],
+                            gridStrokeOpacity: 0.5,
+                        },
+                    }}
+                    interaction={{
+                        tooltip: {
+                            position: 'top-right',
+                            sort: (x: PointItem) => -x.score,
+                            showMarkers: false,
+                        },
+                    }}
+                    legend={{
+                        color: {
+                            labelFormatter: () => '我的队伍',
+                            itemMarker: 'circle',
+                            itemMarkerSize: 12,
+                            itemLabelFontSize: 10,
+                            navPageNumFontSize: 10,
+                            itemSpacing: 0,
+                            colPadding: 6,
+                            navControllerSpacing: 12,
+                            itemLabelFillOpacity: 1,
+                            itemLabelFontWeight: 'bold',
+                            navLoop: true,
+                            navPageNumFillOpacity: 0.65,
+                            layout: {
+                                justifyContent: 'center',
+                            },
+                        },
+                    }}
+                    tooltip={{
+                        title: (d) => format_ts(d.timestamp_s),
+                        items: [
+                            (d) => ({
+                                name: '我的队伍',
+                                value: d.score,
+                            }),
+                        ],
+                    }}
+                    scale={{
+                        y: {
+                            nice: true,
+                        },
+                        x: {
+                            type: 'time',
+                            domainMin: timeRange[0],
+                            domainMax: timeRange[1],
+                        },
+                    }}
+                    style={{
+                        lineWidth: 2,
                     }}
                 />
             </Suspense>
