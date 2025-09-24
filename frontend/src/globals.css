@@ -1,8 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@200;400;900&family=Noto+Serif+SC:wght@200;400;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 200;
+  src: url('/mion/fonts/noto-sans-sc-v39-chinese-simplified_latin-200.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/mion/fonts/noto-sans-sc-v39-chinese-simplified_latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 800;
+  src: url('/mion/fonts/noto-sans-sc-v39-chinese-simplified_latin-800.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/mion/fonts/noto-serif-sc-v34-chinese-simplified_latin-regular.woff2') format('woff2');
+}
 
 :root {
   --border-radius: 12px;
