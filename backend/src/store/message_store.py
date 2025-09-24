@@ -53,7 +53,7 @@ class MessageStore(Table):
     player_unread: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     staff_unread: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    extra: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    extra: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default={})
 
     class DIRECTION:
         TO_STAFF: str = 'to_staff'

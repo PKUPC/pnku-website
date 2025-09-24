@@ -53,7 +53,7 @@ class TicketMessageStore(Table):
     content_type: Mapped[str] = mapped_column(String(32), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
 
-    extra: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    extra: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default={})
 
     def __repr__(self) -> str:
         return f'[User#{self.user_id}][Ticket#{self.ticket_id}]'
