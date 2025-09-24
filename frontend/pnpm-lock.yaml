@@ -63,6 +63,9 @@ importers:
         specifier: ^2.3.6
         version: 2.3.6(react@18.3.1)
     devDependencies:
+      '@eslint/js':
+        specifier: ^9.36.0
+        version: 9.36.0
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^5.2.2
         version: 5.2.2(prettier@3.6.2)
@@ -126,6 +129,9 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.4.21
         version: 0.4.21(eslint@9.36.0(jiti@1.21.7))
+      globals:
+        specifier: ^16.4.0
+        version: 16.4.0
       javascript-obfuscator:
         specifier: ^4.1.1
         version: 4.1.1
@@ -1941,6 +1947,10 @@ packages:
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
+    engines: {node: '>=18'}
+
+  globals@16.4.0:
+    resolution: {integrity: sha512-ob/2LcVVaVGCYN+r14cnwnoDPUufjiYgSqRhiFD0Q1iI4Odora5RE8Iv1D24hAz5oMophRGkGz+yuvQmmUMnMw==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -5574,6 +5584,8 @@ snapshots:
       path-is-absolute: 1.0.1
 
   globals@14.0.0: {}
+
+  globals@16.4.0: {}
 
   globalthis@1.0.4:
     dependencies:

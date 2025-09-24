@@ -186,6 +186,7 @@ export function decodeBase64ToObject(encoded: string): object | undefined {
         const jsonString = atob(encoded);
         return JSON.parse(jsonString);
     } catch (e) {
+        console.error(e);
         return undefined;
     }
 }
