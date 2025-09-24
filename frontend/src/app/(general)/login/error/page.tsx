@@ -1,5 +1,5 @@
 import { Button } from 'antd';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
 import { ARCHIVE_MODE } from '@/constants.tsx';

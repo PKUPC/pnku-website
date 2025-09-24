@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import { TeamApCard } from '@/app/(general)/staff/(detail)/team-detail/TeamApCard.tsx';
 import { TeamApHistoryTable } from '@/app/(general)/staff/(detail)/team-detail/TeamApHistoryTable.tsx';
