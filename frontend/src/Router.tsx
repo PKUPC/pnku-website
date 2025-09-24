@@ -1,4 +1,4 @@
-import { Navigate, RouteObject, RouterProvider, createBrowserRouter, useOutlet } from 'react-router-dom';
+import { Navigate, RouteObject, RouterProvider, createBrowserRouter, useOutlet } from 'react-router';
 
 import GeneralLayout from '@/app/(general)/GeneralLayout.tsx';
 import { AboutLayout } from '@/app/(general)/about/AboutLayout.tsx';

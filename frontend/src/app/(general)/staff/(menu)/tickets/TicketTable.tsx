@@ -1,7 +1,7 @@
 import { SyncOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 
 import { TableParams, getFromSessionStorage, saveToSessionStorage } from '@/app/(general)/staff/(menu)/common';
 import { TableLoader as Table, type TableColumnsType, type TableProps } from '@/components/lazy/TableLoader';

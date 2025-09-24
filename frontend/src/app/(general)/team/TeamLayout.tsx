@@ -1,5 +1,5 @@
 import { BarChartOutlined, StockOutlined } from '@ant-design/icons';
-import { useLocation, useOutlet } from 'react-router-dom';
+import { useLocation, useOutlet } from 'react-router';
 
 import { HistoryIcon } from '@/SvgIcons';
 import NotFound from '@/app/NotFound.tsx';

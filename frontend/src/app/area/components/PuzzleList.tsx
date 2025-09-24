@@ -1,6 +1,6 @@
 import { Empty, Tooltip } from 'antd';
 import React, { Fragment, useLayoutEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { DifficultyStatus } from '@/app/area/components/DifficultyStatus';
 import { PuzzleIcon } from '@/components/DynamicIcons';
