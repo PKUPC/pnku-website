@@ -2,7 +2,7 @@ import { TableLoader as Table, type TableColumnsType } from '@/components/lazy/T
 import { Wish } from '@/types/wish.ts';
 import { format_ts, format_ts_to_HMS } from '@/utils.ts';
 
-import styles from './PuzzleStatisticsTable.module.scss';
+import styles from './PuzzleStatisticsTable.module.css';
 
 type TableItem = Wish.Team.TeamPuzzleStatisticsItem & {
     areaName: string;

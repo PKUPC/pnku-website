@@ -5,7 +5,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { Wish } from '@/types/wish.ts';
 
-import styles from './CopyButton.module.scss';
+import styles from './CopyButton.module.css';
 
 export default function CopyButton({ clipboardData }: { clipboardData: Wish.Puzzle.ClipboardData[] }) {
     const [copied, setCopied] = useState(false);

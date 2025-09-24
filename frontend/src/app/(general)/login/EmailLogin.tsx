@@ -5,7 +5,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
-import styles from './EmailLogin.module.scss';
+import styles from './EmailLogin.module.css';
 
 export function EmailLogin() {
     // 默认为注册
@@ -119,6 +119,7 @@ export function EmailLogin() {
         // recaptchaRef.current.reset();
     };
 
+    // TODO: 换掉 antd 的 Form 组件
     return (
         <div>
             <p>
@@ -146,7 +147,7 @@ export function EmailLogin() {
                 )}
 
                 {info.feature.recaptcha && (
-                    <div className={'recaptcha-wrapper'}>
+                    <div className="flex justify-center mb-6">
                         <ReCAPTCHA
                             ref={recaptchaRef}
                             sitekey={import.meta.env.VITE_RECAPTCHA_KEY ?? ''}

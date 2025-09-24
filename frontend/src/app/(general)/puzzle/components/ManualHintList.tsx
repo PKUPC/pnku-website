@@ -2,7 +2,7 @@ import { DeliveredProcedureOutlined, FieldTimeOutlined, SelectOutlined } from '@
 import { Button, Col, Empty, Row, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-import styles from '@/app/(general)/puzzle/ManualHintTab.module.scss';
+import styles from '@/app/(general)/puzzle/ManualHintTab.module.css';
 import FancyCard from '@/components/FancyCard';
 import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';

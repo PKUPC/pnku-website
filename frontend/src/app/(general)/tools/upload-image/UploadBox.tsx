@@ -6,7 +6,7 @@ import { mutate } from 'swr';
 import { WISH_ROOT } from '@/constants';
 import { WISH_VER } from '@/logic/wish';
 
-import styles from './UploadBox.module.scss';
+import styles from './UploadBox.module.css';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 

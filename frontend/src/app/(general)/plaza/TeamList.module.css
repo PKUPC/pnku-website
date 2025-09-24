@@ -98,11 +98,9 @@
   }
 }
 
-.plazaTitles {
-  text-align: center;
-}
-
 .plazaTitles h3 {
+  @apply text-2xl;
+  @apply font-semibold;
   margin: auto;
   display: flex;
   width: 100%;
@@ -133,7 +131,4 @@
   column-count: auto; /* 默认显示 1 列 */
   column-gap: 16px; /* 列之间的间隔 */
   column-fill: balance;
-}
-
-.teamListWrapper {
 }

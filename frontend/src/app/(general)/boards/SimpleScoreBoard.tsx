@@ -3,7 +3,7 @@ import { TableLoader as Table, type TableColumnsType } from '@/components/lazy/T
 import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
 
-import styles from './SimpleScoreBoard.module.scss';
+import styles from './SimpleScoreBoard.module.css';
 
 function PassedStatus({ team }: { team: Wish.Game.SimpleBoardItem }) {
     return (

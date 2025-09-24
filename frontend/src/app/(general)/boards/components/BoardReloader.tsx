@@ -10,7 +10,7 @@ export function BoardReloader({ reload }: { reload: () => void }) {
     // TODO: 修复响应式问题
     console.log(lastReload);
     return (
-        <div className="flex flex-row justify-between items-center  mb-3 h-9 pl-1">
+        <div className="flex flex-row justify-between items-center mb-3 h-9 pl-1">
             {messageContext}
             <div>
                 <HistoryOutlined />{' '}

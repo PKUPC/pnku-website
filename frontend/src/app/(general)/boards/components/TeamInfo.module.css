@@ -1,0 +1,9 @@
+.scoreBoardTeamInfo {
+  :global(.ant-tag) {
+    opacity: 0.8;
+    line-height: 12px;
+    padding: 2px 4px;
+    font-weight: normal;
+    font-size: 12px;
+  }
+}

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { wish } from '@/logic/wish';
 import { Wish } from '@/types/wish.ts';
 
-import styles from './WishComfirmModal.module.scss';
+import styles from './WishComfirmModal.module.css';
 
 export function WishConfirmModal<T extends Wish.WishConfirmParams>({
     wishParam,

@@ -8,7 +8,6 @@
 
     :global(.ant-collapse-extra) {
       margin: auto;
-      //  antd 的 tag 的奇妙动画效果
     }
   }
 

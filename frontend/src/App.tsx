@@ -14,7 +14,7 @@ import { wish } from '@/logic/wish.ts';
 import { setup } from '@/setup.ts';
 import { mixColor } from '@/utils.ts';
 
-import './globals.scss';
+import './globals.css';
 
 setup();
 

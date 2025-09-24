@@ -6,8 +6,6 @@ import { ARCHIVE_MODE } from '@/constants.tsx';
 import { NeverError } from '@/errors';
 import { useGameInfo } from '@/logic/contexts.ts';
 
-import styles from './page.module.scss';
-
 export function LoginErrorPage() {
     const nav = useNavigate();
     const [searchParam] = useSearchParams();
@@ -18,7 +16,7 @@ export function LoginErrorPage() {
     if (ARCHIVE_MODE) return <NotFound />;
 
     return (
-        <div className={'slim-container ' + styles.main}>
+        <div className={'slim-container'}>
             <br />
             登录出错：{errorMsg}
             <br />

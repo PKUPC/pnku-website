@@ -9,7 +9,7 @@ import { ProfileAvatar } from '@/components/ProfileAvatar.tsx';
 import { TeamStatusTag } from '@/components/TeamStatusTag';
 import { Wish } from '@/types/wish.ts';
 
-import styles from './TeamInfoCard.module.scss';
+import styles from './TeamInfoCard.module.css';
 
 type StaffTeamDetail = Wish.Staff.StaffTeamDetail;
 const form_style = {

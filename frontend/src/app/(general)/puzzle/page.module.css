@@ -1,29 +1,28 @@
-$single-row-breakpoint: 765px;
-
 .puzzleWithListContainer {
+  --single-row-breakpoint: 765px;
   display: flex;
   flex-direction: row;
   gap: 18px;
 
-  .puzzleSidebar {
+  :global(.puzzle-sidebar) {
     flex: 0 0 320px;
     min-width: 0;
   }
 
-  .puzzleContentContainer {
+  :global(.puzzle-content-container) {
     flex: 1 1;
     min-width: 0;
   }
 
-  @media (max-width: $single-row-breakpoint) {
+  @media (max-width: var(--single-row-breakpoint)) {
     display: block;
 
-    .puzzleSidebar {
+    :global(.puzzle-sidebar) {
       width: 100%;
       margin-bottom: 24px;
     }
 
-    .portal-main {
+    :global(.portal-main) {
       margin-left: unset;
     }
   }

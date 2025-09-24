@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './InfoBox.module.scss';
+import styles from './InfoBox.module.css';
 
 export default function InfoBox({
     title,

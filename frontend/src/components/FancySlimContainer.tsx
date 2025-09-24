@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './FancySlimContainer.module.scss';
+import styles from './FancySlimContainer.module.css';
 
 export function FancySlimContainer({
     title,

@@ -7,7 +7,7 @@ import { useTheme } from '@/logic/contexts.ts';
 import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
 
-import styles from './TeamSubmissionTable.module.scss';
+import styles from './TeamSubmissionTable.module.css';
 
 type StaffTeamDetailSubmission = Wish.Staff.StaffTeamDetailSubmission;
 

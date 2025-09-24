@@ -7,14 +7,12 @@ import NotFound from '@/app/NotFound.tsx';
 import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
-import styles from './page.module.scss';
-
 export function LoginBody() {
     const info = useSuccessGameInfo();
     if (info.user) redirect('/home');
 
     return (
-        <div className={'slim-container ' + styles.main}>
+        <div className={'slim-container'}>
             <Alert
                 showIcon
                 message={<b>注意事项</b>}
@@ -33,7 +31,7 @@ export function LoginBody() {
                 }
             />
             <br />
-            <div className="login-instruction">
+            <div className="text-center">
                 {/*<p><b>选择登录方式</b></p>*/}
                 {/*<br/>*/}
                 {info.feature.email_login && <EmailLogin />}

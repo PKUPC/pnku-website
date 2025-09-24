@@ -6,7 +6,7 @@ import { DifficultyStatus } from '@/app/area/components/DifficultyStatus';
 import { PuzzleIcon } from '@/components/DynamicIcons';
 import { Wish } from '@/types/wish.ts';
 
-import styles from './PuzzleListSider.module.scss';
+import styles from './PuzzleListSider.module.css';
 
 export function PuzzleListSider({
     puzzleList,

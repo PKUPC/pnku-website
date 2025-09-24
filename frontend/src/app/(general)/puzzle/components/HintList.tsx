@@ -13,7 +13,7 @@ import { wish } from '@/logic/wish';
 import { Wish } from '@/types/wish.ts';
 import { format_ts_to_HMS } from '@/utils.ts';
 
-import styles from './HintList.module.scss';
+import styles from './HintList.module.css';
 
 function LockedHint({
     puzzleKey,

@@ -13,7 +13,7 @@ import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
 
 import { PuzzleTab } from './PuzzleTab';
-import styles from './TabContainer.module.scss';
+import styles from './TabContainer.module.css';
 
 type TabKeyItem = 'body' | 'submissions' | 'hints' | 'manual-hints' | 'solution';
 
