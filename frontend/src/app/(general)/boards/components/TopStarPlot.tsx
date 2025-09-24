@@ -88,21 +88,67 @@ export default function TopStarPlot({ data }: { data: Wish.Game.FullBoard }) {
                             xField="timestamp_ms"
                             yField="score"
                             seriesField="idx0"
+                            colorField="idx0"
                             stepType="hv"
-                            legend={{
-                                layout: 'horizontal',
-                                position: 'top',
-                            }}
-                            meta={{
-                                idx0: {
-                                    formatter: (x: number) => (data.topstars[x] || { n: '--' }).n,
-                                },
-                                timestamp_ms: {
-                                    type: 'linear',
+                            axis={{
+                                x: {
+                                    labelFormatter: (x: number) => format_ts(x / 1000),
+                                    grid: false,
                                     minLimit: timeRange[0],
                                     maxLimit: timeRange[1],
-                                    formatter: (x: number) => format_ts(x / 1000),
                                 },
+                                y: {
+                                    gridLineDash: [0, 0],
+                                    gridStrokeOpacity: 0.5,
+                                },
+                            }}
+                            interaction={{
+                                tooltip: {
+                                    position: 'top-right',
+                                    sort: (x: PointItem) => -x.score,
+                                    showMarkers: false,
+                                },
+                            }}
+                            legend={{
+                                color: {
+                                    labelFormatter: (x: number) => data.topstars[x].n,
+                                    itemMarker: 'circle',
+                                    itemMarkerSize: 12,
+                                    itemLabelFontSize: 10,
+                                    navPageNumFontSize: 10,
+                                    itemSpacing: 0,
+                                    colPadding: 6,
+                                    navControllerSpacing: 12,
+                                    itemLabelFillOpacity: 1,
+                                    itemLabelFontWeight: 'bold',
+                                    navLoop: true,
+                                    navPageNumFillOpacity: 0.65,
+                                    layout: {
+                                        justifyContent: 'center',
+                                    },
+                                },
+                            }}
+                            tooltip={{
+                                title: (d) => format_ts(d.timestamp_ms / 1000),
+                                items: [
+                                    (d) => ({
+                                        name: data.topstars[d.idx0].n,
+                                        value: d.score,
+                                    }),
+                                ],
+                            }}
+                            scale={{
+                                y: {
+                                    nice: true,
+                                },
+                                x: {
+                                    type: 'time',
+                                    domainMin: timeRange[0],
+                                    domainMax: timeRange[1],
+                                },
+                            }}
+                            style={{
+                                lineWidth: 2,
                             }}
                         />
                     </div>
