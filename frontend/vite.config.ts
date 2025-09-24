@@ -23,6 +23,10 @@ process.env.VITE_APP_BUILD_INFO = getCurrentTimeFormatted();
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
+    const DEV_BACKEND_URL = env.DEV_BACKEND_URL || 'http://127.0.0.1:8080';
+    const DEV_FRONTEND_PORT = Number(env.DEV_FRONTEND_PORT) || 3333;
+    const DEV_FRONTEND_HOST = env.DEV_FRONTEND_HOST || 'localhost';
+
     return {
         root: '.',
         publicDir: 'public',
@@ -149,7 +153,7 @@ export default defineConfig(({ mode }) => {
                 ? [
                       analyzer({
                           analyzerMode: 'server',
-                          analyzerPort: 3334,
+                          analyzerPort: DEV_FRONTEND_PORT + 1,
                           openAnalyzer: true,
                           defaultSizes: 'brotli',
                           brotliOptions: {
@@ -183,23 +187,24 @@ export default defineConfig(({ mode }) => {
         ],
         server: {
             open: true,
-            port: 3333,
+            host: DEV_FRONTEND_HOST,
+            port: DEV_FRONTEND_PORT,
             proxy: {
                 '/service/': {
-                    target: env.DEV_BACKEND_URL,
+                    target: DEV_BACKEND_URL,
                     changeOrigin: true,
                     ws: true,
                 },
                 '/media/': {
-                    target: env.DEV_BACKEND_URL,
+                    target: DEV_BACKEND_URL,
                     changeOrigin: true,
                 },
                 '/m/': {
-                    target: env.DEV_BACKEND_URL,
+                    target: DEV_BACKEND_URL,
                     changeOrigin: true,
                 },
                 '/t/': {
-                    target: env.DEV_BACKEND_URL,
+                    target: DEV_BACKEND_URL,
                     changeOrigin: true,
                 },
             },
