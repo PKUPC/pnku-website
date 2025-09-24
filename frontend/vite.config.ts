@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import obfuscator from 'rollup-plugin-obfuscator';
 import { defineConfig, loadEnv } from 'vite';
+import { analyzer } from 'vite-bundle-analyzer';
 import { compression, defineAlgorithm } from 'vite-plugin-compression2';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import svgr from 'vite-plugin-svgr';
@@ -28,7 +29,7 @@ export default defineConfig(({ mode }) => {
             target: ['es2022', 'firefox128', 'chrome111', 'safari16.4'],
             outDir: 'build',
             assetsInlineLimit: 8192,
-            sourcemap: process.env.GENERATE_SOURCEMAP === 'true',
+            sourcemap: false,
             chunkSizeWarningLimit: 1500,
             reportCompressedSize: true,
             rollupOptions: {
@@ -131,21 +132,41 @@ export default defineConfig(({ mode }) => {
                 },
             }),
             createHtmlPlugin({ minify: true }),
-            compression({
-                include: /\.*$/,
-                exclude: /\.(png|jpg|jpeg|webp|mp3|ogg|webm)$/i,
-                algorithms: [
-                    defineAlgorithm('brotliCompress', {
-                        params: {
-                            [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
-                            [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
-                        },
-                    }),
-                    defineAlgorithm('gzip', {
-                        level: zlib.constants.Z_BEST_COMPRESSION,
-                    }),
-                ],
-            }),
+            ...(process.env.ANALYZE_BUNDLE === 'true'
+                ? [
+                      analyzer({
+                          analyzerMode: 'server',
+                          analyzerPort: 3334,
+                          openAnalyzer: true,
+                          defaultSizes: 'brotli',
+                          brotliOptions: {
+                              params: {
+                                  [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+                                  [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+                              },
+                          },
+                          gzipOptions: {
+                              level: zlib.constants.Z_BEST_COMPRESSION,
+                          },
+                      }),
+                  ]
+                : [
+                      compression({
+                          include: /\.*$/,
+                          exclude: /\.(png|jpg|jpeg|webp|mp3|ogg|webm)$/i,
+                          algorithms: [
+                              defineAlgorithm('brotliCompress', {
+                                  params: {
+                                      [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+                                      [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+                                  },
+                              }),
+                              defineAlgorithm('gzip', {
+                                  level: zlib.constants.Z_BEST_COMPRESSION,
+                              }),
+                          ],
+                      }),
+                  ]),
         ],
         server: {
             open: true,
