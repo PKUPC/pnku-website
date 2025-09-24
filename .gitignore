@@ -1,6 +1,7 @@
 /local*/
 /data/
 /scripts/local*
+/frontend-build
 
 *.local
 *.local.*
