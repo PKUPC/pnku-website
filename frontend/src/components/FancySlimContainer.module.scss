@@ -42,7 +42,7 @@
 }
 
 .contentContainer {
-  background-color: hsl(var(--b1));
+  background-color: oklch(var(--b1));
   padding: 10px 24px;
   margin-top: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

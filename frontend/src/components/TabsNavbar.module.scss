@@ -5,7 +5,7 @@
   padding: 0.5rem 0.5rem;
 
   &:hover::after {
-    border-bottom-color: hsl(var(--bc) / 0.6);
+    border-bottom-color: oklch(var(--bc) / 0.6);
   }
 
   &:after {
@@ -15,16 +15,16 @@
     left: 0.25rem;
     right: 0.25rem;
     border-bottom-width: 0.125rem;
-    border-bottom-color: hsl(var(--bc) / 0);
+    border-bottom-color: oklch(var(--bc) / 0);
   }
 }
 
 .tabActive {
   &:after {
-    border-bottom-color: hsl(var(--bc) / 1);
+    border-bottom-color: oklch(var(--bc) / 1);
   }
 
   &:hover::after {
-    border-bottom-color: hsl(var(--bc) / 1);
+    border-bottom-color: oklch(var(--bc) / 1);
   }
 }
