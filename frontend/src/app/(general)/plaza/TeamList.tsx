@@ -85,7 +85,7 @@ function TeamCardModal({
         <div>
             <Modal
                 open={open}
-                destroyOnClose
+                destroyOnHidden={true}
                 footer={null}
                 maskClosable={true}
                 onCancel={() => setOpen(false)}
