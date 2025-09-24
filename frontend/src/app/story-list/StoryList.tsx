@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { FancySlimContainer } from '@/components/FancySlimContainer';
 import { Wish } from '@/types/wish.ts';
 
-import styles from './StoryList.module.scss';
+import styles from './StoryList.module.css';
 
 function GroupList({ storyGroup }: { storyGroup: Wish.Game.StoryGroup }) {
     return (

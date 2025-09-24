@@ -3,7 +3,7 @@ import { TableLoader as Table, type TableColumnsType } from '@/components/lazy/T
 import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
 
-import styles from './TeamPassedPuzzleTable.module.scss';
+import styles from './TeamPassedPuzzleTable.module.css';
 
 type StaffTeamDetailPassedPuzzles = Wish.Staff.StaffTeamDetailPassedPuzzles;
 

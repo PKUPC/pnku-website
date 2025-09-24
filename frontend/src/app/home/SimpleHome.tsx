@@ -6,7 +6,7 @@ import { FooterContent } from '@/components/FooterContent.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { Wish } from '@/types/wish.ts';
 
-import styles from './SimpleHome.module.scss';
+import styles from './SimpleHome.module.css';
 
 function CarouselTemplate({ heroData }: { heroData: Wish.Game.HomeAreaData }) {
     const fadeContainerRef = useRef<HTMLDivElement>(null);

@@ -3,7 +3,7 @@ import { Alert, Col, FloatButton, Modal, Row, Tooltip } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { EveryUserIcon } from '@/SvgIcons';
-import styles from '@/app/(general)/plaza/TeamList.module.scss';
+import styles from '@/app/(general)/plaza/TeamList.module.css';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import InfoBox from '@/components/InfoBox';
 import { ProfileAvatar } from '@/components/ProfileAvatar.tsx';
@@ -184,7 +184,7 @@ export function TeamList({ teamList }: { teamList: Wish.Game.TeamInfo[] }) {
     }, [onScrolledToBottom]);
 
     return (
-        <div className={styles.teamListWrapper}>
+        <div>
             <Alert
                 showIcon
                 message={<b>注意事项</b>}
@@ -204,7 +204,7 @@ export function TeamList({ teamList }: { teamList: Wish.Game.TeamInfo[] }) {
             {recruitingTeams.length > 0 && (
                 <>
                     <div className={styles.plazaTitles}>
-                        <h3 className="text-2xl font-semibold">招募中的队伍</h3>
+                        <h3>招募中的队伍</h3>
                     </div>
                     <br />
                     <div className={styles.teamList}>

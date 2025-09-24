@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './FancierCard.module.scss';
+import styles from './FancierCard.module.css';
 
 export function FancierCard({
     title,

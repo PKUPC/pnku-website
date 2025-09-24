@@ -1,6 +1,6 @@
 import { Collapse, CollapseProps } from 'antd';
 
-import styles from './CollapseCard.module.scss';
+import styles from './CollapseCard.module.css';
 
 export default function CollapseCard(props: CollapseProps) {
     return (

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
-import styles from './TabsNavbar.module.scss';
+import styles from './TabsNavbar.module.css';
 
 export type MenuItem = {
     type: string;

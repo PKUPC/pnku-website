@@ -14,7 +14,7 @@ import { ARCHIVE_MODE } from '@/constants.tsx';
 import { SiteSettingContext, useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';
 
-import styles from './page.module.scss';
+import styles from './page.module.css';
 
 export function PuzzlePage() {
     const [params] = useSearchParams();
@@ -46,11 +46,11 @@ export function PuzzlePage() {
     if (usePuzzleList == 'show')
         return (
             <div className={styles.puzzleWithListContainer}>
-                <div className={styles.puzzleSidebar}>
+                <div className="puzzle-sidebar">
                     {/*<LinkTitle icon={<LeftCircleIcon/>} title={"区域页"} url={data.data.return}/>*/}
                     <ClickTitle icon={<LeftCircleIcon />} title={'返回'} onClick={() => navigate(-1)} />
                     <br />
-                    <div className={styles.puzzleLists}>
+                    <div className="puzzle-lists">
                         {data.data.puzzle_list.length === 0 ? (
                             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无题目" />
                         ) : (
@@ -60,7 +60,7 @@ export function PuzzlePage() {
                         )}
                     </div>
                 </div>
-                <div className={styles.puzzleContentContainer}>
+                <div className="puzzle-content-container">
                     {hideInfo && (
                         <div>
                             {hideInfo}

@@ -8,7 +8,7 @@ import { PuzzleAnswerInput } from '@/app/(general)/puzzle/components/PuzzleAnswe
 import { TemplateStr } from '@/components/Template';
 import { Wish } from '@/types/wish.ts';
 
-import styles from './PuzzleTab.module.scss';
+import styles from './PuzzleTab.module.css';
 
 export function PuzzleBody({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetailData }) {
     const puzzleBody = <TemplateStr name={'puzzle-desc'}>{puzzleData.desc}</TemplateStr>;

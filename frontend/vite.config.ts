@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react';
+import Md5 from 'crypto-js/md5';
 import { resolve } from 'path';
 import obfuscator from 'rollup-plugin-obfuscator';
 import { defineConfig, loadEnv } from 'vite';
@@ -25,6 +26,18 @@ export default defineConfig(({ mode }) => {
     return {
         root: '.',
         publicDir: 'public',
+        css: {
+            modules: {
+                generateScopedName: (name, filename, css) => {
+                    // 在name的每个大写字母前加 - 然后把大写转成小写
+                    name = name.replace(/([A-Z])/g, '-$1').toLowerCase();
+                    const hash = Md5(filename + css)
+                        .toString()
+                        .substring(0, 8);
+                    return `${name}-${hash}`;
+                },
+            },
+        },
         build: {
             target: ['es2022', 'firefox128', 'chrome111', 'safari16.4'],
             outDir: 'build',

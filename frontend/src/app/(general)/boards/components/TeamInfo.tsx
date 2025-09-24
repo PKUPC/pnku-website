@@ -6,7 +6,7 @@ import { PeopleIcon } from '@/SvgIcons';
 import { TeamStatusTag } from '@/components/TeamStatusTag';
 import { Wish } from '@/types/wish.ts';
 
-import styles from './TeamInfo.module.scss';
+import styles from './TeamInfo.module.css';
 
 export function TeamInfo({ team, maxLength }: { team: Wish.Game.SimpleBoardItem; maxLength?: number }) {
     const fullShowInfo = team.in;
@@ -45,10 +45,10 @@ export function TeamInfo({ team, maxLength }: { team: Wish.Game.SimpleBoardItem;
                         );
                 })}
             >
-                <div className={styles.teamName}>
+                <div className="font-bold text-[0.9375rem] inline">
                     {teamName}
                     {team.bs.length > 0 && team.bs.map((v) => <TeamStatusTag key={v.text} data={v} />)}
-                    <div className={styles.iconWithChinese}>
+                    <div className="inline opacity-36">
                         <PeopleIcon />
                     </div>
                 </div>
@@ -56,10 +56,10 @@ export function TeamInfo({ team, maxLength }: { team: Wish.Game.SimpleBoardItem;
             <br />
             {!!maxLength && showInfo.length > maxLength ? (
                 <Tooltip title={fullShowInfo}>
-                    <div className={styles.teamInfo}>{showInfo}</div>
+                    <div className="opacity-70">{showInfo}</div>
                 </Tooltip>
             ) : (
-                <div className={styles.teamInfo}>{showInfo}</div>
+                <div className="opacity-70">{showInfo}</div>
             )}
         </div>
     );

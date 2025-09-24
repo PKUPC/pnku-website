@@ -3,7 +3,7 @@ import { TableLoader as Table, type TableColumnsType } from '@/components/lazy/T
 import { Wish } from '@/types/wish.ts';
 import { format_ms } from '@/utils.ts';
 
-import styles from './TeamApHistoryTable.module.scss';
+import styles from './TeamApHistoryTable.module.css';
 
 export function TeamApHistoryTable({ history }: { history: Wish.Staff.StaffTeamDetailApChangeHistory[] }) {
     const columns: TableColumnsType<Wish.Staff.StaffTeamDetailApChangeHistory> = [

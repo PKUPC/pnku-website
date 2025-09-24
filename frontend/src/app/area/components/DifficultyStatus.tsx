@@ -2,7 +2,7 @@ import { Progress } from 'antd';
 
 import { detectZoom } from '@/utils.ts';
 
-import styles from './DifficultyStatus.module.scss';
+import styles from './DifficultyStatus.module.css';
 
 export function DifficultyStatus({
     totalNum,

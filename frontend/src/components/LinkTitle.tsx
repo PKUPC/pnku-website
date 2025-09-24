@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import styles from './LinkTitle.module.scss';
+import styles from './LinkTitle.module.css';
 
 export function LinkTitle({
     icon,

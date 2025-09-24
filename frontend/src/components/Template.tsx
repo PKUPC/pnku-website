@@ -9,7 +9,7 @@ import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import { Reloader } from '@/components/Reloader';
 import { fetchTemplateFile } from '@/logic/wish';
 
-import styles from './Template.module.scss';
+import styles from './Template.module.css';
 
 export function SimpleTemplateStr({ name, children }: { name: string; children: string }) {
     return <div className={`template-${name} ` + styles.template} dangerouslySetInnerHTML={{ __html: children }} />;
