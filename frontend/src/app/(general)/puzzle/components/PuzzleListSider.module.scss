@@ -8,9 +8,9 @@
     height: 38px;
     width: 100%;
 
-    border-top: 1px solid hsl(var(--b3));
-    border-left: 1px solid hsl(var(--b3));
-    border-right: 1px solid hsl(var(--b3));
+    border-top: 1px solid oklch(var(--b3));
+    border-left: 1px solid oklch(var(--b3));
+    border-right: 1px solid oklch(var(--b3));
 
     &:first-child {
       border-top-left-radius: var(--rounded-btn);
@@ -20,11 +20,11 @@
     &:last-child {
       border-bottom-left-radius: var(--rounded-btn);
       border-bottom-right-radius: var(--rounded-btn);
-      border-bottom: 1px solid hsl(var(--b3));
+      border-bottom: 1px solid oklch(var(--b3));
     }
 
     &:not(:global(.puzzle-row-select)):hover {
-      background-color: hsl(var(--b3));
+      background-color: oklch(var(--b3));
     }
 
     :global(.puzzle-title) {
@@ -37,7 +37,7 @@
   }
 
   :global(.puzzle-row-select) {
-    background-color: hsl(var(--b3));
+    background-color: oklch(var(--b3));
   }
 
   :global(.puzzle-row-disabled) {
@@ -47,16 +47,16 @@
     height: 38px;
     background: repeating-linear-gradient(
       -45deg,
-      hsl(var(--b2)),
-      hsl(var(--b2)) 10px,
-      hsl(var(--b1)) 10px,
-      hsl(var(--b1)) 20px
+      oklch(var(--b2)),
+      oklch(var(--b2)) 10px,
+      oklch(var(--b1)) 10px,
+      oklch(var(--b1)) 20px
     );
     width: 100%;
 
-    border-top: 1px solid hsl(var(--b3));
-    border-left: 1px solid hsl(var(--b3));
-    border-right: 1px solid hsl(var(--b3));
+    border-top: 1px solid oklch(var(--b3));
+    border-left: 1px solid oklch(var(--b3));
+    border-right: 1px solid oklch(var(--b3));
 
     &:first-child {
       border-top-left-radius: var(--rounded-btn);
@@ -66,11 +66,11 @@
     &:last-child {
       border-bottom-left-radius: var(--rounded-btn);
       border-bottom-right-radius: var(--rounded-btn);
-      border-bottom: 1px solid hsl(var(--b3));
+      border-bottom: 1px solid oklch(var(--b3));
     }
 
     &:hover {
-      background-color: hsl(var(--b3));
+      background-color: oklch(var(--b3));
     }
 
     :global(.puzzle-title) {

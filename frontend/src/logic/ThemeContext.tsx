@@ -6,7 +6,7 @@ import { SiteThemeType, ThemeContext, ThemeContextType, enabledThemes } from '@/
 function getColorFromCssVar(cssVar: string) {
     const color = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
     if (color === '') return '#ffffff';
-    const colorObj = new Color(`hsl(${color})`);
+    const colorObj = new Color(`oklch(${color})`);
     return colorObj.to('srgb').toString({ format: 'hex' });
 }
 

@@ -14,7 +14,7 @@
   height: calc(26px + var(--icon-scale));
   width: 100%;
 
-  border-bottom: 1px solid hsl(var(--b3));
+  border-bottom: 1px solid oklch(var(--b3));
 
   &:first-child {
     border-top-left-radius: var(--rounded-btn);
@@ -28,7 +28,7 @@
   }
 
   &:not(:global(.puzzle-row-select)):hover {
-    background-color: hsl(var(--b3));
+    background-color: oklch(var(--b3));
   }
 }
 
