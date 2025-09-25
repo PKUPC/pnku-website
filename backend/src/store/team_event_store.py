@@ -2,37 +2,57 @@ from __future__ import annotations
 
 import time
 
+from enum import auto
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 from sqlalchemy import JSON, BigInteger, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
+from src.adhoc.constants.enums import CurrencyType
+from src.utils import EnhancedEnum
+
 from . import Table
 
 
+class TeamEventType(EnhancedEnum):
+    GAME_START = auto()
+    SUBMISSION = auto()
+    BUY_NORMAL_HINT = auto()
+    STAFF_MODIFY_CURRENCY = auto()
+    STAFF_MODIFY_AP = auto()
+    PUZZLE_ACTION = auto()
+
+
 class GameStartEvent(BaseModel):
-    type: Literal['game_start']
+    type: Literal[TeamEventType.GAME_START]
 
 
 class SubmissionEvent(BaseModel):
-    type: Literal['submission']
+    type: Literal[TeamEventType.SUBMISSION]
     submission_id: int
 
 
 class BuyNormalHintEvent(BaseModel):
-    type: Literal['buy_normal_hint']
+    type: Literal[TeamEventType.BUY_NORMAL_HINT]
     hint_id: int
 
 
+class StaffModifyCurrencyEvent(BaseModel):
+    type: Literal[TeamEventType.STAFF_MODIFY_CURRENCY]
+    currency_type: CurrencyType
+    delta: int
+    reason: str
+
+
 class StaffModifyApEvent(BaseModel):
-    type: Literal['staff_modify_ap']
+    type: Literal[TeamEventType.STAFF_MODIFY_AP]
     ap_change: int
     reason: str
 
 
 class PuzzleActionEvent(BaseModel):
-    type: Literal['puzzle_action']
+    type: Literal[TeamEventType.PUZZLE_ACTION]
     puzzle_key: str
     content: dict[str, str | int]
 

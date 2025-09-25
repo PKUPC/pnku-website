@@ -7,6 +7,7 @@ from sanic import Blueprint, Request
 from sanic_ext import validate
 
 from src import adhoc
+from src.adhoc.hint import hint_cd_after_puzzle_unlock
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -336,7 +337,7 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
         if not user.is_staff:
             # 对于普通玩家来说，得等待提示解锁
             unlock_puzzle_ts = user.team.game_state.unlock_puzzle_keys[puzzle_key]
-            hint_cd = adhoc.hint_cd_after_puzzle_unlock(hint)
+            hint_cd = hint_cd_after_puzzle_unlock(hint)
             effective_after_ts = unlock_puzzle_ts + hint_cd
 
         rst.append(

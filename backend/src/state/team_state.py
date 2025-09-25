@@ -5,7 +5,7 @@ import time
 from typing import TYPE_CHECKING
 
 from src import secret
-from src.adhoc import StaffTeamGameState, TeamGameState
+from src.adhoc.state import StaffTeamGameState, TeamGameState
 from src.store import (
     BuyNormalHintEvent,
     GameStartEvent,

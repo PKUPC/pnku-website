@@ -5,7 +5,7 @@ from functools import lru_cache
 from typing import TYPE_CHECKING, Literal
 
 from src import utils
-from src.adhoc import gen_puzzles_by_structure
+from src.adhoc.puzzle import gen_puzzles_by_structure
 from src.store import SubmissionEvent
 
 from .base import WithGameLifecycle
