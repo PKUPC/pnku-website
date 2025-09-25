@@ -27,8 +27,7 @@ class CurrencyIncreasePolicy(BaseModel):
 
 class CurrencyIncreaseModel(BaseModel):
     type: CurrencyType
-    begin_time_min: Annotated[str, AfterValidator(validate_time_minute_str)]
-    increase_per_min: int
+    increase_policy: list[CurrencyIncreasePolicy]
 
 
 class BoardSetting(BaseModel):
