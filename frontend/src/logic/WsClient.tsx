@@ -116,10 +116,6 @@ export class PushClient {
                         this.updateCurrentAp();
                         break;
                     }
-                    case 'modify_spap': {
-                        this.reloadInfo();
-                        break;
-                    }
                 }
                 PushClient.notification.info({
                     ...notificationConfig,
