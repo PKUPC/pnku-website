@@ -19,7 +19,6 @@ from .team_event_store import (
     GameStartEvent,
     PuzzleActionEvent,
     StaffModifyApEvent,
-    StaffModifySpApEvent,
     SubmissionEvent,
     TeamEventStore,
 )
@@ -50,7 +49,6 @@ __all__ = [
     'GameStartEvent',
     'PuzzleActionEvent',
     'StaffModifyApEvent',
-    'StaffModifySpApEvent',
     'SubmissionEvent',
     'TeamStore',
     'TicketMessageModel',

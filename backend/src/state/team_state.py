@@ -10,7 +10,6 @@ from src.store import (
     BuyNormalHintEvent,
     GameStartEvent,
     StaffModifyApEvent,
-    StaffModifySpApEvent,
     SubmissionEvent,
     TeamStore,
 )
@@ -151,8 +150,6 @@ class Team(WithGameLifecycle):
         self.ap_change_event: list[TeamEvent] = []
         # 在自然增长的基础上，ap 的变化量，注意正负，总 ap 为自然获取的 + self.ap_change
         self.ap_change: int = 0
-        # special action point，用于特殊用途的第二种货币
-        self.spap_change: int = 0
 
         # 购买过的提示
         self.bought_hint_ids: set[int] = set()
@@ -191,7 +188,6 @@ class Team(WithGameLifecycle):
                 self.team_events = []
                 self.ap_change_event = []
                 self.ap_change = 0
-                self.spap_change = 0
                 self.bought_hint_ids = set()
                 self.game_state = TeamGameState(self, self.game.puzzles.list)
                 self.gaming = False
@@ -260,22 +256,6 @@ class Team(WithGameLifecycle):
                                 'action': 'modify_ap',
                                 'message': (
                                     f'工作人员{"增加" if event.ap_change > 0 else "扣除"}了你们队伍的注意力。原因是：{event.model.info.reason}'
-                                ),
-                            },
-                        }
-                    )
-            case StaffModifySpApEvent():
-                self.spap_change += event.model.info.spap_change
-                if not is_reloading:
-                    self.game.worker.emit_ws_message(
-                        {
-                            'type': 'normal',
-                            'to_users': self.member_ids,
-                            'payload': {
-                                'type': 'staff_action',
-                                'action': 'modify_spap',
-                                'message': (
-                                    f'工作人员{"增加" if event.model.info.spap_change > 0 else "扣除"}了你们队伍的注意力。原因是：{event.model.info.reason}'
                                 ),
                             },
                         }
@@ -440,10 +420,6 @@ class Team(WithGameLifecycle):
         return self.ap_default + self.ap_change
 
     @property
-    def cur_spap(self) -> int:
-        return self.game.policy.cur_policy_modal.default_spap + self.spap_change
-
-    @property
     def last_success_submission(self) -> Submission | None:
         return self.game_state.success_submissions[-1] if len(self.game_state.success_submissions) > 0 else None
 
@@ -541,7 +517,6 @@ class StaffTeam(Team):
                 self.team_events = []
                 self.ap_change_event = []
                 self.ap_change = 0
-                self.spap_change = 0
                 self.bought_hint_ids = set()
                 self.game_state = StaffTeamGameState(self, self.game.puzzles.list)
                 self.is_staff_team = True
