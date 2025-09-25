@@ -190,7 +190,7 @@ if secret.USE_ARCHIVE_API:
                     'type': HintStore.HintType.dict().get(hint.model.type, '未知'),
                     # "type": hint.store.type,
                     'provider': hint.model.extra.provider,
-                    'cost': hint.model.extra.cost,
+                    'price': [{'type': x.type, 'name': x.type.value, 'price': x.price} for x in hint.model.extra.price],
                     'unlock': True,
                     'effective_after_ts': hint.model.effective_after_ts,
                 }

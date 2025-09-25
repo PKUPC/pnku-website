@@ -8,7 +8,7 @@ class Table(DeclarativeBase):
 
 from .announcement_store import AnnouncementStore
 from .game_policy_store import GamePolicyStore, GamePolicyStoreModel, PolicyModel
-from .hint_store import HintStore, HintStoreModel
+from .hint_store import HintStore, HintStoreModel, PriceModel
 from .log_store import LogStore
 from .log_user_store import LogUserStore
 from .message_store import MessageModel, MessageStore
@@ -18,7 +18,7 @@ from .team_event_store import (
     BuyNormalHintEvent,
     GameStartEvent,
     PuzzleActionEvent,
-    StaffModifyApEvent,
+    StaffModifyCurrencyEvent,
     SubmissionEvent,
     TeamEventStore,
     TeamEventType,
@@ -38,6 +38,7 @@ __all__ = [
     'PolicyModel',
     'HintStore',
     'HintStoreModel',
+    'PriceModel',
     'LogStore',
     'LogUserStore',
     'MessageModel',
@@ -50,7 +51,7 @@ __all__ = [
     'BuyNormalHintEvent',
     'GameStartEvent',
     'PuzzleActionEvent',
-    'StaffModifyApEvent',
+    'StaffModifyCurrencyEvent',
     'SubmissionEvent',
     'TeamStore',
     'TicketMessageModel',

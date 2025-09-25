@@ -4,7 +4,7 @@ import time
 
 from typing import TYPE_CHECKING
 
-from src.store import HintStore, HintStoreModel
+from src.store import HintStore, HintStoreModel, PriceModel
 
 from .base import WithGameLifecycle
 
@@ -105,9 +105,8 @@ class Hint(WithGameLifecycle):
         return True
 
     @property
-    def current_cost(self) -> int:
-        base_cost = self.model.extra.cost
-        return base_cost
+    def current_price(self) -> list[PriceModel]:
+        return self.model.extra.price
 
     def describe_type(self) -> str:
         return HintStore.HintType.dict().get(self.model.type, '未知')

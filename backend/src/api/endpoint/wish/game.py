@@ -10,6 +10,8 @@ from sanic import Blueprint, Request
 from sanic_ext import validate
 
 from src import adhoc, secret, utils
+from src.adhoc.constants.enums import CurrencyType
+from src.adhoc.state.currency import CurrencyTypeToClass
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -114,6 +116,8 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
 
     unlock_areas = adhoc.get_unlock_areas_info(user, worker)
 
+    # TODO: 这里的一些设置要移到 adhoc 中去
+    # 排行榜相关逻辑
     board_key_to_icon = {
         'score_board': 'ranking',
         'first_blood': 'first-blood',
@@ -139,6 +143,30 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
                         'name': worker.game_nocheck.boards[board].name,
                     }
                 )
+
+    # 货币相关逻辑，满足以下条件才会下发货币信息：
+    # 1. 不是 playground 模式，并且游戏已经开始
+    # 2. 用户存在、有队伍、并且进入了开始游戏状态
+    # 3. 用户不是 staff
+    currencies: list[dict[str, Any]] = []
+    if (
+        not secret.PLAYGROUND_MODE
+        and worker.game_nocheck.is_game_begin()
+        and user is not None
+        and user.team is not None
+        and user.team.gaming
+        and not user.is_staff
+    ):
+        for currency_type in CurrencyType:
+            currencies.append(
+                {
+                    'type': currency_type.lower_name,
+                    'name': currency_type.value,
+                    'icon': CurrencyTypeToClass[currency_type].icon,
+                    'denominator': CurrencyTypeToClass[currency_type].denominator,
+                    'precision': CurrencyTypeToClass[currency_type].precision,
+                }
+            )
 
     result_dict = {
         'user': None
@@ -188,6 +216,7 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
                 {key: title} for key, title, effective_after in TEMPLATE_LIST if cur_tick >= effective_after
             ],
             'boards': unlock_boards,
+            'currencies': currencies,
         },
         'feature': {
             'push': secret.WS_PUSH_ENABLED and user is not None and user.check_play_game() is None,
@@ -359,24 +388,59 @@ async def get_board(req: Request, body: GetBoardParam, worker: Worker, user: Use
     }
 
 
-@bp.route('/team_ap_detail', ['POST'])
+class GetTeamCurrencyDetailParam(BaseModel):
+    currency_type: str
+
+
+@bp.route('/team_currency_detail', ['POST'])
+@validate(json=GetTeamCurrencyDetailParam)
 @wish_response
 @wish_checker(['player_in_team'])
-async def get_team_ap_detail(_req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
+async def get_team_currency_detail(
+    req: Request, body: GetTeamCurrencyDetailParam, worker: Worker, user: User | None
+) -> dict[str, Any]:
     assert user is not None
+
+    currency_type = CurrencyType.__members__.get(body.currency_type.upper(), None)
+
+    if currency_type is None:
+        store_user_log(
+            req,
+            'api.game.get_team_currency_detail',
+            'abnormal',
+            '未知货币类型！',
+            {'currency_type': body.currency_type},
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '未知货币类型！'}
+
+    currency_class = CurrencyTypeToClass[currency_type]
+
+    # TODO: 可能可以合并 Staff 队伍和非 Staff 队伍，之后看看
     if user.is_staff:
         return {
-            'team_ap_change': 0,
-            'ap_increase_policy': worker.game_nocheck.policy.ap_increase_policy,
+            'data': {
+                'type': currency_type.lower_name,
+                'name': currency_type.value,
+                'icon': currency_class.icon,
+                'denominator': currency_class.denominator,
+                'precision': currency_class.precision,
+                'change': 0,
+                'base': 0,
+                'increase_policy': [],
+            }
         }
-    assert user.team is not None
 
-    return {
-        'data': {
-            'team_ap_change': user.team.ap_change,
-            'ap_increase_policy': worker.game_nocheck.policy.calc_ap_increase_policy_by_team(user.team),
-        }
+    assert user.team is not None
+    result = {
+        'type': currency_type.lower_name,
+        'name': currency_type.value,
+        'icon': currency_class.icon,
+        'denominator': currency_class.denominator,
+        'precision': currency_class.precision,
+        'change': user.team.game_state.currency_state_by_type[currency_type].total_change,
+        'increase_policy': user.team.game_state.get_currency_increase_policy(currency_type),
     }
+    return {'data': result}
 
 
 class GameStartParam(BaseModel):

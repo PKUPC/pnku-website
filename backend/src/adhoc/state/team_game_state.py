@@ -8,9 +8,11 @@ from __future__ import annotations
 from collections.abc import Hashable
 from typing import TYPE_CHECKING, Any
 
-from src.adhoc.constants import PuzzleVisibleStatusLiteral
+from src.adhoc.constants import CurrencyType, PuzzleVisibleStatusLiteral
+from src.adhoc.constants.messages import make_buy_hint_message, make_modify_currency_message
 from src.store import PuzzleActionEvent
 
+from .currency import AttentionCurrencyState, CurrencyEvent, CurrencyState
 from .special_puzzles import (
     Day2Meta,
     Day3Normal,
@@ -25,7 +27,7 @@ from .team_puzzle_state import TeamPuzzleState
 
 
 if TYPE_CHECKING:
-    from src.state import Puzzle, Submission, Team
+    from src.state import Game, Puzzle, Submission, Team
 
     from .team_puzzle_state import SubmissionResult
 
@@ -42,6 +44,7 @@ class TeamGameState:
         会传入对应的 team 对象和所有 puzzle 列表，按需初始化自己的状态和各种题目的状态
         """
         self.team: Team = team
+        self.game: Game = team.game
         self.puzzle_state_by_key: dict[str, TeamPuzzleState] = {}
         # 解锁的题目，key 是 puzzle_key，value 是解锁时间
         self.unlock_puzzle_keys: dict[str, int] = {}
@@ -63,6 +66,10 @@ class TeamGameState:
         self.submissions: list[Submission] = []
         self.passed_puzzles: set[tuple[Puzzle, Submission]] = set()
         self.success_submissions: list[Submission] = []
+
+        self.currency_state_by_type: dict[CurrencyType, CurrencyState] = {
+            CurrencyType.ATTENTION: AttentionCurrencyState(self),
+        }
 
         # 游戏状态
         self.gaming: bool = False
@@ -103,12 +110,110 @@ class TeamGameState:
     def preparing(self) -> bool:
         return not self.gaming
 
+    def get_submission_set(self, puzzle_key: str) -> set[str]:
+        return self.puzzle_state_by_key[puzzle_key].submission_set
+
+    def get_correct_answers(self, puzzle_key: str) -> list[str]:
+        return self.puzzle_state_by_key[puzzle_key].correct_answers
+
+    def get_dyn_actions(self, puzzle_key: str) -> list[dict[str, Any]]:
+        return self.puzzle_state_by_key[puzzle_key].get_dyn_actions()
+
+    def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
+        """
+        用于处理特殊题目的 action
+        """
+        if event.puzzle_key in self.puzzle_state_by_key:
+            self.puzzle_actions[event.puzzle_key].append(event)
+            self.puzzle_state_by_key[event.puzzle_key].on_puzzle_action(event)
+        else:
+            self.team.game.log('warning', 'TeamGameStatus.on_puzzle_action', f'Unknown puzzle_key: {event.puzzle_key}')
+
     def puzzle_visible_status(self, puzzle_key: str) -> PuzzleVisibleStatusLiteral:
         """
         题目可见性，用于自定义题目都有哪些状态，用于按需处理。
         """
         assert puzzle_key in self.puzzle_state_by_key
         return self.puzzle_state_by_key[puzzle_key].visible
+
+    def get_currency_increase_policy(self, currency_type: CurrencyType) -> list[tuple[int, int]]:
+        return self.currency_state_by_type[currency_type].get_increase_policy()
+
+    def get_current_balance(self, currency_type: CurrencyType) -> int:
+        return self.currency_state_by_type[currency_type].current_balance()
+
+    def get_currency_history(self, currency_type: CurrencyType) -> list[dict[str, str | int]]:
+        return self.currency_state_by_type[currency_type].get_currency_history()
+
+    def on_game_start(self, team_game_start_time: int, is_reloading: bool) -> None:
+        self.gaming = True
+        self.gaming_timestamp_s = team_game_start_time
+
+        # 游戏开始前可以进入游戏中状态，但是默认是游戏开始时解锁
+        game_start_time = self.team.game.game_begin_timestamp_s
+        unlock_time = team_game_start_time
+        if unlock_time < game_start_time:
+            unlock_time = game_start_time
+
+        self.unlock_boards.append('score_board')
+        self.unlock_templates.add('prologue')
+        self.unlock_templates.add('day1_intro')
+        self.unlock_areas.add('day1')
+        self.add_unlock_puzzle('day1_01', unlock_time, is_reloading)
+        self.add_unlock_puzzle('day1_02', unlock_time, is_reloading)
+        self.add_unlock_puzzle('day1_03', unlock_time, is_reloading)
+
+    def on_currency_event(self, event: CurrencyEvent, is_reloading: bool) -> None:
+        from src.store import BuyNormalHintEvent, StaffModifyCurrencyEvent
+
+        match event.info:
+            case StaffModifyCurrencyEvent():
+                event.currency_change[event.info.currency_type] = event.info.delta
+                self.currency_state_by_type[event.info.currency_type].on_currency_event(event)
+
+                if not is_reloading:
+                    self.game.worker.emit_ws_message(
+                        {
+                            'type': 'normal',
+                            'to_users': self.team.member_ids,
+                            'payload': {
+                                'type': 'staff_action',
+                                'action': 'modify_currency',
+                                'message': make_modify_currency_message(
+                                    event.info.currency_type, event.info.delta, event.info.reason
+                                ),
+                            },
+                        }
+                    )
+            case BuyNormalHintEvent(hint_id=hint_id):
+                assert hint_id in self.game.hints.hint_by_id
+                hint = self.game.hints.hint_by_id[hint_id]
+
+                price_list = hint.current_price
+
+                for price in price_list:
+                    event.currency_change[price.type] = -price.price
+                    self.currency_state_by_type[price.type].on_currency_event(event)
+
+                if not is_reloading:
+                    origin_key = hint.puzzle.model.key
+                    hash_key = self.game.hash_puzzle_key(self.team.model.id, origin_key)
+                    event_user = self.game.users.user_by_id[event.team_event.model.user_id]
+                    puzzle = self.game.puzzles.puzzle_by_key[origin_key]
+
+                    message = make_buy_hint_message(event_user.model.user_info.nickname, puzzle.model.title, price_list)
+                    self.game.worker.emit_ws_message(
+                        {
+                            'type': 'normal',
+                            'to_users': [x for x in self.team.member_ids if x != event.team_event.model.user_id],
+                            'payload': {
+                                'type': 'teammate_action',
+                                'action': 'buy_normal_hint',
+                                'puzzle_key': hash_key,
+                                'message': message,
+                            },
+                        }
+                    )
 
     def on_submission(self, submission: Submission, is_reloading: bool) -> None:
         """
@@ -310,37 +415,3 @@ class TeamGameState:
                         },
                     }
                 )
-
-    def on_game_start(self, team_game_start_time: int, is_reloading: bool) -> None:
-        self.gaming = True
-        self.gaming_timestamp_s = team_game_start_time
-
-        # 游戏开始前可以进入游戏中状态，但是默认是游戏开始时解锁
-        game_start_time = self.team.game.game_begin_timestamp_s
-        unlock_time = team_game_start_time
-        if unlock_time < game_start_time:
-            unlock_time = game_start_time
-
-        self.unlock_boards.append('score_board')
-        self.unlock_templates.add('prologue')
-        self.unlock_templates.add('day1_intro')
-        self.unlock_areas.add('day1')
-        self.add_unlock_puzzle('day1_01', unlock_time, is_reloading)
-        self.add_unlock_puzzle('day1_02', unlock_time, is_reloading)
-        self.add_unlock_puzzle('day1_03', unlock_time, is_reloading)
-
-    def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
-        if event.puzzle_key in self.puzzle_state_by_key:
-            self.puzzle_actions[event.puzzle_key].append(event)
-            self.puzzle_state_by_key[event.puzzle_key].on_puzzle_action(event)
-        else:
-            self.team.game.log('warning', 'TeamGameStatus.on_puzzle_action', f'Unknown puzzle_key: {event.puzzle_key}')
-
-    def get_submission_set(self, puzzle_key: str) -> set[str]:
-        return self.puzzle_state_by_key[puzzle_key].submission_set
-
-    def get_correct_answers(self, puzzle_key: str) -> list[str]:
-        return self.puzzle_state_by_key[puzzle_key].correct_answers
-
-    def get_dyn_actions(self, puzzle_key: str) -> list[dict[str, Any]]:
-        return self.puzzle_state_by_key[puzzle_key].get_dyn_actions()

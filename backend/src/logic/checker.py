@@ -169,8 +169,12 @@ class Checker:
         if not hint.effective:
             return {'status': 'error', 'title': 'NOT_EFFECTIVE', 'message': '提示当前不可用'}
 
-        if user.team.cur_ap < hint.current_cost:
-            return {'status': 'error', 'title': 'NO_ENOUGH_MONEY', 'message': '体力值不足，无法购买'}
+        for price in hint.current_price:
+            print('DEBUG!!!')
+            print(user.team.cur_currency_by_type(price.type))
+            print(price.price)
+            if user.team.cur_currency_by_type(price.type) < price.price:
+                return {'status': 'error', 'title': 'NO_ENOUGH_MONEY', 'message': f'{price.type.value}不足，无法购买'}
 
         if puzzle_key != hint.model.puzzle_key:
             return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '提示状态异常，请通知工作人员'}

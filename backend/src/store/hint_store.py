@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import JSON, BigInteger, Boolean, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
+from src.adhoc.constants.enums import CurrencyType
 from src.utils import EnhancedEnum
 
 
@@ -15,9 +16,14 @@ if TYPE_CHECKING:
 from . import Table
 
 
+class PriceModel(BaseModel):
+    type: CurrencyType
+    price: int
+
+
 class ExtraInfoModel(BaseModel):
     provider: str
-    cost: int
+    price: list[PriceModel] = Field(default_factory=list)
 
 
 class HintStoreModel(BaseModel):

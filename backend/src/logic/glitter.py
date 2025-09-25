@@ -214,15 +214,8 @@ class SetTicketStatusReq(ActionReq):
 class VMe50Req(ActionReq):
     staff_id: int
     team_id: int
-    ap_change: int
-    reason: str
-
-
-@dataclass
-class VMe100Req(ActionReq):
-    staff_id: int
-    team_id: int
-    ap_change: int
+    currency_type: str
+    change: int
     reason: str
 
 
