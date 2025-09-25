@@ -63,6 +63,8 @@ class TeamGameState:
         self.success_submissions: list[Submission] = []
 
         # 游戏状态
+        self.gaming: bool = False
+        self.gaming_timestamp_s: int = -1
         self.finished: bool = False  # 完赛标记
         self.finished_timestamp_s: int = -1
         self.day1_count = 0
@@ -94,6 +96,10 @@ class TeamGameState:
                         self.puzzle_state_by_key[puzzle.model.key] = Day3Normal(self, team, puzzle)
                 case _:
                     self.puzzle_state_by_key[puzzle.model.key] = TeamPuzzleState(self, team, puzzle)
+
+    @property
+    def preparing(self) -> bool:
+        return not self.gaming
 
     def puzzle_visible_status(self, puzzle_key: str) -> PuzzleVisibleStatusLiteral:
         """
@@ -303,18 +309,23 @@ class TeamGameState:
                     }
                 )
 
-    def team_start_game(self, team_game_start_time: int, is_reloading: bool) -> None:
+    def on_game_start(self, team_game_start_time: int, is_reloading: bool) -> None:
+        self.gaming = True
+        self.gaming_timestamp_s = team_game_start_time
+
+        # 游戏开始前可以进入游戏中状态，但是默认是游戏开始时解锁
         game_start_time = self.team.game.game_begin_timestamp_s
-        if team_game_start_time < game_start_time:
-            team_game_start_time = game_start_time
+        unlock_time = team_game_start_time
+        if unlock_time < game_start_time:
+            unlock_time = game_start_time
 
         self.unlock_boards.append('score_board')
         self.unlock_templates.add('prologue')
         self.unlock_templates.add('day1_intro')
         self.unlock_areas.add('day1')
-        self.add_unlock_puzzle('day1_01', team_game_start_time, is_reloading)
-        self.add_unlock_puzzle('day1_02', team_game_start_time, is_reloading)
-        self.add_unlock_puzzle('day1_03', team_game_start_time, is_reloading)
+        self.add_unlock_puzzle('day1_01', unlock_time, is_reloading)
+        self.add_unlock_puzzle('day1_02', unlock_time, is_reloading)
+        self.add_unlock_puzzle('day1_03', unlock_time, is_reloading)
 
     def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
         if event.puzzle_key in self.puzzle_state_by_key:
