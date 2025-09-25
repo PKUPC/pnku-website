@@ -25,7 +25,9 @@ from .team_puzzle_state import TeamPuzzleState
 
 
 if TYPE_CHECKING:
-    from src.state import Puzzle, Submission, SubmissionResult, Team
+    from src.state import Puzzle, Submission, Team
+
+    from .team_puzzle_state import SubmissionResult
 
 
 class TeamGameState:

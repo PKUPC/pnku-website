@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from src import utils
-from src.state.submission_state import SubmissionResult
 
-from ..team_puzzle_state import TeamPuzzleState
+from ..team_puzzle_state import SubmissionResult, TeamPuzzleState
 
 
 ANSWER_STRING = '梦中的' * 36
