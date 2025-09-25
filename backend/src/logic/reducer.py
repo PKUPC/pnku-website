@@ -6,6 +6,7 @@ import json
 import time
 
 from collections.abc import Awaitable, Callable, Sequence
+from functools import cache
 from typing import Any
 
 import zmq
@@ -27,12 +28,20 @@ from src.store import (
 
 from . import glitter
 from .base import StateContainerBase
+from .glitter import ActionResult
 from .utils import make_callback_decorator
 
 
-CRITICAL_ERROR = utils.pack_rep(
-    {'status': 'error', 'title': 'REDUCER_ERROR', 'message': '出大问题了，快联系工作人员！'}
-)
+@cache
+def make_datebase_error(message: str) -> dict[str, str]:
+    return {'status': 'error', 'title': 'DATABASE_ERROR', 'message': message}
+
+
+CRITICAL_ERROR: dict[str, str] = {
+    'status': 'error',
+    'title': 'CRITICAL_ERROR',
+    'message': '出大问题了，快联系工作人员！',
+}
 
 
 class Reducer(StateContainerBase):
@@ -74,18 +83,22 @@ class Reducer(StateContainerBase):
         self.game_dirty = False
 
     @on_action(glitter.WorkerHelloReq)
-    async def on_worker_hello(self, req: glitter.WorkerHelloReq) -> str | None:
+    async def on_worker_hello(self, req: glitter.WorkerHelloReq) -> ActionResult:
         client_ver = req.protocol_ver
         if client_ver != glitter.PROTOCOL_VER:
-            return f'protocol version mismatch: worker {req.protocol_ver}, reducer {glitter.PROTOCOL_VER}'
+            return {
+                'status': 'error',
+                'title': 'PROTOCOL_VERSION_MISMATCH',
+                'message': f'protocol version mismatch: worker {req.protocol_ver}, reducer {glitter.PROTOCOL_VER}',
+            }
         else:
             await self.emit_sync()
             return None
 
     @on_action(glitter.UserRegReq)
-    async def on_user_reg(self, req: glitter.UserRegReq) -> str | None:
+    async def on_user_reg(self, req: glitter.UserRegReq) -> ActionResult:
         if req.login_key in self._game.users.user_by_login_key:
-            return 'user already exists'
+            return make_datebase_error('user already exists')
 
         with self.SqlSession() as session:
             user = UserStore(
@@ -123,7 +136,7 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.UserResetReq)
-    async def on_user_reset(self, req: glitter.UserResetReq) -> str | None:
+    async def on_user_reset(self, req: glitter.UserResetReq) -> ActionResult:
         assert req.login_key in self._game.users.user_by_login_key
         cur_user = self._game.users.user_by_login_key[req.login_key]
 
@@ -145,13 +158,13 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.UserUpdateProfileReq)
-    async def on_user_update_profile(self, req: glitter.UserUpdateProfileReq) -> str | None:
+    async def on_user_update_profile(self, req: glitter.UserUpdateProfileReq) -> ActionResult:
         uid = int(req.uid)
 
         with self.SqlSession() as session:
             user: UserStore | None = session.query(UserStore).filter_by(id=uid).with_for_update().scalar()
             if user is None:
-                return 'user not found'
+                return make_datebase_error('user not found')
             new_user_info = copy.deepcopy(user.user_info)
             new_user_info.update({'nickname': req.profile['nickname']})
             user.user_info = new_user_info
@@ -164,13 +177,13 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.UserAgreeTermReq)
-    async def on_user_agree_term(self, req: glitter.UserAgreeTermReq) -> str | None:
+    async def on_user_agree_term(self, req: glitter.UserAgreeTermReq) -> ActionResult:
         uid = int(req.uid)
 
         with self.SqlSession() as session:
             user: UserStore | None = session.execute(select(UserStore).where(UserStore.id == uid)).scalar()
             if user is None:
-                return 'user not found'
+                return make_datebase_error('user not found')
 
             # user.terms_agreed = True
             session.commit()
@@ -180,21 +193,21 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.UserCreateTeamReq)
-    async def on_user_create_team(self, req: glitter.UserCreateTeamReq) -> str | None:
+    async def on_user_create_team(self, req: glitter.UserCreateTeamReq) -> ActionResult:
         uid = req.uid
         user_state = self._game.users.user_by_id[uid]
 
         if user_state.model.team_id is not None:
-            return utils.pack_rep({'status': 'error', 'title': 'IN_TEAM', 'message': '你已经在队伍中'})
+            return {'status': 'error', 'title': 'IN_TEAM', 'message': '你已经在队伍中'}
         if user_state.model.group == 'staff':
-            return utils.pack_rep({'status': 'error', 'title': 'BAD_REQUEST', 'message': '工作人员不能组队'})
+            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '工作人员不能组队'}
         if req.team_name in self._game.teams.team_name_set:
-            return utils.pack_rep({'status': 'error', 'title': 'BAD_NAME', 'message': '队伍名不能和现存队伍名重复'})
+            return {'status': 'error', 'title': 'BAD_NAME', 'message': '队伍名不能和现存队伍名重复'}
 
         with self.SqlSession() as session:
             user: UserStore | None = session.execute(select(UserStore).where(UserStore.id == uid)).scalar()
             if user is None:
-                return 'user not found'
+                return make_datebase_error('user not found')
 
             # create team
             team = TeamStore(
@@ -222,35 +235,31 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.TeamUpdateInfoReq)
-    async def on_team_update_profile(self, req: glitter.TeamUpdateInfoReq) -> str | None:
+    async def on_team_update_profile(self, req: glitter.TeamUpdateInfoReq) -> ActionResult:
         user = self._game.users.user_by_id[req.uid]
         # 检查是否已经在队伍里
         if user.team is None:
-            return utils.pack_rep({'status': 'error', 'title': 'NOT_IN_TEAM', 'message': '你还没组队'})
+            return {'status': 'error', 'title': 'NOT_IN_TEAM', 'message': '你还没组队'}
         # 如果已经在队里，必须要是队长
         elif user.team.model.leader_id != user.model.id:
-            return utils.pack_rep(
-                {'status': 'error', 'title': 'NO_PERMISSION', 'message': '你不是队长，没有权限更改队伍信息'}
-            )
+            return {'status': 'error', 'title': 'NO_PERMISSION', 'message': '你不是队长，没有权限更改队伍信息'}
         # 游戏开始后禁止修改
         if user.team.gaming and req.team_name != user.team.model.team_name:
-            return utils.pack_rep(
-                {
-                    'status': 'error',
-                    'title': 'BAD_REQUEST',
-                    'message': '在开始游戏后禁止修改队伍名称，如有需要请联系工作人员。',
-                }
-            )
+            return {
+                'status': 'error',
+                'title': 'BAD_REQUEST',
+                'message': '在开始游戏后禁止修改队伍名称，如有需要请联系工作人员。',
+            }
         # 队伍名不能和现存队伍名重复
         if req.team_name != user.team.model.team_name and req.team_name in self._game.teams.team_name_set:
-            return utils.pack_rep({'status': 'error', 'title': 'BAD_NAME', 'message': '队伍名不能和现存队伍名重复'})
+            return {'status': 'error', 'title': 'BAD_NAME', 'message': '队伍名不能和现存队伍名重复'}
 
         tid = req.tid
 
         with self.SqlSession() as session:
             team: TeamStore | None = session.execute(select(TeamStore).where(TeamStore.id == tid)).scalar()
             if team is None:
-                return 'team not found'
+                return make_datebase_error('team not found')
 
             team.updated_at = int(1000 * time.time())
             team.team_name = req.team_name
@@ -264,17 +273,15 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.TeamUpdateExtraTeamInfoReq)
-    async def on_team_update_extra_info(self, req: glitter.TeamUpdateExtraTeamInfoReq) -> str | None:
+    async def on_team_update_extra_info(self, req: glitter.TeamUpdateExtraTeamInfoReq) -> ActionResult:
         user = self._game.users.user_by_id[req.uid]
         if not user.is_staff:
             # 检查是否已经在队伍里
             if user.team is None:
-                return utils.pack_rep({'status': 'error', 'title': 'NOT_IN_TEAM', 'message': '你还没组队'})
+                return {'status': 'error', 'title': 'NOT_IN_TEAM', 'message': '你还没组队'}
             # 如果已经在队里，必须要是队长
             elif user.team.model.leader_id != user.model.id:
-                return utils.pack_rep(
-                    {'status': 'error', 'title': 'NO_PERMISSION', 'message': '你不是队长，没有权限更改队伍信息'}
-                )
+                return {'status': 'error', 'title': 'NO_PERMISSION', 'message': '你不是队长，没有权限更改队伍信息'}
 
         tid = req.tid
 
@@ -303,27 +310,27 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.UserJoinTeamReq)
-    async def on_user_join_team(self, req: glitter.UserJoinTeamReq) -> str | None:
+    async def on_user_join_team(self, req: glitter.UserJoinTeamReq) -> ActionResult:
         tid = req.tid
         uid = req.uid
         u = self._game.users.user_by_id[uid]
 
         # 检查队伍是否存在
         if tid not in self._game.teams.team_by_id:
-            return utils.pack_rep({'status': 'error', 'title': 'BAD_REQUEST', 'message': '不存在的队伍'})
+            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '不存在的队伍'}
         target_team = self._game.teams.team_by_id[tid]
         # 如果队伍已经封禁，则禁止加入队伍
         if target_team.model.ban_status == TeamStore.BanStatus.BANNED.name:
-            return utils.pack_rep({'status': 'error', 'title': 'BAD_TEAM', 'message': '队伍已封禁，禁止加入。'})
+            return {'status': 'error', 'title': 'BAD_TEAM', 'message': '队伍已封禁，禁止加入。'}
         # 检查是否已经在队伍里
         if u.team is not None:
-            return utils.pack_rep({'status': 'error', 'title': 'BAD_REQUEST', 'message': '你已经在队伍里'})
+            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '你已经在队伍里'}
         # 检查队伍人数限制
         if len(target_team.members) == secret.TEAM_MAX_MEMBER:
-            return utils.pack_rep({'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍人数达到上限'})
+            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍人数达到上限'}
         # 检查 secret
         if target_team.model.team_secret != req.team_secret:
-            return utils.pack_rep({'status': 'error', 'title': 'WRONG_SECRET', 'message': '队伍邀请码错误'})
+            return {'status': 'error', 'title': 'WRONG_SECRET', 'message': '队伍邀请码错误'}
 
         with self.SqlSession() as session:
             # noinspection DuplicatedCode
@@ -340,19 +347,17 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.UserLeaveTeamReq)
-    async def on_user_leave_team(self, req: glitter.UserLeaveTeamReq) -> str | None:
+    async def on_user_leave_team(self, req: glitter.UserLeaveTeamReq) -> ActionResult:
         tid = req.tid
         uid = req.uid
         u = self._game.users.user_by_id[uid]
 
         if u.model.group != 'staff' and u.model.team_id is None:
-            return utils.pack_rep({'status': 'error', 'title': 'NO_TEAM', 'message': '用户不在队伍中'})
+            return {'status': 'error', 'title': 'NO_TEAM', 'message': '用户不在队伍中'}
         # 检查队伍状态
         assert u.team is not None
         if u.team.gaming:
-            return utils.pack_rep(
-                {'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍已经在游戏中，你现在不能离开队伍'}
-            )
+            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍已经在游戏中，你现在不能离开队伍'}
 
         with self.SqlSession() as session:
             team: TeamStore | None = session.execute(select(TeamStore).where(TeamStore.id == tid)).scalar()
@@ -387,24 +392,23 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.TeamRemoveUserReq)
-    async def on_team_remove_user(self, req: glitter.TeamRemoveUserReq) -> str | None:
+    async def on_team_remove_user(self, req: glitter.TeamRemoveUserReq) -> ActionResult:
         target_uid = req.uid
         from_uid = req.from_id
         from_user = self._game.users.user_by_id[from_uid]
 
         if from_user.model.group != 'staff' and from_user.model.team_id is None:
-            return utils.pack_rep({'status': 'error', 'title': 'NO_TEAM', 'message': '用户不在队伍中'})
+            return {'status': 'error', 'title': 'NO_TEAM', 'message': '用户不在队伍中'}
         assert from_user.team is not None
         if from_user.team.leader is not from_user:
-            return utils.pack_rep({'status': 'error', 'title': 'PERMISSION_DENIED', 'message': '你不是队长'})
+            return {'status': 'error', 'title': 'PERMISSION_DENIED', 'message': '你不是队长'}
         if target_uid not in [x.model.id for x in from_user.team.members]:
-            return utils.pack_rep({'status': 'error', 'title': 'USER_NOT_FOUND', 'message': '要删除的用户不在队伍中'})
+            return {'status': 'error', 'title': 'USER_NOT_FOUND', 'message': '要删除的用户不在队伍中'}
         if from_user.team.gaming:
-            return utils.pack_rep(
-                {'status': 'error', 'title': 'TEAM_LOCK', 'message': '队伍已经在游戏中，现在不能移除队伍成员'}
-            )
+            return {'status': 'error', 'title': 'TEAM_LOCK', 'message': '队伍已经在游戏中，现在不能移除队伍成员'}
+
         if from_uid == target_uid:
-            return utils.pack_rep({'status': 'error', 'title': 'PERMISSION_DENIED', 'message': '你不能移除你自己'})
+            return {'status': 'error', 'title': 'PERMISSION_DENIED', 'message': '你不能移除你自己'}
 
         with self.SqlSession() as session:
             user: UserStore | None = session.execute(select(UserStore).where(UserStore.id == target_uid)).scalar()
@@ -418,19 +422,19 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.TeamChangeLeaderReq)
-    async def on_team_change_leader(self, req: glitter.TeamChangeLeaderReq) -> str | None:
+    async def on_team_change_leader(self, req: glitter.TeamChangeLeaderReq) -> ActionResult:
         target_uid = req.uid
         from_uid = req.from_id
         from_user = self._game.users.user_by_id[from_uid]
         if from_user.model.group != 'staff' and from_user.model.team_id is None:
-            return utils.pack_rep({'status': 'error', 'title': 'NO_TEAM', 'message': '用户不在队伍中'})
+            return {'status': 'error', 'title': 'NO_TEAM', 'message': '用户不在队伍中'}
         assert from_user.team is not None
         if from_user.team.leader is not from_user:
-            return utils.pack_rep({'status': 'error', 'title': 'PERMISSION_DENIED', 'message': '你不是队长'})
+            return {'status': 'error', 'title': 'PERMISSION_DENIED', 'message': '你不是队长'}
         if target_uid not in [x.model.id for x in from_user.team.members]:
-            return utils.pack_rep({'status': 'error', 'title': 'USER_NOT_FOUND', 'message': '目标用户不在队伍中'})
+            return {'status': 'error', 'title': 'USER_NOT_FOUND', 'message': '目标用户不在队伍中'}
         if from_user.model.id == target_uid:
-            return utils.pack_rep({'status': 'error', 'title': 'PERMISSION_DENIED', 'message': '你不能转移给你自己'})
+            return {'status': 'error', 'title': 'PERMISSION_DENIED', 'message': '你不能转移给你自己'}
 
         tid = req.tid
 
@@ -450,7 +454,7 @@ class Reducer(StateContainerBase):
         return None
 
     @on_action(glitter.SubmitAnswerReq)
-    async def on_submit_answer(self, req: glitter.SubmitAnswerReq) -> str | None:
+    async def on_submit_answer(self, req: glitter.SubmitAnswerReq) -> ActionResult:
         user = self._game.users.user_by_id[req.user_id]
         assert user.team is not None
 
@@ -498,7 +502,7 @@ class Reducer(StateContainerBase):
             res = {'status': 'success', 'title': '答案正确！', 'message': f'{submission_result.info}'}
         elif submission_result.type == 'staff_wrong':
             res = {'status': 'error', 'title': '答案错误！', 'message': f'{submission_result.info}'}
-        return utils.pack_rep(res)
+        return res
 
     @on_action(glitter.TeamBuyHintReq)
     async def on_team_buy_hint(self, req: glitter.TeamBuyHintReq) -> str | None:
@@ -926,15 +930,15 @@ class Reducer(StateContainerBase):
             with (secret.SYBIL_LOG_PATH / 'sys.log').open('ab') as f:
                 f.write(encoded + b'\n')
 
-    async def handle_action(self, action: glitter.Action) -> str | None:
-        async def default(_self: Any, req: glitter.ActionReq) -> str | None:
-            return f'unknown action: {req.type}'
+    async def handle_action(self, action: glitter.Action) -> ActionResult:
+        async def default(_self: Any, req: glitter.ActionReq) -> ActionResult:
+            return {'status': 'error', 'title': 'UNKNOWN_ACTION', 'message': f'unknown action: {req.type}'}
 
         check_result = await self.checker.check_action(action.req)
         if check_result is not None:
-            return utils.pack_rep(check_result)
+            return check_result
 
-        listener: Callable[[Any, glitter.ActionReq], Awaitable[str | None]] = self.action_listeners.get(
+        listener: Callable[[Any, glitter.ActionReq], Awaitable[ActionResult]] = self.action_listeners.get(
             type(action.req), default
         )
 
@@ -1002,10 +1006,7 @@ class Reducer(StateContainerBase):
             old_counter = self.state_counter
 
             try:
-                if action is None:
-                    err: str | None = 'malformed glitter packet'
-                else:
-                    err = await self.handle_action(action)
+                err = await self.handle_action(action)
 
                 if err is not None and action.req.type != 'SubmitAnswerReq':
                     self.log('warning', 'reducer.handle_action', f'error for action {action.req.type}: {err}')
@@ -1015,7 +1016,11 @@ class Reducer(StateContainerBase):
                     'reducer.handle_action',
                     f'exception, will report as internal error: {utils.get_traceback(e)}',
                 )
-                err = '内部错误，已记录日志'
+                err = {
+                    'status': 'error',
+                    'title': 'INTERNAL_ERROR',
+                    'message': '内部错误，已记录日志，如果您经常遇到此问题，请反馈给工作人员。',
+                }
 
             if self.state_counter != old_counter:
                 self.log('debug', 'reducer.mainloop', f'state counter {old_counter} -> {self.state_counter}')

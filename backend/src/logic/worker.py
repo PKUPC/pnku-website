@@ -64,7 +64,7 @@ class Worker(StateContainerBase):
                 await asyncio.sleep(self.RECOVER_INTERVAL_S)
             else:
                 if hello_res.result is not None:
-                    self.log('critical', 'worker.before_run', f'handshake failure: {hello_res.result}')
+                    self.log('critical', 'worker.before_run', f'handshake failure: {hello_res.result["message"]}')
                     raise RuntimeError(f'handshake failure: {hello_res.result}')
 
                 break
@@ -162,7 +162,7 @@ class Worker(StateContainerBase):
         # 参数检查
         check_result = await self.checker.check_action(req, http_req)
         if check_result is not None:
-            return glitter.ActionRep(result=utils.pack_rep(check_result), state_counter=-1)
+            return glitter.ActionRep(result=check_result, state_counter=-1)
 
         with utils.log_slow(self.log, 'worker.perform_action', f'perform action {req.type}'):
             rep = await glitter.Action(req).call(self.action_socket)

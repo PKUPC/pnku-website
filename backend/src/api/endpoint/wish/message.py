@@ -108,7 +108,7 @@ async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: U
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     return {'status': 'success'}
 
@@ -156,7 +156,7 @@ async def read_message(req: Request, body: ReadMsgParam, worker: Worker, user: U
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     return {}
 

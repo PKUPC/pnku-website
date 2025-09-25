@@ -80,7 +80,7 @@ async def create_team(req: Request, body: CreateTeamParam, worker: Worker, user:
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     assert user.team is not None
     assert user.team.leader is user
@@ -172,7 +172,7 @@ async def update_team(req: Request, body: UpdateTeamInfoParam, worker: Worker, u
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     # worker.log("debug", "api.team.update_team", f"update {user.team} info")
 
@@ -252,7 +252,7 @@ async def update_extra_team_info(
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     # worker.log("debug", "api.team.update_team", f"update {user.team} info")
 
@@ -308,7 +308,7 @@ async def join_team(req: Request, body: JoinTeamParam, worker: Worker, user: Use
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     store_user_log(
         req, 'api.team.join_team', 'join_team', '', {'team_id': body.team_id, 'team_secret': body.team_secret}
@@ -347,7 +347,7 @@ async def leave_team(req: Request, worker: Worker, user: User | None) -> dict[st
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     store_user_log(req, 'api.team.leave_team', 'leave_team', '', {})
 
@@ -390,7 +390,7 @@ async def remove_user(req: Request, body: RemoveUserParam, worker: Worker, user:
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     store_user_log(req, 'api.team.remove_user', 'remove_user', '', {'user_id': body.user_id})
 
@@ -428,7 +428,7 @@ async def change_leader(req: Request, body: ChangeLeaderParam, worker: Worker, u
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     store_user_log(req, 'api.team.change_leader', 'change_leader', '', {'user_id': body.user_id})
 

@@ -410,7 +410,7 @@ async def game_start(req: Request, body: GameStartParam, worker: Worker, user: U
             )
         )
         if rep.result is not None:
-            return utils.unpack_rep(rep.result)
+            return rep.result
 
     return reply
 

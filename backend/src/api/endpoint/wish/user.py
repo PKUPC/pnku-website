@@ -51,7 +51,7 @@ async def update_profile(req: Request, body: UpdateProfileParam, worker: Worker,
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     store_user_log(req, 'api.user.update_profile', 'update_profile', '', {'profile': body.profile})  # type: ignore
 

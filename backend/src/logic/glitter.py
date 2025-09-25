@@ -240,11 +240,12 @@ class TeamGameBeginReq(ActionReq):
     team_id: int
 
 
+ActionResult = dict[str, Any] | None
+
+
 @dataclass
 class ActionRep:
-    # 可能是一个裸字符串，可能是一个 str() 后的 dict，可以用 util.unpack_rep 处理
-    # 这里有一些历史遗留问题
-    result: str | None
+    result: ActionResult
     state_counter: int
 
 
