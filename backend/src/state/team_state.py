@@ -156,12 +156,21 @@ class Team(WithGameLifecycle):
 
         # 游戏解锁状态
         self.game_state: TeamGameState = TeamGameState(self, self.game.puzzles.list)
-        self.gaming: bool = False  # TODO: 这个状态应该放进 TeamGameState
-        self.game_start_time: int = -1  # TODO: 这个状态应该放进 TeamGameState
+
+    # 以前是 gaming 和 gaming_timestamp_s 是在这里，现在挪到了 TeamGameState 中
+    # 这里添加一些 property 兼容以前的代码逻辑
 
     @property
     def preparing(self) -> bool:
-        return not self.gaming
+        return self.game_state.preparing
+
+    @property
+    def gaming(self) -> bool:
+        return self.game_state.gaming
+
+    @property
+    def game_start_time(self) -> int:
+        return self.game_state.gaming_timestamp_s
 
     @property
     def creat_time(self) -> int:
@@ -190,8 +199,6 @@ class Team(WithGameLifecycle):
                 self.ap_change = 0
                 self.bought_hint_ids = set()
                 self.game_state = TeamGameState(self, self.game.puzzles.list)
-                self.gaming = False
-                self.game_start_time = -1
                 # self.game.log("debug", "team.on_preparing_to_reload_team_event", f"T#{self.model.id} done!")
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool = False) -> None:
@@ -233,11 +240,9 @@ class Team(WithGameLifecycle):
 
             case GameStartEvent():
                 # gaming 是一个根据 team event 决定的状态
-                assert not self.gaming
-                self.gaming = True
+                assert not self.game_state.gaming
                 self.game.need_updating_scoreboard = True
-                self.game_start_time = event.model.created_at // 1000
-                self.game_state.team_start_game(event.model.created_at // 1000, is_reloading)
+                self.game_state.on_game_start(event.model.created_at // 1000, is_reloading)
                 if not is_reloading:
                     self.game.worker.emit_ws_message(
                         {'type': 'normal', 'to_users': self.member_ids, 'payload': {'type': 'game_start'}}
@@ -298,9 +303,9 @@ class Team(WithGameLifecycle):
     @property
     def status(self) -> str:
         # 注意！ 不应当用 team.store.status 了，之后会被移除
-        if self.gaming:
+        if self.game_state.gaming:
             return 'gaming'
-        if self.preparing:
+        if self.game_state.preparing:
             return 'preparing'
         return self.model.status  # TODO: 未来会被移除
 
@@ -505,7 +510,6 @@ class StaffTeam(Team):
     def __init__(self, game: Game, store: TeamStore):
         super().__init__(game, store)
         self.is_staff_team = True
-        self.gaming = False
         self.game_state = StaffTeamGameState(self, self.game.puzzles.list)
 
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
@@ -520,8 +524,6 @@ class StaffTeam(Team):
                 self.bought_hint_ids = set()
                 self.game_state = StaffTeamGameState(self, self.game.puzzles.list)
                 self.is_staff_team = True
-                self.gaming = False
-                self.game_start_time = -1
                 # self.game.log("debug", "team.on_preparing_to_reload_team_event", f"T#{self.model.id} done!")
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool = False) -> None:
@@ -537,7 +539,6 @@ class StaffTeam(Team):
 
     def on_team_event_reload_done(self) -> None:
         self._update_total_score()
-        self.gaming = False
 
     def get_disp_list(self) -> list[dict[str, str]]:
         super_rst = super().get_disp_list()
