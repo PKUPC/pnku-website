@@ -28,9 +28,24 @@ MESSAGE_MESSAGES: Final[dict[str, str]] = {
 PUZZLE_MESSAGES: Final[dict[str, str]] = {
     # error
     'GAME_END': '游戏已结束！',
-    'ANSWER_TOO_LONG': '答案长度应在1到100之间。',
+    'ANSWER_TOO_LONG': '答案长度应在 1 到 100 之间。',
     'PUZZLE_NOT_FOUND': '谜题不存在！',
     'STAFF_INVALID_API': 'staff 不能调这个接口',
+}
+
+STAFF_MESSAGES: Final[dict[str, str]] = {
+    # error
+    'NO_TEAM': '队伍不存在！',
+    'BANNED': '您已被禁用该功能！',
+    'GAME_END': '游戏已结束！',
+    'CHANGE_STAFF_AP': '不能改 staff 队伍的注意力，别捣乱了！',
+    'CHANGE_ZERO_AP': '体力值变动不能为 0！',
+    'BAD_CHANGE_REASON_LEN': '更改原因的长度应在 1 到 100 之间',
+    'BAD_START_IDX': 'start_idx 不能小于 1',
+    'BAD_CNT': 'count 不能小于 1 或大于 100',
+    'BAD_REQUEST': '不支持的操作！',
+    'TEAM_ID_NOT_FOUND': '队伍id不存在！',
+    'WRONG_TIME_TYPE': '时间格式出错！',
 }
 
 USER_MESSAGES: Final[dict[str, str]] = {
