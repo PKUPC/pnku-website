@@ -543,26 +543,6 @@ class Reducer(StateContainerBase):
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
         return None
 
-    @on_action(glitter.VMe100Req)
-    async def on_v_me_100(self, req: glitter.VMe50Req) -> str | None:
-        with self.SqlSession() as session:
-            team_event = TeamEventStore(
-                user_id=req.staff_id,
-                team_id=req.team_id,
-                info={
-                    'type': 'staff_modify_spap',
-                    'spap_change': req.ap_change,
-                    'reason': req.reason,
-                },
-            )
-            session.add(team_event)
-            session.commit()
-            assert team_event.id is not None, 'created team_event not in db'
-            self.state_counter += 1
-        team_event_id: int = team_event.id
-        await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
-        return None
-
     @on_action(glitter.TeamGameBeginReq)
     async def on_team_game_begin(self, req: glitter.TeamGameBeginReq) -> str | None:
         with self.SqlSession() as session:

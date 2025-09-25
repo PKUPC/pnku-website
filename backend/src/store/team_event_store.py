@@ -31,12 +31,6 @@ class StaffModifyApEvent(BaseModel):
     reason: str
 
 
-class StaffModifySpApEvent(BaseModel):
-    type: Literal['staff_modify_spap']
-    spap_change: int
-    reason: str
-
-
 class PuzzleActionEvent(BaseModel):
     type: Literal['puzzle_action']
     puzzle_key: str
@@ -50,14 +44,7 @@ class TeamEventStoreModel(BaseModel):
     created_at: int
     user_id: int
     team_id: int
-    info: (
-        GameStartEvent
-        | SubmissionEvent
-        | BuyNormalHintEvent
-        | StaffModifyApEvent
-        | StaffModifySpApEvent
-        | PuzzleActionEvent
-    )
+    info: GameStartEvent | SubmissionEvent | BuyNormalHintEvent | StaffModifyApEvent | PuzzleActionEvent
 
 
 class TeamEventStore(Table):

@@ -171,7 +171,6 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
             ],
             'recruiting': user.team.model.extra_info.recruiting,
             'recruiting_contact': user.team.model.extra_info.recruiting_contact,
-            'spap': user.team.cur_spap,
             'ban_list': {
                 'ban_message_until': user.team.model.extra_info.ban_list.ban_message_until_ts,
                 'ban_manual_hint_until': user.team.model.extra_info.ban_list.ban_manual_hint_until_ts,

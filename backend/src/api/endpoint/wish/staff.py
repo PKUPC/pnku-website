@@ -83,7 +83,6 @@ async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker
         'cur_ap': team.cur_ap,
         'ap_change': team.ap_change,
         'ap_change_history': team.get_ap_change_list(),
-        'spap_change': team.spap_change,
         'submissions': [
             {
                 'idx': idx,
@@ -190,57 +189,6 @@ async def get_team_list_staff(req: Request, worker: Worker, user: User | None) -
             for team in worker.game_nocheck.teams.list
         ]
     }
-
-
-class VMe100Param(BaseModel):
-    team_id: int = Field(description='team id')
-    spap_change: int = Field(description='体力值的变动量')
-    reason: str = Field(description='变动原因')
-
-
-@bp.route('/v_me_100', ['POST'])
-@validate(json=VMe100Param)
-@wish_response
-@wish_checker(['user_is_staff'])
-async def v_me_100(req: Request, body: VMe100Param, worker: Worker, user: User | None) -> dict[str, Any]:
-    assert user is not None
-    assert user.is_staff
-
-    if user.model.user_info.ban_list.ban_staff:
-        return {'status': 'error', 'title': 'BANNED', 'message': '您已被禁用该功能！'}
-
-    if worker.game_nocheck.is_game_end():
-        return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
-
-    if body.team_id not in worker.game_nocheck.teams.team_by_id:
-        return {'status': 'error', 'title': 'NO_TEAM', 'message': '队伍不存在'}
-    if body.spap_change == 0:
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '体力值变动不能为0'}
-    if not (0 < len(body.reason) <= 100):
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '更改原因的长度应在1到100之间'}
-
-    rep = await worker.perform_action(
-        glitter.VMe100Req(
-            client=worker.process_name,
-            staff_id=user.model.id,
-            team_id=body.team_id,
-            ap_change=body.spap_change,
-            reason=body.reason,
-        )
-    )
-
-    store_user_log(
-        req,
-        'api.staff.v_me_100',
-        'staff_v_me_100',
-        '',
-        {'team_id': body.team_id, 'spap_change': body.spap_change, 'reason': body.reason},
-    )
-
-    if rep.result is not None:
-        return {'status': 'error', 'title': '出错了！', 'message': rep.result}
-
-    return {'data': 'ok'}
 
 
 class GetSubmissionListParam(BaseModel):

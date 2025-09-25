@@ -27,7 +27,6 @@ class PolicyModel(BaseModel):
     puzzle_passed_display: list[int]
     ap_increase_setting: list[ApIncreaseModel]
     board_setting: BoardSetting
-    default_spap: int = Field(default=0)
 
 
 class GamePolicyStoreModel(BaseModel):
@@ -56,7 +55,6 @@ class GamePolicyStore(Table):
                     'end_time': '2024-03-31 00:00:00',
                     'top_star_n': 10,
                 },
-                'default_spap': 0,
             },
         )
 
