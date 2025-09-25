@@ -15,11 +15,6 @@ from src.utils import validate_time_minute_str, validate_time_second_str
 from . import Table
 
 
-class ApIncreaseModel(BaseModel):
-    begin_time_min: Annotated[str, AfterValidator(validate_time_minute_str)]
-    increase_per_min: int
-
-
 class CurrencyIncreasePolicy(BaseModel):
     begin_time_min: Annotated[str, AfterValidator(validate_time_minute_str)]
     increase_per_min: int
@@ -41,8 +36,9 @@ class BoardSetting(BaseModel):
 
 
 class PolicyModel(BaseModel):
+    model_config = ConfigDict(extra='ignore')
+
     puzzle_passed_display: list[int] = Field(default_factory=list)
-    ap_increase_setting: list[ApIncreaseModel] = Field(default_factory=list)
     currency_increase_policy: list[CurrencyIncreaseModel] = Field(default_factory=list)
     board_setting: BoardSetting
 
@@ -81,16 +77,16 @@ class GamePolicyStore(Table):
         return pydantic 验证后的 model，可能会抛异常，需要处理。
         """
         model = GamePolicyStoreModel.model_validate(self)
-        if len(model.json_policy.ap_increase_setting) == 0:
-            assert False, 'ap_increase_setting 列表不能为空'
-        pre_time = -1
-        for item in model.json_policy.ap_increase_setting:
-            date_obj = datetime.strptime(item.begin_time_min, '%Y-%m-%d %H:%M')
-            t_min = int(time.mktime(date_obj.timetuple())) // 60
-            if t_min <= pre_time:
-                assert False, 'ap_increase_setting 列表的时间不是严格递增的！！！！'
-            else:
-                pre_time = t_min
+
+        for policy in model.json_policy.currency_increase_policy:
+            pre_time = -1
+            for item in policy.increase_policy:
+                date_obj = datetime.strptime(item.begin_time_min, '%Y-%m-%d %H:%M')
+                t_min = int(time.mktime(date_obj.timetuple())) // 60
+                if t_min <= pre_time:
+                    assert False, f'{policy.type.value} 的 increase_policy 列表的时间不是严格递增的！！！！'
+                else:
+                    pre_time = t_min
 
         return model
 

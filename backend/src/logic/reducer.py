@@ -534,8 +534,9 @@ class Reducer(StateContainerBase):
                 user_id=req.staff_id,
                 team_id=req.team_id,
                 info={
-                    'type': TeamEventType.STAFF_MODIFY_AP.name,
-                    'ap_change': req.ap_change,
+                    'type': TeamEventType.STAFF_MODIFY_CURRENCY.name,
+                    'currency_type': req.currency_type,
+                    'delta': req.change,
                     'reason': req.reason,
                 },
             )

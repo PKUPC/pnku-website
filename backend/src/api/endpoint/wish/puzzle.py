@@ -324,7 +324,7 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
         {'body_puzzle_key': body.puzzle_key, 'real_puzzle_key': puzzle_key},
     )
 
-    rst: list[dict[str, str | int]] = []
+    rst: list[dict[str, Any]] = []
     current_ts = time.time()
     for hint in worker.game_nocheck.hints.hint_by_key.get(puzzle_key, []):
         if not hint.model.enable:
@@ -340,13 +340,23 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
             hint_cd = hint_cd_after_puzzle_unlock(hint)
             effective_after_ts = unlock_puzzle_ts + hint_cd
 
+        price = [{'type': x.type.name.lower(), 'price': x.price} for x in hint.model.extra.price]
+        # 至少设置一个 price
+        if len(price) == 0:
+            worker.log(
+                'warning',
+                'wish.puzzle.get_hints',
+                f'hint {hint.model.id} has no price',
+            )
+            continue
+
         rst.append(
             {
                 'id': hint.model.id,
                 'question': hint.model.question,
                 'answer': hint.model.answer if (user.is_staff or hint.model.id in user.team.bought_hint_ids) else '',
                 'type': HintStore.HintType.dict().get(hint.model.type, '未知'),
-                'cost': hint.model.extra.cost,
+                'price': price,
                 'unlock': user.is_staff or hint.model.id in user.team.bought_hint_ids,
                 'effective_after_ts': effective_after_ts,
             }

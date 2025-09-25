@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-import time
-
+from collections import defaultdict
 from typing import TYPE_CHECKING
 
 from src import secret
+from src.adhoc.constants.enums import CurrencyType
 from src.adhoc.state import StaffTeamGameState, TeamGameState
+from src.adhoc.state.currency import CurrencyEvent
 from src.store import (
     BuyNormalHintEvent,
     GameStartEvent,
-    StaffModifyApEvent,
+    StaffModifyCurrencyEvent,
     SubmissionEvent,
     TeamStore,
 )
@@ -146,10 +147,9 @@ class Team(WithGameLifecycle):
         self.score_by_board: dict[str, int] = {}
 
         self.team_events: list[TeamEvent] = []
-        # action point 货币/能量值/体力值 等
-        self.ap_change_event: list[TeamEvent] = []
-        # 在自然增长的基础上，ap 的变化量，注意正负，总 ap 为自然获取的 + self.ap_change
-        self.ap_change: int = 0
+
+        # 货币的变化量，按货币种类分
+        self.currency_change_event: dict[CurrencyType, list[TeamEvent]] = defaultdict(list)
 
         # 购买过的提示
         self.bought_hint_ids: set[int] = set()
@@ -195,8 +195,7 @@ class Team(WithGameLifecycle):
                 self.total_score = 0
                 self.score_by_board = {}
                 self.team_events = []
-                self.ap_change_event = []
-                self.ap_change = 0
+                self.currency_change_event = defaultdict(list)
                 self.bought_hint_ids = set()
                 self.game_state = TeamGameState(self, self.game.puzzles.list)
                 # self.game.log("debug", "team.on_preparing_to_reload_team_event", f"T#{self.model.id} done!")
@@ -247,53 +246,25 @@ class Team(WithGameLifecycle):
                     self.game.worker.emit_ws_message(
                         {'type': 'normal', 'to_users': self.member_ids, 'payload': {'type': 'game_start'}}
                     )
-            case StaffModifyApEvent():
-                event.ap_change = event.model.info.ap_change
-                self.ap_change_event.append(event)
-                self.ap_change += event.ap_change
-                if not is_reloading:
-                    self.game.worker.emit_ws_message(
-                        {
-                            'type': 'normal',
-                            'to_users': self.member_ids,
-                            'payload': {
-                                'type': 'staff_action',
-                                'action': 'modify_ap',
-                                'message': (
-                                    f'工作人员{"增加" if event.ap_change > 0 else "扣除"}了你们队伍的注意力。原因是：{event.model.info.reason}'
-                                ),
-                            },
-                        }
-                    )
+            case StaffModifyCurrencyEvent():
+                info = event.model.info
+                if info.delta == 0:
+                    return
+                self.game_state.on_currency_event(CurrencyEvent(event), is_reloading)
+
             case BuyNormalHintEvent(hint_id=hint_id):
-                if hint_id in self.game.hints.hint_by_id:
-                    hint = self.game.hints.hint_by_id[hint_id]
-                    self.ap_change_event.append(event)
-                    event.ap_change = -hint.current_cost
-                    self.bought_hint_ids.add(hint_id)
-                    self.ap_change += event.ap_change
-                    if not is_reloading:
-                        origin_key = hint.puzzle.model.key
-                        hash_key = self.game.hash_puzzle_key(self.model.id, origin_key)
-                        event_user = self.game.users.user_by_id[event.model.user_id]
-                        puzzle = self.game.puzzles.puzzle_by_key[origin_key]
-                        self.game.worker.emit_ws_message(
-                            {
-                                'type': 'normal',
-                                'to_users': [x for x in self.member_ids if x != event.model.user_id],
-                                'payload': {
-                                    'type': 'teammate_action',
-                                    'action': 'buy_normal_hint',
-                                    'puzzle_key': hash_key,
-                                    'message': (
-                                        f'你的队友 {event_user.model.user_info.nickname} 花费了 {-event.ap_change} 注意力'
-                                        f'购买了题目 {puzzle.model.title} 的提示。'
-                                    ),
-                                },
-                            }
-                        )
-                else:
-                    self.game.log('debug', 'team.on_team_event', f'skip hint#{hint_id}: hint not exists')
+                # 可能出现在 hind 被删除的时候
+                if hint_id not in self.game.hints.hint_by_id:
+                    return
+                if hint_id in self.bought_hint_ids:
+                    self.game.log(
+                        'warning',
+                        'team.on_team_event.BuyNormalHintEvent',
+                        f'[event#{event.model.id}][team#{self.model.id}] hint_id {hint_id} already bought',
+                    )
+                    return
+                self.bought_hint_ids.add(hint_id)
+                self.game_state.on_currency_event(CurrencyEvent(event), is_reloading)
 
         self.team_events.append(event)
 
@@ -350,79 +321,15 @@ class Team(WithGameLifecycle):
     def get_submissions_by_puzzle_key(self, puzzle_key: str) -> list[Submission]:
         return [x for x in self.game_state.submissions if x.store.puzzle_key == puzzle_key]
 
-    def get_default_ap_by_timestamp_s(self, timestamp_s: int) -> int:
-        cur_ap_policy = self.game.policy.calc_ap_increase_policy_by_team(self)
-        assert len(cur_ap_policy) >= 1
-        cur_min = timestamp_s // 60  # 当前的分钟数
-        ap = 0
-        for i in range(len(cur_ap_policy) - 1):
-            # 如果当前分钟数比下一个增长时间点多，则获取这一时间段的全部 ap
-            if cur_min > cur_ap_policy[i + 1][0]:
-                ap += (cur_ap_policy[i + 1][0] - cur_ap_policy[i][0]) * cur_ap_policy[i][1]
-            # 如果当前分钟数不到这一增长的时间点，则停止计算
-            elif cur_min <= cur_ap_policy[i][0]:
-                break
-            # 否则，计算在这一时间段内的增长，之后可以直接 break
-            else:
-                ap += (cur_min - cur_ap_policy[i][0]) * cur_ap_policy[i][1]
-                break
-        if cur_min > cur_ap_policy[-1][0]:
-            ap += (cur_min - cur_ap_policy[-1][0]) * cur_ap_policy[-1][1]
-
-        minute_from_game_begin = cur_min - cur_ap_policy[0][0]
-
-        self.game.log(
-            'debug',
-            'get_default_ap_by_timestamp_s',
-            f'[minute_from_game_begin={minute_from_game_begin} action_points={ap}]',
-        )
-        return ap
-
-    def get_ap_default_and_timestamp_s(self) -> tuple[int, int]:
-        cur_timestamp_s = int(time.time())
-        ap = self.get_default_ap_by_timestamp_s(cur_timestamp_s)
-        return ap, cur_timestamp_s
+    def get_currency_change_list_by_type(self, currency_type: CurrencyType) -> list[dict[str, str | int]]:
+        return self.game_state.get_currency_history(currency_type)
 
     @property
-    def ap_default(self) -> int:
-        ap, _ = self.get_ap_default_and_timestamp_s()
-        return ap
+    def cur_currency(self) -> dict[CurrencyType, int]:
+        return {currency_type: self.game_state.get_current_balance(currency_type) for currency_type in CurrencyType}
 
-    def get_ap_change_list(self) -> list[dict[str, str | int]]:
-        """
-        获取体力值变动记录，给前端呈现
-        """
-        # 默认的顺序应该是时间从前到后，前端呈现的时候自己反向一下好了
-        rst: list[dict[str, str | int]] = []
-        t_total_change = 0
-        for team_event in self.ap_change_event:
-            cur_default_ts = self.get_default_ap_by_timestamp_s(team_event.model.created_at // 1000)
-            t_total_change += team_event.ap_change
-            rst.append(
-                {
-                    'timestamp_ms': team_event.model.created_at,
-                    'change': team_event.ap_change,
-                    'cur_ap': t_total_change + cur_default_ts,
-                    'info': team_event.describe_cost(),
-                }
-            )
-        ap, timestamp_s = self.get_ap_default_and_timestamp_s()
-        t_total_change += ap
-
-        rst.append(
-            {
-                'timestamp_ms': timestamp_s * 1000,
-                'change': ap,
-                'cur_ap': t_total_change,
-                'info': '随时间增长自动增长的注意力。',
-            }
-        )
-
-        return rst
-
-    @property
-    def cur_ap(self) -> int:
-        return self.ap_default + self.ap_change
+    def cur_currency_by_type(self, currency_type: CurrencyType) -> int:
+        return self.game_state.get_current_balance(currency_type)
 
     @property
     def last_success_submission(self) -> Submission | None:
@@ -519,8 +426,7 @@ class StaffTeam(Team):
                 self.total_score = 0
                 self.score_by_board = {}
                 self.team_events = []
-                self.ap_change_event = []
-                self.ap_change = 0
+                self.currency_change_event = defaultdict(list)
                 self.bought_hint_ids = set()
                 self.game_state = StaffTeamGameState(self, self.game.puzzles.list)
                 self.is_staff_team = True

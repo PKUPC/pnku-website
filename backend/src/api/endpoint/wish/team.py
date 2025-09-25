@@ -11,6 +11,7 @@ from sanic import Blueprint, Request
 from sanic_ext import validate
 
 from src import adhoc, secret, utils
+from src.adhoc.constants import CurrencyType
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -435,17 +436,43 @@ async def change_leader(req: Request, body: ChangeLeaderParam, worker: Worker, u
     return {}
 
 
-@bp.route('/get_ap_change_history', ['POST'])
+class GetCurrencyChangeHistoryParam(BaseModel):
+    currency_type: str = Field(description='货币类型')
+
+
+@bp.route('/get_currency_change_history', ['POST'])
+@validate(json=GetCurrencyChangeHistoryParam)
 @wish_response
 @wish_checker(['team_is_gaming', 'game_start'])
-async def get_ap_change_history(req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
+async def get_currency_change_history(
+    req: Request, body: GetCurrencyChangeHistoryParam, worker: Worker, user: User | None
+) -> dict[str, Any]:
     assert user is not None
     if user.model.group == 'staff':
         return {'status': 'error', 'title': 'NOT_IMPLEMENT', 'message': 'staff 暂时无法调用这个接口'}
     assert user.team is not None
-    res = {'history': user.team.get_ap_change_list()}
 
-    store_user_log(req, 'api.team.get_ap_change_history', 'get_ap_change_history', '', {})
+    currency_type = CurrencyType.__members__.get(body.currency_type.upper(), None)
+
+    if currency_type is None:
+        store_user_log(
+            req,
+            'api.team.get_currency_change_history',
+            'abnormal',
+            '未知货币类型！',
+            {'currency_type': body.currency_type},
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '未知货币类型！'}
+
+    res = {'history': user.team.get_currency_change_list_by_type(currency_type)}
+
+    store_user_log(
+        req,
+        'api.team.get_currency_change_history',
+        'get_currency_change_history',
+        '',
+        {'currency_type': body.currency_type},
+    )
 
     return res
 

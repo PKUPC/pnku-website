@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 from sanic import Blueprint, Request
 from sanic_ext import validate
 
+from src.adhoc.constants import CurrencyType
+from src.adhoc.state.currency import CurrencyTypeToClass
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import Submission, Ticket, User
@@ -69,6 +71,33 @@ async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker
 
     store_user_log(req, 'api.staff.get_team_detail', 'staff_get_team_detail', '', {})
 
+    # 队伍货币情况
+    currency_status: list[dict[str, Any]] = []
+    for currency_type in CurrencyType:
+        denominator = CurrencyTypeToClass[currency_type].denominator
+        precision = CurrencyTypeToClass[currency_type].precision
+
+        current = team.game_state.get_current_balance(currency_type)
+        change = team.game_state.currency_state_by_type[currency_type].total_change
+        history = team.get_currency_change_list_by_type(currency_type)
+
+        # 统一前端展示，从系统视角来看所有货币都直接用一个 int 和 denominator, precision 表示
+        # current_str = f'{current / denominator:.{precision}f}'
+        # change_str = f'{change / denominator:.{precision}f}'
+
+        currency_status.append(
+            {
+                'type': currency_type.lower_name,
+                'name': currency_type.value,
+                'icon': CurrencyTypeToClass[currency_type].icon,
+                'denominator': denominator,
+                'precision': precision,
+                'current': current,
+                'change': change,
+                'history': history,
+            }
+        )
+
     # 队伍提交信息
     return {
         'team_id': team.model.id,
@@ -80,9 +109,7 @@ async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker
             {'id': member.model.id, 'nickname': member.model.user_info.nickname, 'avatar_url': member.avatar_url}
             for member in team.leader_and_members_modal
         ],
-        'cur_ap': team.cur_ap,
-        'ap_change': team.ap_change,
-        'ap_change_history': team.get_ap_change_list(),
+        'currency_status': currency_status,
         'submissions': [
             {
                 'idx': idx,
@@ -110,7 +137,8 @@ async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker
 
 class VMe50Param(BaseModel):
     team_id: int = Field(description='team id')
-    ap_change: int = Field(description='体力值的变动量')
+    type: str = Field(description='货币类型')
+    change: int = Field(description='货币的变动量')
     reason: str = Field(description='变动原因')
 
 
@@ -134,23 +162,40 @@ async def v_me_50(req: Request, body: VMe50Param, worker: Worker, user: User | N
             'api.staff.v_me_50',
             'abnormal',
             '某个 staff 试图变动 staff 队伍的注意力。',
-            {'team_id': body.team_id, 'ap_change': body.ap_change, 'reason': body.reason},
+            {
+                'team_id': body.team_id,
+                'type': body.type,
+                'change': body.change,
+                'reason': body.reason,
+            },
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '不能改变 staff 队伍的注意力，别捣乱了！'}
 
     if body.team_id not in worker.game_nocheck.teams.team_by_id:
         return {'status': 'error', 'title': 'NO_TEAM', 'message': '队伍不存在'}
-    if body.ap_change == 0:
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '体力值变动不能为0'}
+    if body.change == 0:
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '货币的变动量不能为0'}
     if not (0 < len(body.reason) <= 100):
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '更改原因的长度应在1到100之间'}
+
+    currency_type = CurrencyType.__members__.get(body.type.upper(), None)
+    if currency_type is None:
+        store_user_log(
+            req,
+            'api.staff.v_me_50',
+            'abnormal',
+            '未知货币类型！',
+            {'type': body.type},
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '未知货币类型！'}
 
     rep = await worker.perform_action(
         glitter.VMe50Req(
             client=worker.process_name,
             staff_id=user.model.id,
             team_id=body.team_id,
-            ap_change=body.ap_change,
+            currency_type=currency_type.name,
+            change=body.change,
             reason=body.reason,
         )
     )
@@ -160,7 +205,7 @@ async def v_me_50(req: Request, body: VMe50Param, worker: Worker, user: User | N
         'api.staff.v_me_50',
         'staff_v_me_50',
         '',
-        {'team_id': body.team_id, 'ap_change': body.ap_change, 'reason': body.reason},
+        {'team_id': body.team_id, 'currency_type': body.type, 'change': body.change, 'reason': body.reason},
     )
 
     if rep.result is not None:

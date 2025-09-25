@@ -36,11 +36,6 @@ class HintView(BaseView):
         'effective_after_ts': fields.timestamp_s_formatter,
     }
 
-    form_widget_args = {
-        'puzzle_key': {
-            'readonly': True,
-        }
-    }
     form_overrides = {
         'effective_after_ts': fields.TimestampSField,
         'extra': HintExtraField,
@@ -54,6 +49,16 @@ class HintView(BaseView):
             form.puzzle_key.choices = [
                 (k, p.model.title) for k, p in reducer.game_nocheck.puzzles.puzzle_by_key.items()
             ]
+        return form  # type: ignore  # create_form itself returns Any
+
+    def edit_form(self, **kwargs: Any) -> Form:
+        form = super().create_form(**kwargs)
+        if 'puzzle_key' in dir(form):
+            reducer: Reducer = current_app.config['reducer_obj']
+            form.puzzle_key.choices = [
+                (k, p.model.title) for k, p in reducer.game_nocheck.puzzles.puzzle_by_key.items()
+            ]
+        form.puzzle_key.render_kw = {'readonly': True, 'disabled': True}
         return form  # type: ignore  # create_form itself returns Any
 
     def on_model_change(self, form: Any, model: store.HintStore, is_created: bool) -> None:
@@ -74,6 +79,9 @@ class HintView(BaseView):
                 raise e
             # 如果模型更改，需要检查
             assert reducer.game is not None
+            # 禁止修改puzzle key
+            if model.puzzle_key != reducer.game_nocheck.hints.hint_by_id[model.id].model.puzzle_key:
+                raise ValueError('禁止修改 puzzle key')
             # 可能是从 disable 变成 enable
             if model.id not in reducer.game_nocheck.hints.hint_by_id:
                 current_hint = reducer.load_one_data(store.HintStore, model.id)

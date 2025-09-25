@@ -20,7 +20,6 @@ class TeamEventType(EnhancedEnum):
     SUBMISSION = auto()
     BUY_NORMAL_HINT = auto()
     STAFF_MODIFY_CURRENCY = auto()
-    STAFF_MODIFY_AP = auto()
     PUZZLE_ACTION = auto()
 
 
@@ -45,12 +44,6 @@ class StaffModifyCurrencyEvent(BaseModel):
     reason: str
 
 
-class StaffModifyApEvent(BaseModel):
-    type: Literal[TeamEventType.STAFF_MODIFY_AP]
-    ap_change: int
-    reason: str
-
-
 class PuzzleActionEvent(BaseModel):
     type: Literal[TeamEventType.PUZZLE_ACTION]
     puzzle_key: str
@@ -64,7 +57,7 @@ class TeamEventStoreModel(BaseModel):
     created_at: int
     user_id: int
     team_id: int
-    info: GameStartEvent | SubmissionEvent | BuyNormalHintEvent | StaffModifyApEvent | PuzzleActionEvent
+    info: GameStartEvent | SubmissionEvent | BuyNormalHintEvent | StaffModifyCurrencyEvent | PuzzleActionEvent
 
 
 class TeamEventStore(Table):
@@ -83,14 +76,6 @@ class TeamEventStore(Table):
 
     # 所有其他需要的信息都放在这里
     info: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
-
-    EXTRA_SNIPPETS = {
-        'game_start': """{}""",
-        'buy_normal_hint': """{"type": "but_normal_hint", "ap_change": -100, "hint_id" : 1}""",
-        # 如果当次提交会有体力值返还，则一同计算
-        'submission': """{"sub_id": 1}""",
-        'like_hint': """{"type": "normal","provider": "staff", "cost" : 3000}""",
-    }
 
     def __repr__(self) -> str:
         return f'Event#{self.id} type="{self.info["type"]}" info={self.info}'

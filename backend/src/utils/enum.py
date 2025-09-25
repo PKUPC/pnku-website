@@ -52,6 +52,10 @@ class EnhancedEnum(Enum):
     def list(cls) -> list[tuple[str, str]]:
         return [(name, member.value) for name, member in cls.__members__.items()]
 
+    @property
+    def lower_name(self) -> str:
+        return self.name.lower()
+
     def __str__(self) -> str:
         return self.name
 
