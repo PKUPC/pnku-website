@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from sanic import Blueprint, Request
 from sanic_ext import validate
 
-from src import adhoc, utils
+from src import adhoc
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -81,7 +81,7 @@ async def submit_answer(req: Request, body: SubmitParam, worker: Worker, user: U
     need_reload = True
 
     if rep.result is not None:
-        res_dict: dict[str, Any] = utils.unpack_rep(rep.result)
+        res_dict: dict[str, Any] = rep.result
         res_dict['need_reload'] = need_reload
         if res_dict['status'] == 'success':
             store_user_log(
@@ -421,6 +421,6 @@ async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: User 
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     return {'data': 'ok'}

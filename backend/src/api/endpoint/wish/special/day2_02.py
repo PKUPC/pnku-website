@@ -6,7 +6,6 @@ from pydantic import BaseModel
 from sanic import Request
 from sanic_ext import validate
 
-from src import utils
 from src.api.endpoint.wish import wish_checker, wish_response
 from src.custom import store_user_log
 from src.logic import Worker, glitter
@@ -64,7 +63,7 @@ async def time_garden(req: Request, body: ChangeTimeParam, worker: Worker, user:
         )
     )
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     return {
         'status': 'success',

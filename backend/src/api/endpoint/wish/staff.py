@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field
 from sanic import Blueprint, Request
 from sanic_ext import validate
 
-from src import utils
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import Submission, Ticket, User
@@ -434,6 +433,6 @@ async def update_extra_team_info(
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     return {}

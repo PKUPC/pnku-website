@@ -103,7 +103,7 @@ async def request_hint(req: Request, body: RequestHintParam, worker: Worker, use
         )
     )
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     store_user_log(req, 'api.ticket.request_hint', 'request_hint', '', {'puzzle_key': puzzle_key})
 
@@ -330,7 +330,7 @@ async def send_message(req: Request, body: SendMessageParam, worker: Worker, use
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     return {'status': 'success', 'title': 'SUCCESS', 'message': '发送成功！'}
 
@@ -431,6 +431,6 @@ async def set_ticket_status(
     )
 
     if rep.result is not None:
-        return utils.unpack_rep(rep.result)
+        return rep.result
 
     return {'status': 'success', 'title': 'SUCCESS', 'message': '发送成功！'}

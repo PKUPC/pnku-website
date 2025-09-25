@@ -1,4 +1,3 @@
-from .action_rep_tools import pack_rep, unpack_rep
 from .email import send_email, send_reg_email
 from .enum import EnhancedEnum
 from .hash_tools import calc_md5, calc_sha1
@@ -21,8 +20,6 @@ from .template import pure_render_template, render_template
 
 
 __all__ = [
-    'pack_rep',
-    'unpack_rep',
     'send_email',
     'send_reg_email',
     'EnhancedEnum',
