@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 from sqlalchemy import JSON, BigInteger, Boolean, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.utils.enum import EnumWrapper
+from src.utils import EnhancedEnum
 
 
 if TYPE_CHECKING:
@@ -45,7 +45,7 @@ class HintStore(Table):
 
     type: Mapped[str] = mapped_column(String(32), nullable=False)
 
-    class HintType(EnumWrapper):
+    class HintType(EnhancedEnum):
         BASIC = '指引'
         NORMAL = '观测'
         ADVANCE = '灵视'

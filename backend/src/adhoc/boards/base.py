@@ -53,12 +53,19 @@ class Board(WithGameLifecycle, ABC):
 
     @staticmethod
     def _admin_knowledge(team: Team) -> list[dict[str, str]]:
-        return [
+        """
+        用于在排行榜上显示一些 staff 才能看到的信息
+        默认是用 antd 的 tag 表示的，需要 text 和 color 两个字段，示例如下：
+
+        [
             {
                 'text': 'haha',
                 'color': 'default',
             }
         ]
+
+        """
+        return []
 
     @abstractmethod
     def _render(self, is_admin: bool) -> dict[str, Any]:

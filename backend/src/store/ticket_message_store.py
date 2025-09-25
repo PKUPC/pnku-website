@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import JSON, BigInteger, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.utils.enum import EnumWrapper
+from src.utils import EnhancedEnum
 
 from . import Table
 
@@ -34,11 +34,11 @@ class TicketMessageModel(BaseModel):
 class TicketMessageStore(Table):
     __tablename__ = 'ticket_message'
 
-    class Direction(EnumWrapper):
+    class Direction(EnhancedEnum):
         TO_PLAYER = '发送给玩家'
         TO_STAFF = '发送给工作人员'
 
-    class ContentType(EnumWrapper):
+    class ContentType(EnhancedEnum):
         TEXT = '文字消息'
 
     created_at: Mapped[int] = mapped_column(BigInteger, nullable=False, default=lambda: int(1000 * time.time()))

@@ -56,7 +56,7 @@ def get_story_list(user: User) -> list[dict[str, Any]]:
     for group in STORY_LIST:
         rst_group: dict[str, Any] = {'subtitle': group['subtitle'], 'list': []}
         for story in group['list']:
-            if story['template'] in user.team.game_status.unlock_templates:  # type: ignore
+            if story['template'] in user.team.game_state.unlock_templates:  # type: ignore
                 rst_group['list'].append(story)
 
         if len(rst_group['list']) > 0:

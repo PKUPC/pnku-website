@@ -6,10 +6,10 @@ from collections.abc import Hashable
 
 from src import utils
 
-from ..team_puzzle_status import TeamPuzzleStatus
+from ..team_puzzle_state import TeamPuzzleState
 
 
-class Day203Status(TeamPuzzleStatus):
+class Day203State(TeamPuzzleState):
     def get_render_info(self) -> tuple[tuple[str, str | int | tuple[Hashable, ...]], ...]:
         game_start_seconds = self.team.game.game_begin_timestamp_s
         current_seconds = int(time.time())

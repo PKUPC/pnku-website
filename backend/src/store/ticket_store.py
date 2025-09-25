@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 from sqlalchemy import JSON, BigInteger, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.utils.enum import EnumWrapper
+from src.utils import EnhancedEnum
 
 
 if TYPE_CHECKING:
@@ -40,10 +40,10 @@ class TicketStoreModel(BaseModel):
 class TicketStore(Table):
     __tablename__ = 'ticket'
 
-    class TicketType(EnumWrapper):
+    class TicketType(EnhancedEnum):
         MANUAL_HINT = '人工提示'
 
-    class TicketStatus(EnumWrapper):
+    class TicketStatus(EnhancedEnum):
         OPEN = '进行中'
         CLOSED = '已关闭'
 

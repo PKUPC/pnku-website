@@ -32,7 +32,7 @@ async def time_garden(req: Request, body: ChangeTimeParam, worker: Worker, user:
         return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
 
     if not user.is_staff:
-        if 'day2_02' not in user.team.game_status.unlock_puzzle_keys:
+        if 'day2_02' not in user.team.game_state.unlock_puzzle_keys:
             store_user_log(
                 req,
                 'api.special.day2_02',

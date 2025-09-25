@@ -1,5 +1,6 @@
 from .action_rep_tools import pack_rep, unpack_rep
 from .email import send_email, send_reg_email
+from .enum import EnhancedEnum
 from .hash_tools import calc_md5, calc_sha1
 from .http_tools import add_cookie
 from .jwt_tools import jwt_decode, jwt_encode
@@ -24,6 +25,7 @@ __all__ = [
     'unpack_rep',
     'send_email',
     'send_reg_email',
+    'EnhancedEnum',
     'calc_md5',
     'calc_sha1',
     'add_cookie',

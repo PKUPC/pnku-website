@@ -138,10 +138,10 @@ class Game(WithGameLifecycle):
                 # 过滤脏数据
                 if (
                     submission.result.type == 'pass'
-                    and submission.store.puzzle_key in submission.team.game_status.passed_puzzle_keys
+                    and submission.store.puzzle_key in submission.team.game_state.passed_puzzle_keys
                 ):
                     self.log('debug', 'game.on_team_event', f'dirty submission! passed! Sub#{sub_id}')
-                elif submission.cleaned_content in submission.team.game_status.get_submission_set(
+                elif submission.cleaned_content in submission.team.game_state.get_submission_set(
                     submission.puzzle.model.key
                 ):
                     self.log('debug', 'game.on_team_event', f'dirty submission! in submission set! Sub#{sub_id}')
@@ -164,7 +164,7 @@ class Game(WithGameLifecycle):
                 else:
                     event.team.on_team_event(event, is_reloading)
             case PuzzleActionEvent():
-                event.team.game_status.on_puzzle_action(event.model.info)
+                event.team.game_state.on_puzzle_action(event.model.info)
             case _:
                 self.puzzles.on_team_event(event, is_reloading)
                 self.hints.on_team_event(event, is_reloading)

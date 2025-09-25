@@ -35,7 +35,7 @@ def get_more_puzzle_detail(puzzle: Puzzle, user: User | None = None) -> dict[str
             rst['area_name'] = ''
     # 添加正确答案
     if user is not None and user.team is not None:
-        correct_answers = user.team.game_status.get_correct_answers(puzzle.model.key)
+        correct_answers = user.team.game_state.get_correct_answers(puzzle.model.key)
         answer_display = ''.join(['『' + x + '』' for x in correct_answers])
         rst['answer_display'] = answer_display
     return rst

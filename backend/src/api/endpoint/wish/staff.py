@@ -96,11 +96,11 @@ async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker
                 'info': sub.result.info,
                 'timestamp_s': int(sub.store.created_at / 1000),
             }
-            for idx, sub in enumerate(team.game_status.submissions)
+            for idx, sub in enumerate(team.game_state.submissions)
         ][::-1],
         'passed_puzzles': [
             {'title': p.model.title, 'timestamp_s': int(s.store.created_at / 1000)}
-            for p, s in team.game_status.passed_puzzles
+            for p, s in team.game_state.passed_puzzles
         ],
         'ban_list': {
             'ban_message_until': team.model.extra_info.ban_list.ban_message_until_ts,

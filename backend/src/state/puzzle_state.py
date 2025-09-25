@@ -185,8 +185,8 @@ class Puzzle(WithGameLifecycle):
         extra: tuple[tuple[str, str | int | tuple[Hashable, ...]], ...] = tuple()
         is_finished = False
         if user.team is not None:
-            extra = user.team.game_status.get_render_info(self.model.key)
-            is_finished = user.team.game_status.finished
+            extra = user.team.game_state.get_render_info(self.model.key)
+            is_finished = user.team.game_state.finished
         return self._render_template(
             tick=self.game.cur_tick,
             passed=user.team in self.passed_teams or user.model.group == 'staff',

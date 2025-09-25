@@ -99,7 +99,7 @@ async def push(req: Request, ws: WebsocketImplProtocol) -> None:
                                     if (
                                         user.team is not None
                                         and worker.game_nocheck.is_game_begin()
-                                        and category in user.team.game_status.unlock_announcement_categories
+                                        and category in user.team.game_state.unlock_announcement_categories
                                     ):
                                         store_user_log(req, 'ws.send', 'type_new_announcement', '', payload)
                                         await ws.send(json.dumps(payload))

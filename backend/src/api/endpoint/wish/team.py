@@ -471,7 +471,7 @@ async def get_submission_history(req: Request, worker: Worker, user: User | None
                     'info': sub.result.info,
                     'timestamp_s': int(sub.store.created_at / 1000),
                 }
-                for idx, sub in enumerate(user.team.game_status.submissions)
+                for idx, sub in enumerate(user.team.game_state.submissions)
             ][::-1],
             'passed_submissions': [
                 {
@@ -479,7 +479,7 @@ async def get_submission_history(req: Request, worker: Worker, user: User | None
                     'gained_score': sub.gained_score(),
                     # "finished": sub.finished,
                 }
-                for sub in user.team.game_status.success_submissions
+                for sub in user.team.game_state.success_submissions
             ],
         }
     }
@@ -502,15 +502,15 @@ async def get_puzzle_statistics(req: Request, worker: Worker, user: User | None)
 
     res = []
     for area_name in area_list:
-        if area_name in user.team.game_status.unlock_areas:
+        if area_name in user.team.game_state.unlock_areas:
             puzzle_structure = worker.game_nocheck.puzzles.puzzles_by_structure.get(area_name, {})
             res_dict: dict[str, Any] = {'name': adhoc.AREA_NAME.get(area_name, 'NONE'), 'puzzles': []}
             for group in puzzle_structure:
                 for puzzle in puzzle_structure[group]:
-                    unlock_ts = user.team.game_status.unlock_puzzle_keys.get(puzzle.model.key, -1)
+                    unlock_ts = user.team.game_state.unlock_puzzle_keys.get(puzzle.model.key, -1)
                     if unlock_ts == -1:
                         continue
-                    passed_ts: int | None = user.team.game_status.passed_puzzle_keys.get(puzzle.model.key, -1)
+                    passed_ts: int | None = user.team.game_state.passed_puzzle_keys.get(puzzle.model.key, -1)
                     if passed_ts == -1:
                         passed_ts = None
                     time_cost = None

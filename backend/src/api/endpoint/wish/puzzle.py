@@ -60,7 +60,7 @@ async def submit_answer(req: Request, body: SubmitParam, worker: Worker, user: U
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
     # 此时 puzzle_key 一定是存在的
-    if not user.is_staff and puzzle_key not in user.team.game_status.unlock_puzzle_keys:
+    if not user.is_staff and puzzle_key not in user.team.game_state.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.submit_answer', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
 
@@ -141,7 +141,7 @@ async def get_submissions(req: Request, body: GetSubmissionsParam, worker: Worke
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
     # 此时 puzzle_key 一定是存在的
-    if not user.is_staff and puzzle_key not in user.team.game_status.unlock_puzzle_keys:
+    if not user.is_staff and puzzle_key not in user.team.game_state.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.get_submissions', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
 
@@ -221,14 +221,14 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
     # 此时 puzzle_key 一定是存在的
-    if not user.is_staff and puzzle_key not in user.team.game_status.unlock_puzzle_keys:
+    if not user.is_staff and puzzle_key not in user.team.game_state.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.get_puzzle_details', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
 
     puzzle = worker.game_nocheck.puzzles.puzzle_by_key[puzzle_key]
     if not user.is_staff:
         # 如果不是 unlock，则视为没解锁，状态是 found 也不行
-        if user.team.game_status.puzzle_visible_status(puzzle_key) != 'unlock':
+        if user.team.game_state.puzzle_visible_status(puzzle_key) != 'unlock':
             store_user_log(
                 req, 'api.puzzle.get_detail', 'abnormal', '试图访问没解锁的题目。', {'puzzle_key': puzzle_key}
             )
@@ -239,7 +239,7 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
     puzzle_status = 'untouched'
     if not user.is_staff:
         puzzle_status = puzzle.status_by_team(user.team)
-        if user.team.game_status.puzzle_visible_status(puzzle.model.key) == 'found':
+        if user.team.game_state.puzzle_visible_status(puzzle.model.key) == 'found':
             puzzle_status = 'found'
 
     # found 状态寻思下要不要设置
@@ -249,7 +249,7 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
 
     puzzle_list: list[Any] = adhoc.gen_puzzle_structure_by_puzzle(puzzle, user, worker)
 
-    dyn_actions = user.team.game_status.get_dyn_actions(puzzle.model.key)
+    dyn_actions = user.team.game_state.get_dyn_actions(puzzle.model.key)
 
     return_value = {
         'key': puzzle.model.key,
@@ -264,12 +264,12 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
     if not user.is_staff:
         assert user.team is not None
         # 游戏结束后这个 assert 可能不成立
-        # assert puzzle.model.key in user.team.game_status.unlock_puzzle_keys
-        if puzzle.model.key in user.team.game_status.unlock_puzzle_keys:
-            return_value['unlock_ts'] = user.team.game_status.unlock_puzzle_keys[puzzle.model.key]
-            return_value['cold_down_ts'] = user.team.game_status.puzzle_status_by_key[puzzle.model.key].cold_down_ts
-            if puzzle.model.key in user.team.game_status.passed_puzzle_keys:
-                return_value['pass_ts'] = user.team.game_status.passed_puzzle_keys[puzzle.model.key]
+        # assert puzzle.model.key in user.team.game_state.unlock_puzzle_keys
+        if puzzle.model.key in user.team.game_state.unlock_puzzle_keys:
+            return_value['unlock_ts'] = user.team.game_state.unlock_puzzle_keys[puzzle.model.key]
+            return_value['cold_down_ts'] = user.team.game_state.puzzle_state_by_key[puzzle.model.key].cold_down_ts
+            if puzzle.model.key in user.team.game_state.passed_puzzle_keys:
+                return_value['pass_ts'] = user.team.game_state.passed_puzzle_keys[puzzle.model.key]
         return_value['key'] = worker.game_nocheck.hash_puzzle_key(user.team.model.id, puzzle_key)
 
     if len(puzzle.model.clipboard) > 0:
@@ -308,7 +308,7 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
     # 此时 puzzle_key 一定是存在的
-    if not user.is_staff and puzzle_key not in user.team.game_status.unlock_puzzle_keys:
+    if not user.is_staff and puzzle_key not in user.team.game_state.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.get_hints', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
 
@@ -335,7 +335,7 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
         effective_after_ts = hint.model.effective_after_ts
         if not user.is_staff:
             # 对于普通玩家来说，得等待提示解锁
-            unlock_puzzle_ts = user.team.game_status.unlock_puzzle_keys[puzzle_key]
+            unlock_puzzle_ts = user.team.game_state.unlock_puzzle_keys[puzzle_key]
             hint_cd = adhoc.hint_cd_after_puzzle_unlock(hint)
             effective_after_ts = unlock_puzzle_ts + hint_cd
 
@@ -393,7 +393,7 @@ async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: User 
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
     # 此时 puzzle_key 一定是存在的
-    if puzzle_key not in user.team.game_status.unlock_puzzle_keys:
+    if puzzle_key not in user.team.game_state.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.buy_hint', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
 

@@ -481,7 +481,7 @@ class Reducer(StateContainerBase):
         tid: int = team_event.id
         # 理论上应当在添加完成 team event 之后读取结果，但是有点麻烦，因为没做 team_event_by_id
         # 先 test 应当是一样的
-        submission_result = user.team.game_status.test_submission(req.puzzle_key, req.content)
+        submission_result = user.team.game_state.test_submission(req.puzzle_key, req.content)
         await self.emit_event(glitter.Event(glitter.EventType.NEW_SUBMISSION, self.state_counter, tid))
 
         res = {'status': 'error', 'title': '未知错误！', 'message': '请联系网站管理员。'}

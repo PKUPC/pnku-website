@@ -70,7 +70,7 @@ def check_template_permission(filename: str, worker: Worker, user: User | None) 
     if filename in TEMPLATE_AFTER_GAME_START and not worker.game_nocheck.is_game_begin():
         return False
 
-    return filename in user.team.game_status.unlock_templates
+    return filename in user.team.game_state.unlock_templates
 
 
 def is_safe_path(path: str) -> bool:

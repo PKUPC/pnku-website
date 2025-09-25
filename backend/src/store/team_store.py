@@ -18,7 +18,7 @@ from sqlalchemy import JSON, BigInteger, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.utils.enum import EnumWrapper
+from src.utils import EnhancedEnum
 
 from . import Table
 from .user_store import UserStore
@@ -110,7 +110,7 @@ class TeamStore(Table):
     team_secret: Mapped[str] = mapped_column('team_secret', String(MAX_INFO_LEN), nullable=False, default='')
     TEAM_SECRET_VAL = re.compile(r'^.{10,20}$')
 
-    class Status(EnumWrapper):
+    class Status(EnhancedEnum):
         NORMAL = '正常'
         DISSOLVED = '已解散'
 
@@ -118,7 +118,7 @@ class TeamStore(Table):
 
     status: Mapped[str] = mapped_column('status', String(32), nullable=False, default=DEFAULT_STATUS)
 
-    class BanStatus(EnumWrapper):
+    class BanStatus(EnhancedEnum):
         NORMAL = '一般通过队伍'
         BANNED = '已封禁'
         HIDDEN = '在排行榜上隐藏'

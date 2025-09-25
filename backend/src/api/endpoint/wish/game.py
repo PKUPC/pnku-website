@@ -57,12 +57,12 @@ async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker
     if body.area_name in ['intro', 'day1', 'day2', 'day3']:
         if body.area_name == 'intro' and not worker.game_nocheck.is_intro_unlock():
             return not_found
-        if body.area_name not in user.team.game_status.unlock_areas:
+        if body.area_name not in user.team.game_state.unlock_areas:
             worker.log(
                 'debug',
                 'get_area_detail',
                 f'area {body.area_name} not in T#{user.team.model.id}'
-                + f'unlock areas {user.team.game_status.unlock_areas}]',
+                + f'unlock areas {user.team.game_state.unlock_areas}]',
             )
             return not_found
 
@@ -90,7 +90,7 @@ async def get_puzzle_list(req: Request, worker: Worker, user: User | None) -> di
             return {'status': 'error', 'title': 'ABNORMAL', 'message': '游戏未开始！'}
         assert user.team is not None
         for area_name in area_list:
-            if area_name in user.team.game_status.unlock_areas:
+            if area_name in user.team.game_state.unlock_areas:
                 rst_data.append(adhoc.get_area_info(area_name, user, worker))
 
     return {'status': 'success', 'data': rst_data}
@@ -131,7 +131,7 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
                     }
                 )
         elif user.team is not None and worker.game_nocheck.is_game_begin():
-            for board in user.team.game_status.unlock_boards:
+            for board in user.team.game_state.unlock_boards:
                 unlock_boards.append(
                     {
                         'key': board,
@@ -235,7 +235,7 @@ async def get_announcements(_req: Request, worker: Worker, user: User | None) ->
             if user.team is None:
                 continue
             if worker.game_nocheck.is_game_begin():
-                if ann.store.category in user.team.game_status.unlock_announcement_categories:
+                if ann.store.category in user.team.game_state.unlock_announcement_categories:
                     filtered_list.append(ann)
 
     return {
@@ -287,7 +287,7 @@ async def get_board(req: Request, body: GetBoardParam, worker: Worker, user: Use
                 req, 'api.game.get_board', 'abnormal', '游戏未开始时调用了 API。', {'board_key': body.board_key}
             )
             return {'status': 'error', 'title': 'NOT_FOUND', 'message': '排行榜不存在！'}
-        if board_key not in user.team.game_status.unlock_boards:
+        if board_key not in user.team.game_state.unlock_boards:
             store_user_log(
                 req,
                 'api.game.get_board',
@@ -324,7 +324,7 @@ async def get_board(req: Request, body: GetBoardParam, worker: Worker, user: Use
                         user is not None
                         and user.team is not None
                         and user.team.gaming
-                        and user.team.game_status.puzzle_visible_status(puzzle_key) != 'lock'
+                        and user.team.game_state.puzzle_visible_status(puzzle_key) != 'lock'
                     ):
                         is_lock = False
                     if is_lock:

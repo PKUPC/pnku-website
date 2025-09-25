@@ -23,7 +23,7 @@ def gen_puzzle_data_basic(puzzle: Puzzle) -> dict[str, Any]:
 def gen_puzzle_data(user: User, worker: Worker, puzzle: Puzzle) -> dict[str, Any] | None:
     assert user.team is not None
     if not user.is_staff:
-        if user.team.game_status.puzzle_visible_status(puzzle.model.key) == 'lock':
+        if user.team.game_state.puzzle_visible_status(puzzle.model.key) == 'lock':
             return None
 
     puzzle_status = 'untouched'
@@ -33,12 +33,12 @@ def gen_puzzle_data(user: User, worker: Worker, puzzle: Puzzle) -> dict[str, Any
         # 这里是解题状态
         puzzle_status = puzzle.status_by_team(user.team)
         # 这里是是否发现该 puzzle
-        if user.team.game_status.puzzle_visible_status(puzzle.model.key) == 'found':
+        if user.team.game_state.puzzle_visible_status(puzzle.model.key) == 'found':
             puzzle_status = 'found'
 
     # ADHOC day3_premeta
     if puzzle.model.key == 'day3_premeta' and (
-        'day3_premeta' in user.team.game_status.unlock_puzzle_keys or user.is_staff
+        'day3_premeta' in user.team.game_state.unlock_puzzle_keys or user.is_staff
     ):
         puzzle_status = 'special'
 

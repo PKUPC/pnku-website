@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Hashable
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
 from src import secret, utils
+from src.adhoc.constants import PuzzleVisibleStatusLiteral
 from src.state.submission_state import SubmissionResult
 from src.store import PuzzleActionEvent
 
@@ -11,7 +12,7 @@ from src.store import PuzzleActionEvent
 if TYPE_CHECKING:
     from src.state import Puzzle, Submission, Team
 
-    from .team_game_state import TeamGameStatus
+    from .team_game_state import TeamGameState
 
 if secret.DEBUG_MODE:
     COOLDOWN_TIME = 2
@@ -19,12 +20,12 @@ else:
     COOLDOWN_TIME = 60
 
 
-class TeamPuzzleStatus:
-    def __init__(self, game_status: TeamGameStatus, team: Team, puzzle: Puzzle):
-        self.game_status = game_status
+class TeamPuzzleState:
+    def __init__(self, game_state: TeamGameState, team: Team, puzzle: Puzzle):
+        self.game_state = game_state
         self.team: Team = team
         self.puzzle: Puzzle = puzzle
-        self.visible: Literal['unlock', 'lock', 'found'] = 'lock'
+        self.visible: PuzzleVisibleStatusLiteral = 'lock'
         self.wrong_count = 0
         self.cold_down_ts = -1
         self.submission_set: set[str] = set()
@@ -33,7 +34,7 @@ class TeamPuzzleStatus:
 
     @property
     def passed(self) -> bool:
-        return self.puzzle.model.key in self.game_status.passed_puzzle_keys
+        return self.puzzle.model.key in self.game_state.passed_puzzle_keys
 
     def on_submission(self, submission: Submission, is_reloading: bool = False) -> None:
         assert submission.cleaned_content not in self.submission_set
