@@ -39,8 +39,10 @@ class TeamView(BaseView):
     column_formatters = {
         'created_at': fields.timestamp_ms_formatter,
         'updated_at': fields.timestamp_ms_formatter,
-        'status': lambda _view, _context, model, name: store.TeamStore.Status.dict().get(name, 'UNKNOWN'),
-        'ban_status': lambda _view, _context, model, name: store.TeamStore.BanStatus.dict().get(name, 'UNKNOWN'),
+        'status': lambda _view, _context, model, _name: store.TeamStore.Status.dict().get(model.status, 'UNKNOWN'),
+        'ban_status': lambda _view, _context, model, _name: store.TeamStore.BanStatus.dict().get(
+            model.ban_status, 'UNKNOWN'
+        ),
         'team_info': lambda _v, _c, model, _n: (
             model.team_info[:18] + '...' if len(model.team_info) > 20 else model.team_info
         ),
@@ -48,8 +50,10 @@ class TeamView(BaseView):
     column_formatters_detail = {
         'created_at': fields.timestamp_ms_formatter,
         'updated_at': fields.timestamp_ms_formatter,
-        'status': lambda _view, _context, model, name: store.TeamStore.Status.dict().get(name, 'UNKNOWN'),
-        'ban_status': lambda _view, _context, model, name: store.TeamStore.BanStatus.dict().get(name, 'UNKNOWN'),
+        'status': lambda _view, _context, model, _name: store.TeamStore.Status.dict().get(model.status, 'UNKNOWN'),
+        'ban_status': lambda _view, _context, model, _name: store.TeamStore.BanStatus.dict().get(
+            model.ban_status, 'UNKNOWN'
+        ),
         'extra_info': lambda _v, _c, model, _n: (
             Markup('<samp style="white-space: pre-wrap">%s</samp>')
             % json.dumps(model.extra_info, indent=4, ensure_ascii=False)

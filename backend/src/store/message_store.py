@@ -83,13 +83,9 @@ class MessageStore(Table):
 
     def validated_model(self) -> MessageModel:
         """
-        assert model is validated
+        return pydantic 验证后的 model，可能会抛异常，需要处理。
         """
-        try:
-            model = MessageModel.model_validate(self)
-        except ValidationError:
-            assert False
-        return model
+        return MessageModel.model_validate(self)
 
     def validate(self) -> tuple[bool, ValidationError | None]:
         try:

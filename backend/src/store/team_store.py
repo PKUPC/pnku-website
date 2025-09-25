@@ -2,23 +2,22 @@ import re
 import time
 
 from datetime import datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 import sqlalchemy
 
 from pydantic import (
+    AfterValidator,
     BaseModel,
     ConfigDict,
     Field,
     ValidationError,
-    ValidationInfo,
-    field_validator,
 )
 from sqlalchemy import JSON, BigInteger, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.utils import EnhancedEnum
+from src.utils import EnhancedEnum, validate_time_minute_str
 
 from . import Table
 from .user_store import UserStore
@@ -35,21 +34,10 @@ class TeamExtraSpecialStatus(BaseModel):
 
 class BanList(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    ban_message_until: str = Field(default='2024-01-01 00:00')
-    ban_manual_hint_until: str = Field(default='2024-01-01 00:00')
-    ban_recruiting_until: str = Field(default='2024-01-01 00:00')
+    ban_message_until: Annotated[str, AfterValidator(validate_time_minute_str)] = Field(default='2024-01-01 00:00')
+    ban_manual_hint_until: Annotated[str, AfterValidator(validate_time_minute_str)] = Field(default='2024-01-01 00:00')
+    ban_recruiting_until: Annotated[str, AfterValidator(validate_time_minute_str)] = Field(default='2024-01-01 00:00')
     ban_upload_image: bool = Field(default=False)
-
-    @field_validator('ban_message_until', 'ban_manual_hint_until', 'ban_recruiting_until')
-    @classmethod
-    def check_time(cls, v: str, info: ValidationInfo) -> str:
-        if isinstance(v, str):
-            try:
-                datetime.strptime(v, '%Y-%m-%d %H:%M')
-                return v
-            except ValueError:
-                assert False, f'{info.field_name} 不是合法的时间格式！'
-        return v
 
     @property
     def ban_message_until_ts(self) -> int:
@@ -158,13 +146,9 @@ class TeamStore(Table):
 
     def validated_model(self) -> TeamStoreModel:
         """
-        assert model is validated
+        return pydantic 验证后的 model，可能会抛异常，需要处理。
         """
-        try:
-            model = TeamStoreModel.model_validate(self)
-        except ValidationError:
-            assert False
-        return model
+        return TeamStoreModel.model_validate(self)
 
     def validate(self) -> tuple[bool, ValidationError | None]:
         try:
