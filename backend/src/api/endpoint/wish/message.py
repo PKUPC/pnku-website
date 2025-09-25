@@ -5,6 +5,7 @@ from sanic import Blueprint, Request
 from sanic_ext import validate
 
 from src import adhoc, secret, utils
+from src.adhoc.constants.api.response import response_message
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -38,13 +39,13 @@ async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: U
             '在 playground 模式下发送站内信。',
             {'team_id': body.team_id, 'type': body.type, 'content': body.content},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '在目前的游戏模式下无法使用此操作！'}
+        return response_message('PLAYGROUND_BAD_REQUEST', status='error')
 
     if user.model.user_info.ban_list.ban_message:
-        return {'status': 'error', 'title': 'BANNED', 'message': '您已被禁用该功能！'}
+        return response_message('BANNED', status='error')
 
     if worker.game_nocheck.is_game_end():
-        return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
+        return response_message('GAME_END', status='error')
 
     if not user.is_staff:
         if user.model.team_id != body.team_id:
@@ -55,7 +56,7 @@ async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: U
                 '提供的队伍 id 不是用户的队伍 id。',
                 {'team_id': body.team_id, 'type': body.type, 'content': body.content},
             )
-            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍 id 出错！'}
+            return response_message('WRONG_TEAM_ID', status='error')
         elif body.team_id not in worker.game_nocheck.teams.team_by_id:
             store_user_log(
                 req,
@@ -64,7 +65,7 @@ async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: U
                 '提供的队伍 id 不存在。',
                 {'team_id': body.team_id, 'type': body.type, 'content': body.content},
             )
-            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍id不存在！'}
+            return response_message('TEAM_ID_NOT_FOUND', status='error')
 
     if body.type not in MessageStore.CONTENT_TYPE.TYPE_SET:
         store_user_log(
@@ -74,7 +75,7 @@ async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: U
             '提供了非法的 content type。',
             {'team_id': body.team_id, 'type': body.type, 'content': body.content},
         )
-        return {'status': 'error', 'title': 'WRONG_TYPE', 'message': 'content type 错误'}
+        return response_message('WRONG_TYPE', status='error')
 
     if not (1 <= len(body.content) <= 400):
         store_user_log(
@@ -84,7 +85,7 @@ async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: U
             f'消息长度不合法，长度为{len(body.content)}。',
             {'team_id': body.team_id, 'type': body.type, 'content': body.content},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '消息长度错误，消息长度应在1到400之间'}
+        return response_message('INVALID_LENGTH', status='error')
 
     if body.team_id == 0:
         store_user_log(
@@ -94,7 +95,7 @@ async def send_message(req: Request, body: SendMsgParam, worker: Worker, user: U
             '某个 staff 试图给 staff 队伍发信息。',
             {'team_id': body.team_id, 'type': body.type, 'content': body.content},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '不能给 staff 队伍发消息，别捣乱了！'}
+        return response_message('SEND_MSG_TO_STAFF', status='error')
 
     rep = await worker.perform_action(
         glitter.TeamSendMsgReq(
@@ -134,7 +135,7 @@ async def read_message(req: Request, body: ReadMsgParam, worker: Worker, user: U
             'staff 试图调用这个 API。',
             {'team_id': body.team_id, 'msg_id': body.msg_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': 'staff 不能调这个接口'}
+        return response_message('STAFF_INVALID_API', status='error')
 
     if user.model.team_id != body.team_id:
         store_user_log(
@@ -144,7 +145,7 @@ async def read_message(req: Request, body: ReadMsgParam, worker: Worker, user: U
             '用户提交的队伍 id 不是用户自己的队伍 id。',
             {'team_id': body.team_id, 'msg_id': body.msg_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍id出错'}
+        return response_message('WRONG_TEAM_ID', status='error')
 
     rep = await worker.perform_action(
         glitter.TeamReadMsgReq(
@@ -182,7 +183,7 @@ async def get_message(req: Request, body: GetMsgParam, worker: Worker, user: Use
             '提供的 start_id 不合法。',
             {'team_id': body.team_id, 'start_id': body.start_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '提供的消息id错误'}
+        return response_message('WRONG_MSG_ID', status='error')
 
     if not user.is_staff and user.model.team_id != body.team_id:
         store_user_log(
@@ -192,12 +193,12 @@ async def get_message(req: Request, body: GetMsgParam, worker: Worker, user: Use
             '提供的队伍 id 和用户的队伍 id 不一致。',
             {'team_id': body.team_id, 'start_id': body.start_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍id出错'}
+        return response_message('WRONG_TEAM_ID', status='error')
 
     rst = worker.game_nocheck.messages.get_msg_list(body.team_id, body.start_id)
 
     if rst is None:
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '提供的消息id错误'}
+        return response_message('WRONG_MSG_ID', status='error')
 
     if user.model.group != 'staff':
         rst = [x for x in rst]

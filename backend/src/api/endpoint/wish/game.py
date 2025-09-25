@@ -10,6 +10,7 @@ from sanic import Blueprint, Request
 from sanic_ext import validate
 
 from src import adhoc, secret, utils
+from src.adhoc.constants.api.response import response_message
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -38,10 +39,8 @@ async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker
     assert user is not None
     assert user.is_staff or user.team is not None
 
-    not_found = {'status': 'error', 'title': 'NOT FOUND', 'message': '不存在的区域'}
-
     if body.area_name not in ['intro', 'day1', 'day2', 'day3']:
-        return not_found
+        return response_message('AREA_NOT_FOUND', status='error')
 
     if user.is_staff:
         return {'status': 'success', 'data': adhoc.get_area_info(body.area_name, user, worker)}
@@ -51,12 +50,12 @@ async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker
         store_user_log(
             req, 'api.game.get_area_detail', 'abnormal', '游戏未开始时调用了 API。', {'area_name': body.area_name}
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '游戏未开始！'}
+        return response_message('GAME_NOT_START', status='error')
 
     # 检查是否未解锁
     if body.area_name in ['intro', 'day1', 'day2', 'day3']:
         if body.area_name == 'intro' and not worker.game_nocheck.is_intro_unlock():
-            return not_found
+            return response_message('AREA_NOT_FOUND', status='error')
         if body.area_name not in user.team.game_status.unlock_areas:
             worker.log(
                 'debug',
@@ -64,7 +63,7 @@ async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker
                 f'area {body.area_name} not in T#{user.team.model.id}'
                 + f'unlock areas {user.team.game_status.unlock_areas}]',
             )
-            return not_found
+            return response_message('AREA_NOT_FOUND', status='error')
 
     return {'status': 'success', 'data': adhoc.get_area_info(body.area_name, user, worker)}
 
@@ -87,7 +86,7 @@ async def get_puzzle_list(req: Request, worker: Worker, user: User | None) -> di
         # 检查是否开始游戏
         if not worker.game_nocheck.is_game_begin():
             store_user_log(req, 'api.game.get_puzzle_list', 'abnormal', '游戏未开始时调用了 API。', {})
-            return {'status': 'error', 'title': 'ABNORMAL', 'message': '游戏未开始！'}
+            return response_message('GAME_NOT_START', status='error')
         assert user.team is not None
         for area_name in area_list:
             if area_name in user.team.game_status.unlock_areas:
@@ -106,7 +105,7 @@ TEMPLATE_LIST = [
 @wish_response
 async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     if worker.game is None:
-        return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
+        return response_message('NO_GAME', status='error')
 
     cur_tick = worker.game.cur_tick
 
@@ -247,7 +246,7 @@ async def get_announcements(_req: Request, worker: Worker, user: User | None) ->
 @wish_response
 async def get_schedule(_req: Request, worker: Worker) -> dict[str, Any]:
     if worker.game is None:
-        return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
+        return response_message('NO_GAME', status='error')
 
     return {
         'data': [
@@ -286,7 +285,7 @@ async def get_board(req: Request, body: GetBoardParam, worker: Worker, user: Use
             store_user_log(
                 req, 'api.game.get_board', 'abnormal', '游戏未开始时调用了 API。', {'board_key': body.board_key}
             )
-            return {'status': 'error', 'title': 'NOT_FOUND', 'message': '排行榜不存在！'}
+            return response_message('GAME_NOT_START', status='error')
         if board_key not in user.team.game_status.unlock_boards:
             store_user_log(
                 req,
@@ -295,11 +294,11 @@ async def get_board(req: Request, body: GetBoardParam, worker: Worker, user: Use
                 'board_key 不在玩家的 unlock_boards 中。',
                 {'board_key': body.board_key},
             )
-            return {'status': 'error', 'title': 'NOT_FOUND', 'message': '排行榜不存在！'}
+            return response_message('BOARD_NOT_FOUND', status='error')
 
     b = worker.game_nocheck.boards.get(board_key, None)
     if b is None:
-        return {'status': 'error', 'title': 'NOT_FOUND', 'message': '排行榜不存在'}
+        return response_message('BOARD_NOT_FOUND', status='error')
 
     # 在首杀榜上屏蔽没有解锁的题目
     # 游戏结束后就开放
@@ -393,7 +392,7 @@ async def game_start(req: Request, body: GameStartParam, worker: Worker, user: U
 
     if not worker.game_nocheck.is_intro_unlock() and not user.is_staff:
         store_user_log(req, 'api.game.game_start', 'abnormal', '序章开放前调用了 API。', {'content': body.content})
-        return {'status': 'error', 'title': 'ABNORMAL', 'message': '序章尚未开放。'}
+        return response_message('INTRO_LOCK', status='error')
 
     store_user_log(req, 'api.game.game_start', 'game_start', '', {'content': body.content})
 
@@ -420,7 +419,7 @@ async def game_start(req: Request, body: GameStartParam, worker: Worker, user: U
 # @wish_response
 # async def get_message_status(_req: Request, worker: Worker, user: Optional[User]) -> Dict[str, Any]:
 #     if worker.game is None:
-#         return {"status": "error", "title": "NO_GAME", "message": "服务暂时不可用"}
+#         return response_message("NO_GAME", status="error")
 #
 #     return {
 #         "unread": 0 if user is None else (
@@ -475,10 +474,10 @@ async def get_story_list(req: Request, worker: Worker, user: User | None) -> dic
     if not user.is_staff:
         if not worker.game_nocheck.is_game_begin():
             store_user_log(req, 'api.game.get_story_list', 'abnormal', '游戏开始前调用了 API。', {})
-            return {'status': 'error', 'title': 'ABNORMAL', 'message': '游戏未开始！'}
+            return response_message('GAME_NOT_START', status='error')
         if not user.team.gaming:
             store_user_log(req, 'api.game.get_story_list', 'abnormal', '在队伍开始游戏前调用了 API。', {})
-            return {'status': 'error', 'title': 'ABNORMAL', 'message': '队伍未开始游戏！'}
+            return response_message('TEAM_NOT_START', status='error')
 
     rst = adhoc.get_story_list(user)
 

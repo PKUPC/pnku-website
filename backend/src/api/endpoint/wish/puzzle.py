@@ -7,6 +7,7 @@ from sanic import Blueprint, Request
 from sanic_ext import validate
 
 from src import adhoc, utils
+from src.adhoc.constants.api.response import response_message
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -32,11 +33,11 @@ async def submit_answer(req: Request, body: SubmitParam, worker: Worker, user: U
     assert user.team is not None
 
     if worker.game_nocheck.is_game_end():
-        return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
+        return response_message('GAME_END', status='error')
 
     if not (0 < len(body.content) <= 100):
         store_user_log(req, 'api.puzzle.submit_answer', 'abnormal', f'答案长度不合法，长度为{len(body.content)}。', {})
-        return {'status': 'error', 'title': '答案过长', 'message': '答案长度应在1到100之间。'}
+        return response_message('ANSWER_TOO_LONG', status='error')
 
     team_id, puzzle_key = worker.game_nocheck.unhash_puzzle_key(user.team.model.id, body.puzzle_key)
     # 找不到原始 puzzle_key
@@ -48,7 +49,7 @@ async def submit_answer(req: Request, body: SubmitParam, worker: Worker, user: U
             'unhash puzzle_key 失败。',
             {'body_puzzle_key': body.puzzle_key},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 是其他队伍的 puzzle_key
     if team_id != user.team.model.id:
         store_user_log(
@@ -58,11 +59,11 @@ async def submit_answer(req: Request, body: SubmitParam, worker: Worker, user: U
             '提交了其他队伍的 puzzle_key。',
             {'body_puzzle_key': body.puzzle_key, 'real_puzzle_key': puzzle_key, 'another_team_id': team_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 此时 puzzle_key 一定是存在的
     if not user.is_staff and puzzle_key not in user.team.game_status.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.submit_answer', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
 
     store_user_log(
         req, 'api.puzzle.submit_answer', 'submit_answer', '', {'puzzle_key': puzzle_key, 'content': body.content}
@@ -129,7 +130,7 @@ async def get_submissions(req: Request, body: GetSubmissionsParam, worker: Worke
             'unhash puzzle_key 失败。',
             {'body_puzzle_key': body.puzzle_key},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 是其他队伍的 puzzle_key
     if team_id != user.team.model.id:
         store_user_log(
@@ -139,11 +140,11 @@ async def get_submissions(req: Request, body: GetSubmissionsParam, worker: Worke
             '提交了其他队伍的 puzzle_key。',
             {'body_puzzle_key': body.puzzle_key, 'real_puzzle_key': puzzle_key, 'another_team_id': team_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 此时 puzzle_key 一定是存在的
     if not user.is_staff and puzzle_key not in user.team.game_status.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.get_submissions', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
 
     store_user_log(req, 'api.puzzle.get_submissions', 'get_submissions', '', {'puzzle_key': puzzle_key})
 
@@ -209,7 +210,7 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
             'unhash puzzle_key 失败。',
             {'body_puzzle_key': body.puzzle_key},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 是其他队伍的 puzzle_key
     if team_id != user.team.model.id:
         store_user_log(
@@ -219,11 +220,11 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
             '提交了其他队伍的 puzzle_key。',
             {'body_puzzle_key': body.puzzle_key, 'real_puzzle_key': puzzle_key, 'another_team_id': team_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 此时 puzzle_key 一定是存在的
     if not user.is_staff and puzzle_key not in user.team.game_status.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.get_puzzle_details', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
 
     puzzle = worker.game_nocheck.puzzles.puzzle_by_key[puzzle_key]
     if not user.is_staff:
@@ -232,7 +233,7 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
             store_user_log(
                 req, 'api.puzzle.get_detail', 'abnormal', '试图访问没解锁的题目。', {'puzzle_key': puzzle_key}
             )
-            return {'status': 'error', 'title': 'NOT_FOUND', 'message': '题目不存在'}
+            return response_message('PUZZLE_NOT_FOUND', status='error')
 
     store_user_log(req, 'api.puzzle.get_puzzle_details', 'get_puzzle_details', '', {'puzzle_key': puzzle_key})
 
@@ -296,7 +297,7 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
         store_user_log(
             req, 'api.puzzle.get_hints', 'abnormal', 'unhash puzzle_key 失败。', {'body_puzzle_key': body.puzzle_key}
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 是其他队伍的 puzzle_key
     if team_id != user.team.model.id:
         store_user_log(
@@ -306,11 +307,11 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
             '提交了其他队伍的 puzzle_key。',
             {'body_puzzle_key': body.puzzle_key, 'real_puzzle_key': puzzle_key, 'another_team_id': team_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 此时 puzzle_key 一定是存在的
     if not user.is_staff and puzzle_key not in user.team.game_status.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.get_hints', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
 
     puzzle = worker.game_nocheck.puzzles.puzzle_by_key.get(puzzle_key, None)
     assert puzzle is not None
@@ -366,13 +367,13 @@ class BuyHintParam(BaseModel):
 async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: User | None) -> dict[str, Any]:
     assert user is not None
     if worker.game_nocheck.is_game_end():
-        return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
+        return response_message('GAME_END', status='error')
 
     if user.is_staff:
         store_user_log(
             req, 'api.puzzle.buy_hint', 'abnormal', 'staff 不应该调这个 API。', {'body_puzzle_key': body.puzzle_key}
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': 'staff不应该调用这个接口'}
+        return response_message('STAFF_INVALID_API', status='error')
     assert user.team is not None
 
     team_id, puzzle_key = worker.game_nocheck.unhash_puzzle_key(user.team.model.id, body.puzzle_key)
@@ -381,7 +382,7 @@ async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: User 
         store_user_log(
             req, 'api.puzzle.buy_hint', 'abnormal', 'unhash puzzle_key 失败。', {'body_puzzle_key': body.puzzle_key}
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 是其他队伍的 puzzle_key
     if team_id != user.team.model.id:
         store_user_log(
@@ -391,11 +392,11 @@ async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: User 
             '提交了其他队伍的 puzzle_key。',
             {'body_puzzle_key': body.puzzle_key, 'real_puzzle_key': puzzle_key, 'another_team_id': team_id},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
     # 此时 puzzle_key 一定是存在的
     if puzzle_key not in user.team.game_status.unlock_puzzle_keys:
         store_user_log(req, 'api.puzzle.buy_hint', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+        return response_message('PUZZLE_NOT_FOUND', status='error')
 
     puzzle = worker.game_nocheck.puzzles.puzzle_by_key.get(puzzle_key, None)
     assert puzzle is not None

@@ -8,6 +8,7 @@ from sanic import Blueprint, Request
 from sanic_ext import validate
 
 from src import secret, utils
+from src.adhoc.constants.api.response import response_message
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -31,16 +32,17 @@ async def update_profile(req: Request, body: UpdateProfileParam, worker: Worker,
     assert user is not None
 
     if worker.game_nocheck.is_game_end():
-        return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
+        return response_message('GAME_END', status='error')
 
     delta = time.time() - user.model.updated_at / 1000
     if not secret.DEBUG_MODE and delta < 3:
-        return {'status': 'error', 'title': 'RATE_LIMIT', 'message': f'提交太频繁，请等待 {3 - delta:.1f} 秒'}
+        return response_message('RATE_LIMIT', status='error', seconds=3 - delta)
 
     if 'nickname' not in body.profile:
-        return {'status': 'error', 'title': 'INVALID_PARAM', 'message': '缺少昵称信息'}
+        return response_message('INVALID_PARAM_MISSING_NICKNAME', status='error')
+
     if body.profile['nickname'] == '':
-        return {'status': 'error', 'title': 'INVALID_PARAM', 'message': '昵称不能为空'}
+        return response_message('INVALID_PARAM_EMPTY_NICKNAME', status='error')
 
     rep = await worker.perform_action(
         glitter.UserUpdateProfileReq(
@@ -71,7 +73,7 @@ async def change_password(req: Request, body: ChangePasswordParam, worker: Worke
     assert user is not None
 
     if user.model.login_properties.type == 'manual':
-        return {'status': 'error', 'title': 'INVALID_OPERATION', 'message': '测试用户不能更改密码'}
+        return response_message('INVALID_OPERATION_CHANGE_PASSWORD', status='error')
 
     assert user.model.login_properties.type == 'email'
 
@@ -83,7 +85,7 @@ async def change_password(req: Request, body: ChangePasswordParam, worker: Worke
     input_password_md5 = utils.calc_md5(body.old_password + salt)
 
     if input_password_md5 != cur_password_md5 and input_password_md5 != next_password_md5:
-        return {'status': 'error', 'title': 'WRONG_PASSWORD', 'message': '原始密码错误'}
+        return response_message('WRONG_PASSWORD', status='error')
 
     new_password_md5 = utils.calc_md5(body.new_password + salt)
 
@@ -104,7 +106,7 @@ async def change_password(req: Request, body: ChangePasswordParam, worker: Worke
     )
 
     if rep.result is not None:
-        return {'status': 'error', 'title': 'REDUCER_ERROR', 'message': rep.result}
+        return response_message('REDUCER_ERROR', status='error', error=rep.result)
 
     store_user_log(req, 'api.user.change_password', 'change_password', '', {})
 

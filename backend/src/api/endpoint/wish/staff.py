@@ -6,6 +6,7 @@ from sanic import Blueprint, Request
 from sanic_ext import validate
 
 from src import utils
+from src.adhoc.constants.api.response import response_message
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import Submission, Ticket, User
@@ -64,7 +65,7 @@ async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker
     assert user.is_staff
 
     if body.team_id not in worker.game_nocheck.teams.team_by_id:
-        return {'status': 'error', 'title': 'NO_TEAM', 'message': '队伍不存在'}
+        return response_message('NO_TEAM', status='error')
 
     team = worker.game_nocheck.teams.team_by_id[body.team_id]
 
@@ -125,10 +126,10 @@ async def v_me_50(req: Request, body: VMe50Param, worker: Worker, user: User | N
     assert user.is_staff
 
     if user.model.user_info.ban_list.ban_staff:
-        return {'status': 'error', 'title': 'BANNED', 'message': '您已被禁用该功能！'}
+        return response_message('BANNED', status='error')
 
     if worker.game_nocheck.is_game_end():
-        return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
+        return response_message('GAME_END', status='error')
 
     if body.team_id == 0:
         store_user_log(
@@ -138,14 +139,15 @@ async def v_me_50(req: Request, body: VMe50Param, worker: Worker, user: User | N
             '某个 staff 试图变动 staff 队伍的注意力。',
             {'team_id': body.team_id, 'ap_change': body.ap_change, 'reason': body.reason},
         )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '不能改变 staff 队伍的注意力，别捣乱了！'}
-
+        return response_message('CHANGE_STAFF_AP', status='error')
     if body.team_id not in worker.game_nocheck.teams.team_by_id:
-        return {'status': 'error', 'title': 'NO_TEAM', 'message': '队伍不存在'}
+        return response_message('NO_TEAM', status='error')
+
     if body.ap_change == 0:
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '体力值变动不能为0'}
+        return response_message('CHANGE_ZERO_AP', status='error')
+
     if not (0 < len(body.reason) <= 100):
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '更改原因的长度应在1到100之间'}
+        return response_message('BAD_CHANGE_REASON_LEN', status='error')
 
     rep = await worker.perform_action(
         glitter.VMe50Req(
@@ -208,17 +210,19 @@ async def v_me_100(req: Request, body: VMe100Param, worker: Worker, user: User |
     assert user.is_staff
 
     if user.model.user_info.ban_list.ban_staff:
-        return {'status': 'error', 'title': 'BANNED', 'message': '您已被禁用该功能！'}
+        return response_message('BANNED', status='error')
 
     if worker.game_nocheck.is_game_end():
-        return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
+        return response_message('GAME_END', status='error')
 
     if body.team_id not in worker.game_nocheck.teams.team_by_id:
-        return {'status': 'error', 'title': 'NO_TEAM', 'message': '队伍不存在'}
+        return response_message('NO_TEAM', status='error')
+
     if body.spap_change == 0:
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '体力值变动不能为0'}
+        return response_message('CHANGE_ZERO_AP', status='error')
+
     if not (0 < len(body.reason) <= 100):
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '更改原因的长度应在1到100之间'}
+        return response_message('BAD_CHANGE_REASON_LEN', status='error')
 
     rep = await worker.perform_action(
         glitter.VMe100Req(
@@ -265,9 +269,9 @@ async def get_submission_list(
     assert user.is_staff
 
     if body.start_idx < 1:
-        return {'status': 'error', 'title': 'BAD', 'message': 'start_idx不能小于1'}
+        return response_message('BAD_START_IDX', status='error')
     if body.count < 1 or body.count > 100:
-        return {'status': 'error', 'title': 'BAD', 'message': 'count不能小于1或大于100'}
+        return response_message('BAD_CNT', status='error')
 
     store_user_log(req, 'api.staff.get_submission_list', 'get_submission_list', '', body.model_dump())
 
@@ -329,9 +333,9 @@ async def get_tickets(req: Request, body: GetTicketListParam, worker: Worker, us
     assert user.is_staff
 
     if body.start_idx < 1:
-        return {'status': 'error', 'title': 'BAD', 'message': 'start_idx不能小于1'}
+        return response_message('BAD_START_IDX', status='error')
     if body.count < 1 or body.count > 100:
-        return {'status': 'error', 'title': 'BAD', 'message': 'count不能小于1或大于100'}
+        return response_message('BAD_CNT', status='error')
 
     store_user_log(req, 'api.staff.get_tickets', 'get_tickets', '', body.model_dump())
 
@@ -389,19 +393,19 @@ async def update_extra_team_info(
     assert user is not None
 
     if user.model.user_info.ban_list.ban_staff:
-        return {'status': 'error', 'title': 'BANNED', 'message': '您已被禁用该功能！'}
+        return response_message('BANNED', status='error')
 
     if worker.game_nocheck.is_game_end():
-        return {'status': 'error', 'title': 'GAME_END', 'message': '活动已结束！'}
+        return response_message('GAME_END', status='error')
 
     # if body.type not in TeamStore.EXTRA_INFO_TYPES:
     #     return {"status": "error", "title": "BAD_REQUEST", "message": "类别错误"}
 
     if body.type != 'ban_list':
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '不支持的操作。'}
+        return response_message('BAD_REQUEST', status='error')
 
     if body.team_id not in worker.game_nocheck.teams.team_by_id:
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '队伍 id 不存在。'}
+        return response_message('TEAM_ID_NOT_FOUND', status='error')
 
     extra_data: dict[str, str] = {}
     extra_data['ban_message_until'] = body.data.get('ban_message_until', '2024-01-01 00:00')
@@ -412,7 +416,7 @@ async def update_extra_team_info(
         datetime.strptime(extra_data['ban_manual_hint_until'], '%Y-%m-%d %H:%M')
         datetime.strptime(extra_data['ban_recruiting_until'], '%Y-%m-%d %H:%M')
     except ValueError:
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '时间格式错误！'}
+        return response_message('WRONG_TIME_TYPE', status='error')
 
     rep = await worker.perform_action(
         glitter.TeamUpdateExtraTeamInfoReq(
