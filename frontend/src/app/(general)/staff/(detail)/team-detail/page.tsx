@@ -26,8 +26,6 @@ function TeamDetailBody({ tid }: { tid: number }) {
             <TeamApCard data={data} reloadData={mutate} />
             <br />
             <TeamBanListCard data={data} reloadData={mutate} />
-            {/*<br/>*/}
-            {/*<TeamSpApCard data={data} reloadData={mutate}/>*/}
             <br />
             <TeamSubmissionsTable data={data.submissions} />
             <br />

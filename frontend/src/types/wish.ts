@@ -238,7 +238,6 @@ export namespace Wish {
                           recruiting: boolean;
                           recruiting_contact: string;
                           gaming: boolean;
-                          spap: number;
                           ban_list: {
                               ban_message_until: number;
                               ban_manual_hint_until: number;
@@ -510,7 +509,6 @@ export namespace Wish {
             ap_change: number;
             ap_change_history: StaffTeamDetailApChangeHistory[];
             cur_ap: number;
-            spap_change: number;
             submissions: StaffTeamDetailSubmission[];
             passed_puzzles: StaffTeamDetailPassedPuzzles[];
             ban_list: {
@@ -532,14 +530,6 @@ export namespace Wish {
             request: {
                 endpoint: 'staff/v_me_50';
                 payload: { team_id: number; ap_change: number; reason: string };
-            };
-            response: NormalRes;
-        };
-
-        export type VMe100Api = {
-            request: {
-                endpoint: 'staff/v_me_100';
-                payload: { team_id: number; spap_change: number; reason: string };
             };
             response: NormalRes;
         };
@@ -630,7 +620,6 @@ export namespace Wish {
             | GetGameInfoApi
             | GetTeamDetailApi
             | VMe50Api
-            | VMe100Api
             | GetTeamListApi
             | GetSubmissionListApi
             | GetTicketsApi
@@ -894,7 +883,6 @@ export namespace Wish {
         | Puzzle.BuyHintApi
         | Game.GameStartApi
         | Staff.VMe50Api
-        | Staff.VMe100Api
         | Staff.UpdateExtraTeamInfoApi;
 
     type ExtractParam<T> = T extends { request: infer P } ? P : never;

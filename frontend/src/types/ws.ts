@@ -39,7 +39,7 @@ export namespace WsClient {
 
     export type StaffActionData = {
         type: 'staff_action';
-        action: 'modify_ap' | 'modify_spap';
+        action: 'modify_ap';
         message: string;
     };
 
