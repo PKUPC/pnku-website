@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src import adhoc, secret
+from src import secret
+from src.adhoc.boards import get_boards
 from src.store import GameStartEvent, PuzzleActionEvent, SubmissionEvent
 
 from .announcement_state import Announcements
@@ -88,7 +89,7 @@ class Game(WithGameLifecycle):
 
         self.boards: dict[str, Board] = {}
         if use_boards and not secret.PLAYGROUND_MODE:
-            self.boards = adhoc.boards.get_boards(self)
+            self.boards = get_boards(self)
 
         self.n_corr_submission: int = 0
 

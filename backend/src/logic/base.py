@@ -37,6 +37,7 @@ from src.store import (
     LogStore,
     MessageStore,
     PuzzleStore,
+    SubmissionEvent,
     SubmissionStore,
     Table,
     TeamEventStore,
@@ -271,8 +272,7 @@ class StateContainerBase(ABC):
         event_store = self.load_one_data(TeamEventStore, event_id)
         assert event_store is not None, 'event store is None'
         team_event = TeamEvent(self._game, event_store)
-        assert team_event.model.info.type == 'submission', f'submission_id error: {event_store.info}'
-
+        assert isinstance(team_event.model.info, SubmissionEvent), f'submission_id error: {event_store.info}'
         # 添加 submission store
         sub_store = self.load_one_data(SubmissionStore, team_event.model.info.submission_id)
         assert sub_store is not None, 'submission not found'

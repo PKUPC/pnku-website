@@ -20,6 +20,7 @@ from src.store import (
     MessageStore,
     SubmissionStore,
     TeamEventStore,
+    TeamEventType,
     TeamStore,
     TicketMessageStore,
     TicketStore,
@@ -473,13 +474,14 @@ class Reducer(StateContainerBase):
                 user_id=req.user_id,
                 team_id=user.team.model.id,
                 info={
-                    'type': 'submission',
+                    'type': TeamEventType.SUBMISSION.name,
                     'submission_id': submission.id,
                 },
             )
             session.add(team_event)
             session.flush()
             assert team_event.id is not None, 'created team_event not in db'
+            team_event.validated_model()
             session.commit()
             self.state_counter += 1
         tid: int = team_event.id
@@ -511,13 +513,15 @@ class Reducer(StateContainerBase):
                 user_id=req.user_id,
                 team_id=req.team_id,
                 info={
-                    'type': 'buy_normal_hint',
+                    'type': TeamEventType.BUY_NORMAL_HINT.name,
                     'hint_id': req.hint_id,
                 },
             )
             session.add(team_event)
-            session.commit()
+            session.flush()
             assert team_event.id is not None, CRITICAL_ERROR
+            team_event.validated_model()
+            session.commit()
             self.state_counter += 1
         team_event_id: int = team_event.id
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
@@ -530,14 +534,16 @@ class Reducer(StateContainerBase):
                 user_id=req.staff_id,
                 team_id=req.team_id,
                 info={
-                    'type': 'staff_modify_ap',
+                    'type': TeamEventType.STAFF_MODIFY_AP.name,
                     'ap_change': req.ap_change,
                     'reason': req.reason,
                 },
             )
             session.add(team_event)
-            session.commit()
+            session.flush()
             assert team_event.id is not None, 'created team_event not in db'
+            team_event.validated_model()
+            session.commit()
             self.state_counter += 1
         team_event_id: int = team_event.id
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
@@ -546,10 +552,13 @@ class Reducer(StateContainerBase):
     @on_action(glitter.TeamGameBeginReq)
     async def on_team_game_begin(self, req: glitter.TeamGameBeginReq) -> str | None:
         with self.SqlSession() as session:
-            team_event = TeamEventStore(user_id=req.user_id, team_id=req.team_id, info={'type': 'game_start'})
+            team_event = TeamEventStore(
+                user_id=req.user_id, team_id=req.team_id, info={'type': TeamEventType.GAME_START.name}
+            )
             session.add(team_event)
             session.flush()
             assert team_event.id is not None, 'create team_event failed'
+            team_event.validated_model()
             session.commit()
             self.state_counter += 1
 
@@ -712,7 +721,7 @@ class Reducer(StateContainerBase):
                 user_id=req.user_id,
                 team_id=req.team_id,
                 info={
-                    'type': 'puzzle_action',
+                    'type': TeamEventType.PUZZLE_ACTION.name,
                     'puzzle_key': req.puzzle_key,
                     'content': req.content,
                 },
@@ -720,6 +729,7 @@ class Reducer(StateContainerBase):
             session.add(team_event)
             session.flush()
             assert team_event.id is not None, 'create team_event failed'
+            team_event.validated_model()
             session.commit()
             self.state_counter += 1
 

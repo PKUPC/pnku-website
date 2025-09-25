@@ -10,3 +10,10 @@ class PuzzleVisibleStatus(EnhancedEnum):
 
 
 PuzzleVisibleStatusLiteral = Literal['unlock', 'lock', 'found']
+
+
+class CurrencyType(EnhancedEnum):
+    ATTENTION = '注意力'
+
+
+CurrencyTypeLiteral = Literal['ATTENTION']

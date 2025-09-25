@@ -21,6 +21,7 @@ from .team_event_store import (
     StaffModifyApEvent,
     SubmissionEvent,
     TeamEventStore,
+    TeamEventType,
 )
 from .team_store import TeamStore
 from .ticket_message_store import TicketMessageModel, TicketMessageStore
@@ -45,6 +46,7 @@ __all__ = [
     'PuzzleStoreModel',
     'SubmissionStore',
     'TeamEventStore',
+    'TeamEventType',
     'BuyNormalHintEvent',
     'GameStartEvent',
     'PuzzleActionEvent',

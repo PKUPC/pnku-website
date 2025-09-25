@@ -5,7 +5,9 @@ from typing import Any
 
 from sanic.request import Request
 
-from src import adhoc, secret, store, utils
+from src import secret, store, utils
+from src.adhoc.constants import MANUAL_HINT_COOLDOWN
+from src.adhoc.hint import hint_cd_after_puzzle_unlock
 from src.custom import store_user_log
 from src.state import Game
 
@@ -175,7 +177,7 @@ class Checker:
 
         current_ts = time.time()
         unlock_puzzle_ts = user.team.game_state.unlock_puzzle_keys[puzzle_key]
-        hint_cd = adhoc.hint_cd_after_puzzle_unlock(hint)
+        hint_cd = hint_cd_after_puzzle_unlock(hint)
         if unlock_puzzle_ts + hint_cd > current_ts:
             store_user_log(
                 http_req,
@@ -235,7 +237,7 @@ class Checker:
         # 判断是否到达解锁时间
         if req.ticket_type == 'MANUAL_HINT':
             puzzle_key = req.extra['puzzle_key']
-            if user.team.game_state.unlock_puzzle_keys[puzzle_key] + adhoc.MANUAL_HINT_COOLDOWN > time.time():
+            if user.team.game_state.unlock_puzzle_keys[puzzle_key] + MANUAL_HINT_COOLDOWN > time.time():
                 store_user_log(
                     http_req,
                     'checker.on_team_create_ticket',
