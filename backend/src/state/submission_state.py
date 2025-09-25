@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from . import Game, Puzzle, Team, User
 
 
+# TODO: 这里的 SubmissionResult 要考虑放到 adhoc 中
 class SubmissionResult:
     def __init__(
         self,
@@ -71,7 +72,7 @@ class Submission:
 
         self.cleaned_content = clean_submission(store.content)
 
-        self.result: SubmissionResult = self.team.game_status.test_submission(
+        self.result: SubmissionResult = self.team.game_state.test_submission(
             self.store.puzzle_key, self.cleaned_content
         )
         self.finished = False

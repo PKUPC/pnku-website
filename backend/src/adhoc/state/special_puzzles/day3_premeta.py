@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from src import secret, utils
 from src.state.submission_state import SubmissionResult
 
-from ..team_puzzle_status import TeamPuzzleStatus
+from ..team_puzzle_state import TeamPuzzleState
 
 
 if TYPE_CHECKING:
@@ -22,7 +22,7 @@ else:
 # meta3：bcefhjkorsu
 
 
-class Day3PreMetaStatus(TeamPuzzleStatus):
+class Day3PreMetaState(TeamPuzzleState):
     def on_submission(self, submission: Submission, is_reloading: bool = False) -> None:
         assert submission.cleaned_content not in self.submission_set
         self.submission_set.add(submission.cleaned_content)

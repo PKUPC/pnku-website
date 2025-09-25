@@ -1,35 +1,46 @@
+"""
+TeamGameState 描述了一个队伍在一次活动中的全部游戏状态，包括各类信息的解锁状态、谜题状态等
+题目最关键的解锁逻辑
+"""
+
 from __future__ import annotations
 
 from collections.abc import Hashable
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
+from src.adhoc.constants import PuzzleVisibleStatusLiteral
 from src.store import PuzzleActionEvent
 
 from .special_puzzles import (
     Day2Meta,
     Day3Normal,
-    Day3PreMetaStatus,
-    Day201Status,
-    Day202Status,
-    Day203Status,
-    Day206Status,
-    Day320Status,
+    Day3PreMetaState,
+    Day201State,
+    Day202State,
+    Day203State,
+    Day206State,
+    Day320State,
 )
-from .team_puzzle_status import TeamPuzzleStatus
+from .team_puzzle_state import TeamPuzzleState
 
 
 if TYPE_CHECKING:
     from src.state import Puzzle, Submission, SubmissionResult, Team
 
 
-class TeamGameStatus:
+class TeamGameState:
     """
-    只跟游戏进程有关的类，只影响与解谜本身相关的进度，包括解锁状态、特殊谜题状态等。
+    TeamGameState 描述了一个队伍在一次活动中的全部游戏状态，包括各类信息的解锁状态、谜题状态等。
+    解锁逻辑也全都在这里实现，根据用户当前的提交和当前的状态计算应当解锁的题目，是完全由代码实现的。
+    对不不同的活动来说，需要完全手动在这里实现自己的需求，这是 feature。
     """
 
     def __init__(self, team: Team, puzzle_list: list[Puzzle]):
+        """
+        会传入对应的 team 对象和所有 puzzle 列表，按需初始化自己的状态和各种题目的状态
+        """
         self.team: Team = team
-        self.puzzle_status_by_key: dict[str, TeamPuzzleStatus] = {}
+        self.puzzle_state_by_key: dict[str, TeamPuzzleState] = {}
         # 解锁的题目，key 是 puzzle_key，value 是解锁时间
         self.unlock_puzzle_keys: dict[str, int] = {}
         # 通过的题目，key 是 puzzle_key，value 是通过时间
@@ -63,32 +74,39 @@ class TeamGameStatus:
             self.puzzle_actions.setdefault(puzzle.model.key, [])
             match puzzle.model.key:
                 case 'day2_01':
-                    self.puzzle_status_by_key[puzzle.model.key] = Day201Status(self, team, puzzle)
+                    self.puzzle_state_by_key[puzzle.model.key] = Day201State(self, team, puzzle)
                 case 'day2_02':
-                    self.puzzle_status_by_key[puzzle.model.key] = Day202Status(self, team, puzzle)
+                    self.puzzle_state_by_key[puzzle.model.key] = Day202State(self, team, puzzle)
                 case 'day2_03':
-                    self.puzzle_status_by_key[puzzle.model.key] = Day203Status(self, team, puzzle)
+                    self.puzzle_state_by_key[puzzle.model.key] = Day203State(self, team, puzzle)
                 case 'day2_06':
-                    self.puzzle_status_by_key[puzzle.model.key] = Day206Status(self, team, puzzle)
+                    self.puzzle_state_by_key[puzzle.model.key] = Day206State(self, team, puzzle)
                 case 'day2_meta':
-                    self.puzzle_status_by_key[puzzle.model.key] = Day2Meta(self, team, puzzle)
+                    self.puzzle_state_by_key[puzzle.model.key] = Day2Meta(self, team, puzzle)
                 case _ if puzzle.model.key.startswith('day3'):
                     if puzzle.model.key in ['day3_meta1', 'day3_meta2', 'day3_meta3']:
-                        self.puzzle_status_by_key[puzzle.model.key] = TeamPuzzleStatus(self, team, puzzle)
+                        self.puzzle_state_by_key[puzzle.model.key] = TeamPuzzleState(self, team, puzzle)
                     elif puzzle.model.key == 'day3_premeta':
-                        self.puzzle_status_by_key[puzzle.model.key] = Day3PreMetaStatus(self, team, puzzle)
+                        self.puzzle_state_by_key[puzzle.model.key] = Day3PreMetaState(self, team, puzzle)
                     elif puzzle.model.key == 'day3_20':
-                        self.puzzle_status_by_key[puzzle.model.key] = Day320Status(self, team, puzzle)
+                        self.puzzle_state_by_key[puzzle.model.key] = Day320State(self, team, puzzle)
                     else:
-                        self.puzzle_status_by_key[puzzle.model.key] = Day3Normal(self, team, puzzle)
+                        self.puzzle_state_by_key[puzzle.model.key] = Day3Normal(self, team, puzzle)
                 case _:
-                    self.puzzle_status_by_key[puzzle.model.key] = TeamPuzzleStatus(self, team, puzzle)
+                    self.puzzle_state_by_key[puzzle.model.key] = TeamPuzzleState(self, team, puzzle)
 
-    def puzzle_visible_status(self, puzzle_key: str) -> Literal['unlock', 'lock', 'found']:
-        assert puzzle_key in self.puzzle_status_by_key
-        return self.puzzle_status_by_key[puzzle_key].visible
+    def puzzle_visible_status(self, puzzle_key: str) -> PuzzleVisibleStatusLiteral:
+        """
+        题目可见性，用于自定义题目都有哪些状态，用于按需处理。
+        """
+        assert puzzle_key in self.puzzle_state_by_key
+        return self.puzzle_state_by_key[puzzle_key].visible
 
     def on_submission(self, submission: Submission, is_reloading: bool) -> None:
+        """
+        处理提交结果。is_reloading 表示现在是否是重新计算状态阶段，此阶段是全局状态正在重新
+        加载，应当避免在此时发送之应当在第一次到达某状态时发送的信息。
+        """
         self.submissions.append(submission)
         match submission.result.type:
             case 'pass':
@@ -203,13 +221,13 @@ class TeamGameStatus:
 
                 submission.finished = self.finished
 
-        self.puzzle_status_by_key[submission.puzzle.model.key].on_submission(submission, is_reloading)
+        self.puzzle_state_by_key[submission.puzzle.model.key].on_submission(submission, is_reloading)
 
     def test_submission(self, puzzle_key: str, submission: str) -> SubmissionResult:
         """
         检查 submission 的结果，不更改状态
         """
-        submission_result = self.puzzle_status_by_key[puzzle_key].test_submission(submission)
+        submission_result = self.puzzle_state_by_key[puzzle_key].test_submission(submission)
         if submission_result.type == 'pass':
             if puzzle_key.startswith('day1') and puzzle_key != 'day1_meta' and 'day1_meta' in self.passed_puzzle_keys:
                 submission_result.pass_after_meta = True
@@ -236,7 +254,7 @@ class TeamGameStatus:
             {"status": 2, "image", "test.png"}
         后由 jinja2 渲染。
         """
-        return self.puzzle_status_by_key[puzzle_key].get_render_info()
+        return self.puzzle_state_by_key[puzzle_key].get_render_info()
 
     def add_unlock_puzzle(self, puzzle_key: str, unlock_ts: int, is_reloading: bool) -> None:
         assert puzzle_key not in self.unlock_puzzle_keys
@@ -245,7 +263,7 @@ class TeamGameStatus:
                 'debug', 'team_game_state.add_unlock_puzzle', f'team#{self.team.model.id} unlock {puzzle_key}'
             )
         self.unlock_puzzle_keys[puzzle_key] = unlock_ts
-        self.puzzle_status_by_key[puzzle_key].visible = 'unlock'
+        self.puzzle_state_by_key[puzzle_key].visible = 'unlock'
 
         if not is_reloading:
             if puzzle_key == 'day1_meta':
@@ -299,17 +317,17 @@ class TeamGameStatus:
         self.add_unlock_puzzle('day1_03', team_game_start_time, is_reloading)
 
     def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
-        if event.puzzle_key in self.puzzle_status_by_key:
+        if event.puzzle_key in self.puzzle_state_by_key:
             self.puzzle_actions[event.puzzle_key].append(event)
-            self.puzzle_status_by_key[event.puzzle_key].on_puzzle_action(event)
+            self.puzzle_state_by_key[event.puzzle_key].on_puzzle_action(event)
         else:
             self.team.game.log('warning', 'TeamGameStatus.on_puzzle_action', f'Unknown puzzle_key: {event.puzzle_key}')
 
     def get_submission_set(self, puzzle_key: str) -> set[str]:
-        return self.puzzle_status_by_key[puzzle_key].submission_set
+        return self.puzzle_state_by_key[puzzle_key].submission_set
 
     def get_correct_answers(self, puzzle_key: str) -> list[str]:
-        return self.puzzle_status_by_key[puzzle_key].correct_answers
+        return self.puzzle_state_by_key[puzzle_key].correct_answers
 
     def get_dyn_actions(self, puzzle_key: str) -> list[dict[str, Any]]:
-        return self.puzzle_status_by_key[puzzle_key].get_dyn_actions()
+        return self.puzzle_state_by_key[puzzle_key].get_dyn_actions()

@@ -61,7 +61,7 @@ class Checker:
             else:
                 COOLDOWN = 15 * 60
             # 检查距离上次的时间
-            actions = team.game_status.puzzle_actions['day2_02']
+            actions = team.game_state.puzzle_actions['day2_02']
             if len(actions) > 0:
                 last_action = actions[-1]
                 time_diff = int(req.content.get('real_seconds', -1)) - int(last_action.content.get('real_seconds', -1))
@@ -93,7 +93,7 @@ class Checker:
 
         # 没解锁的题目直接不存在
         # 游戏开始前题目自然都没有解锁，因此这个逻辑也是对的
-        if user.team.game_status.puzzle_visible_status(puzzle.model.key) != 'unlock':
+        if user.team.game_state.puzzle_visible_status(puzzle.model.key) != 'unlock':
             store_user_log(
                 http_req,
                 'checker.submit_answer',
@@ -113,7 +113,7 @@ class Checker:
             )
             return {'status': 'error', 'title': 'NOT_FOUND', 'message': '题目不存在'}
 
-        if utils.clean_submission(req.content) in user.team.game_status.get_submission_set(req.puzzle_key):
+        if utils.clean_submission(req.content) in user.team.game_state.get_submission_set(req.puzzle_key):
             return {'status': 'info', 'title': '重复提交', 'message': '你已经提交过这个答案，请在提交列表查看。'}
 
         # 理论上在上一步就限制了
@@ -127,7 +127,7 @@ class Checker:
                 if delta < 3:
                     return {'status': 'error', 'title': '太快了！', 'message': f'提交太频繁，请等待 {3 - delta:.1f} 秒'}
 
-        if time.time() < user.team.game_status.puzzle_status_by_key[req.puzzle_key].cold_down_ts:
+        if time.time() < user.team.game_state.puzzle_state_by_key[req.puzzle_key].cold_down_ts:
             return {'status': 'error', 'title': '冷却中', 'message': '冷却中，无法提交题目。'}
 
         return None
@@ -174,7 +174,7 @@ class Checker:
             return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '提示状态异常，请通知工作人员'}
 
         current_ts = time.time()
-        unlock_puzzle_ts = user.team.game_status.unlock_puzzle_keys[puzzle_key]
+        unlock_puzzle_ts = user.team.game_state.unlock_puzzle_keys[puzzle_key]
         hint_cd = adhoc.hint_cd_after_puzzle_unlock(hint)
         if unlock_puzzle_ts + hint_cd > current_ts:
             store_user_log(
@@ -235,7 +235,7 @@ class Checker:
         # 判断是否到达解锁时间
         if req.ticket_type == 'MANUAL_HINT':
             puzzle_key = req.extra['puzzle_key']
-            if user.team.game_status.unlock_puzzle_keys[puzzle_key] + adhoc.MANUAL_HINT_COOLDOWN > time.time():
+            if user.team.game_state.unlock_puzzle_keys[puzzle_key] + adhoc.MANUAL_HINT_COOLDOWN > time.time():
                 store_user_log(
                     http_req,
                     'checker.on_team_create_ticket',

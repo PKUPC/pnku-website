@@ -6,17 +6,18 @@ from typing import TYPE_CHECKING
 from src import secret, utils
 from src.state.submission_state import SubmissionResult
 
-from ..team_puzzle_status import TeamPuzzleStatus
+from ..team_puzzle_state import TeamPuzzleState
 
 
 if TYPE_CHECKING:
     from src.state import Puzzle, Submission, Team
 
-    from ..team_game_state import TeamGameStatus
+    from ..team_game_state import TeamGameState
 
-STATE_TO_ANSWER = {1: '韭菜盒子', 2: '花', 3: '密西西比', 4: '一目十行', 5: '乔治盖莫夫'}
 
-ANSWERS = ['韭菜盒子', '花', '密西西比', '一目十行', '乔治盖莫夫']
+STATE_TO_ANSWER = {1: '相', 2: '力', 3: 'SAND', 4: '乏力', 5: '锦', 6: 'tuberose', 7: '巫', 8: 'HANDS'}
+
+ANSWERS = ['相', '力', 'sand', '乏力', '锦', 'tuberose', '巫', 'hands']
 
 if secret.DEBUG_MODE:
     COOLDOWN_TIME = 2
@@ -24,11 +25,20 @@ else:
     COOLDOWN_TIME = 30
 
 
-class Day201Status(TeamPuzzleStatus):
-    def __init__(self, game_status: TeamGameStatus, team: Team, puzzle: Puzzle):
-        super().__init__(game_status, team, puzzle)
+class Day320State(TeamPuzzleState):
+    def __init__(self, game_state: TeamGameState, team: Team, puzzle: Puzzle):
+        super().__init__(game_state, team, puzzle)
         self.state_id = 1
-        self.submission_set_by_id: dict[int, set[str]] = {1: set(), 2: set(), 3: set(), 4: set(), 5: set()}
+        self.submission_set_by_id: dict[int, set[str]] = {
+            1: set(),
+            2: set(),
+            3: set(),
+            4: set(),
+            5: set(),
+            6: set(),
+            7: set(),
+            8: set(),
+        }
         self.submission_set = self.submission_set_by_id[1]
 
     def handle_wrong_submission(self, submission: Submission) -> None:
@@ -53,10 +63,10 @@ class Day201Status(TeamPuzzleStatus):
     def test_submission(self, submission: str) -> SubmissionResult:
         cleaned_submission = utils.clean_submission(submission)
         if cleaned_submission == utils.clean_submission(STATE_TO_ANSWER[self.state_id]):
-            if self.state_id != 5:
+            if self.state_id != 8:
                 return SubmissionResult('milestone', '答案正确！请继续回答下一个小题。')
             else:
-                return SubmissionResult('pass', '答案正确！', trigger_value='乔治盖莫夫')
+                return SubmissionResult('pass', '答案正确！', trigger_value='HANDS')
 
         return SubmissionResult('wrong', '答案错误！你没有得到任何信息！')
 

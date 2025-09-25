@@ -5,7 +5,7 @@ import time
 from typing import TYPE_CHECKING
 
 from src import secret
-from src.adhoc import StaffTeamGameStatus, TeamGameStatus
+from src.adhoc import StaffTeamGameState, TeamGameState
 from src.store import (
     BuyNormalHintEvent,
     GameStartEvent,
@@ -158,9 +158,9 @@ class Team(WithGameLifecycle):
         self.bought_hint_ids: set[int] = set()
 
         # 游戏解锁状态
-        self.game_status: TeamGameStatus = TeamGameStatus(self, self.game.puzzles.list)
-        self.gaming: bool = False  # TODO: 这个状态应该放进 TeamGameStatus
-        self.game_start_time: int = -1  # TODO: 这个状态应该放进 TeamGameStatus
+        self.game_state: TeamGameState = TeamGameState(self, self.game.puzzles.list)
+        self.gaming: bool = False  # TODO: 这个状态应该放进 TeamGameState
+        self.game_start_time: int = -1  # TODO: 这个状态应该放进 TeamGameState
 
     @property
     def preparing(self) -> bool:
@@ -193,7 +193,7 @@ class Team(WithGameLifecycle):
                 self.ap_change = 0
                 self.spap_change = 0
                 self.bought_hint_ids = set()
-                self.game_status = TeamGameStatus(self, self.game.puzzles.list)
+                self.game_state = TeamGameState(self, self.game.puzzles.list)
                 self.gaming = False
                 self.game_start_time = -1
                 # self.game.log("debug", "team.on_preparing_to_reload_team_event", f"T#{self.model.id} done!")
@@ -205,7 +205,7 @@ class Team(WithGameLifecycle):
         match event.model.info:
             case SubmissionEvent(submission_id=submission_id):
                 submission = self.game.submissions_by_id[submission_id]
-                self.game_status.on_submission(submission, is_reloading)
+                self.game_state.on_submission(submission, is_reloading)
                 if submission.result.type == 'pass':
                     for _, board in self.game.boards.items():
                         if submission.puzzle.on_simple_board(board.key):
@@ -241,7 +241,7 @@ class Team(WithGameLifecycle):
                 self.gaming = True
                 self.game.need_updating_scoreboard = True
                 self.game_start_time = event.model.created_at // 1000
-                self.game_status.team_start_game(event.model.created_at // 1000, is_reloading)
+                self.game_state.team_start_game(event.model.created_at // 1000, is_reloading)
                 if not is_reloading:
                     self.game.worker.emit_ws_message(
                         {'type': 'normal', 'to_users': self.member_ids, 'payload': {'type': 'game_start'}}
@@ -343,7 +343,7 @@ class Team(WithGameLifecycle):
         self.total_score = 0
         self.score_by_board = {}
 
-        for puzzle, submission in self.game_status.passed_puzzles:
+        for puzzle, submission in self.game_state.passed_puzzles:
             score = submission.gained_score()
             for board in self.game.boards:
                 board_key = self.game.boards[board].key
@@ -363,7 +363,7 @@ class Team(WithGameLifecycle):
         self.total_score += score
 
     def get_submissions_by_puzzle_key(self, puzzle_key: str) -> list[Submission]:
-        return [x for x in self.game_status.submissions if x.store.puzzle_key == puzzle_key]
+        return [x for x in self.game_state.submissions if x.store.puzzle_key == puzzle_key]
 
     def get_default_ap_by_timestamp_s(self, timestamp_s: int) -> int:
         cur_ap_policy = self.game.policy.calc_ap_increase_policy_by_team(self)
@@ -445,11 +445,11 @@ class Team(WithGameLifecycle):
 
     @property
     def last_success_submission(self) -> Submission | None:
-        return self.game_status.success_submissions[-1] if len(self.game_status.success_submissions) > 0 else None
+        return self.game_state.success_submissions[-1] if len(self.game_state.success_submissions) > 0 else None
 
     @property
     def last_submission(self) -> Submission | None:
-        return self.game_status.submissions[-1] if len(self.game_status.submissions) > 0 else None
+        return self.game_state.submissions[-1] if len(self.game_state.submissions) > 0 else None
 
     @property
     def leader_and_members(self) -> list[str]:
@@ -502,7 +502,7 @@ class Team(WithGameLifecycle):
         elif self.gaming:
             rst.append({'text': '已开始游戏', 'color': 'blue'})
         # 是否完赛
-        if self.game_status.finished:
+        if self.game_state.finished:
             rst.append({'text': '已完赛', 'color': 'green'})
         # 是否封禁
         if self.model.ban_status == TeamStore.BanStatus.BANNED.name:
@@ -530,7 +530,7 @@ class StaffTeam(Team):
         super().__init__(game, store)
         self.is_staff_team = True
         self.gaming = False
-        self.game_status = StaffTeamGameStatus(self, self.game.puzzles.list)
+        self.game_state = StaffTeamGameState(self, self.game.puzzles.list)
 
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
         match reloading_type:
@@ -543,7 +543,7 @@ class StaffTeam(Team):
                 self.ap_change = 0
                 self.spap_change = 0
                 self.bought_hint_ids = set()
-                self.game_status = StaffTeamGameStatus(self, self.game.puzzles.list)
+                self.game_state = StaffTeamGameState(self, self.game.puzzles.list)
                 self.is_staff_team = True
                 self.gaming = False
                 self.game_start_time = -1
@@ -556,7 +556,7 @@ class StaffTeam(Team):
         match event.model.info:
             case SubmissionEvent(submission_id=submission_id):
                 submission = self.game.submissions_by_id[submission_id]
-                self.game_status.on_submission(submission, is_reloading)
+                self.game_state.on_submission(submission, is_reloading)
 
         self.team_events.append(event)
 

@@ -3,13 +3,13 @@ from __future__ import annotations
 from src import utils
 from src.state.submission_state import SubmissionResult
 
-from ..team_puzzle_status import TeamPuzzleStatus
+from ..team_puzzle_state import TeamPuzzleState
 
 
 ANSWER_STRING = '梦中的' * 36
 
 
-class Day2Meta(TeamPuzzleStatus):
+class Day2Meta(TeamPuzzleState):
     def test_submission(self, submission: str) -> SubmissionResult:
         cleaned_submission = utils.clean_submission(submission)
         # 检查除了正确答案之外的 trigger

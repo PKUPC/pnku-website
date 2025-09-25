@@ -116,7 +116,7 @@ async def time_machine(req: Request, body: TimeMachineParam, worker: Worker, use
                 {'year': body.year, 'month': body.month, 'day': body.day},
             )
             return {'status': 'error', 'title': 'ABNORMAL', 'message': '非法操作！'}
-        if 'day2_05' not in user.team.game_status.unlock_puzzle_keys:
+        if 'day2_05' not in user.team.game_state.unlock_puzzle_keys:
             store_user_log(
                 req,
                 'api.special.day2_05',

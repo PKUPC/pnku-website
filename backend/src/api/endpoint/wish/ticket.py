@@ -82,7 +82,7 @@ async def request_hint(req: Request, body: RequestHintParam, worker: Worker, use
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
     # 此时 puzzle_key 一定是存在的
-    if puzzle_key not in user.team.game_status.unlock_puzzle_keys:
+    if puzzle_key not in user.team.game_state.unlock_puzzle_keys:
         store_user_log(req, 'api.ticket.request_hint', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
 
@@ -147,7 +147,7 @@ async def get_manual_hints(req: Request, body: GetHintListParam, worker: Worker,
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
     # 此时 puzzle_key 一定是存在的
-    if puzzle_key not in user.team.game_status.unlock_puzzle_keys:
+    if puzzle_key not in user.team.game_state.unlock_puzzle_keys:
         store_user_log(req, 'api.ticket.get_manual_hints', 'abnormal', '题目未解锁。', {'puzzle_key': puzzle_key})
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
 
@@ -166,7 +166,7 @@ async def get_manual_hints(req: Request, body: GetHintListParam, worker: Worker,
         )
     rst: dict[str, Any] = {'list': hint_list}
 
-    effective_after_ts = user.team.game_status.unlock_puzzle_keys[puzzle_key] + adhoc.MANUAL_HINT_COOLDOWN
+    effective_after_ts = user.team.game_state.unlock_puzzle_keys[puzzle_key] + adhoc.MANUAL_HINT_COOLDOWN
     rst['effective_after_ts'] = effective_after_ts
     # 先判断现在是否能申请神谕
     if effective_after_ts > time.time():

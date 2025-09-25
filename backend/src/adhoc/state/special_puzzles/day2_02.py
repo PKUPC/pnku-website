@@ -5,19 +5,19 @@ import time
 from collections.abc import Hashable
 from typing import TYPE_CHECKING
 
-from ..team_puzzle_status import TeamPuzzleStatus
+from ..team_puzzle_state import TeamPuzzleState
 
 
 if TYPE_CHECKING:
     from src.state import Puzzle, Team
     from src.store import PuzzleActionEvent
 
-    from ..team_game_state import TeamGameStatus
+    from ..team_game_state import TeamGameState
 
 
-class Day202Status(TeamPuzzleStatus):
-    def __init__(self, game_status: TeamGameStatus, team: Team, puzzle: Puzzle):
-        super().__init__(game_status, team, puzzle)
+class Day202State(TeamPuzzleState):
+    def __init__(self, game_state: TeamGameState, team: Team, puzzle: Puzzle):
+        super().__init__(game_state, team, puzzle)
         self.real_seconds = -1
         self.target_seconds = -1
 

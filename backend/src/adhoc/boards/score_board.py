@@ -32,7 +32,7 @@ class ScoreBoard(Board):
             team, score = x
             # 小的在前面
             return (
-                team.game_status.finished_timestamp_s if team.game_status.finished else 90000000000,
+                team.game_state.finished_timestamp_s if team.game_state.finished else 90000000000,
                 -score,
                 -1 if team.last_success_submission is None else team.last_success_submission.store.id,
                 team.model.created_at,
@@ -81,8 +81,8 @@ class ScoreBoard(Board):
                     'n': team.model.team_name or '--',
                     'in': team.model.team_info,
                     'ms': team.leader_and_members,
-                    'f': team.game_status.finished,
-                    'fts': team.game_status.finished_timestamp_s,
+                    'f': team.game_state.finished,
+                    'fts': team.game_state.finished_timestamp_s,
                     's': score,
                     'lts': int(team.last_success_submission.store.created_at / 1000)
                     if team.last_success_submission
@@ -101,7 +101,7 @@ class ScoreBoard(Board):
                             sub.store.created_at,
                             sub.gained_score(),
                         ]
-                        for sub in team.game_status.success_submissions
+                        for sub in team.game_state.success_submissions
                         if sub.store.created_at <= board_end_ts * 1000
                     ],
                 }

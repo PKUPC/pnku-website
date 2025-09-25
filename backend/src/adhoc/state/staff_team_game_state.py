@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING, Any
 
 from src.store import PuzzleActionEvent
 
-from .team_game_state import TeamGameStatus
+from .team_game_state import TeamGameState
 
 
 if TYPE_CHECKING:
     from src.state import Puzzle, Submission, SubmissionResult, Team
 
 
-class StaffTeamGameStatus(TeamGameStatus):
+class StaffTeamGameState(TeamGameState):
     """
     只跟游戏进程有关的类，只影响与解谜本身相关的进度，包括解锁状态、特殊谜题状态等。
     """
@@ -32,15 +32,15 @@ class StaffTeamGameStatus(TeamGameStatus):
         # 和普通队伍不同的是，staff 队伍不需要解锁谜题，所以所有解锁相关的都不需要处理
         # 顺便，staff 队伍的 submission type 也都跟普通队伍区分开，用于做一些特殊处理
         self.submissions.append(submission)
-        self.puzzle_status_by_key[submission.puzzle.model.key].on_submission(submission, is_reloading)
+        self.puzzle_state_by_key[submission.puzzle.model.key].on_submission(submission, is_reloading)
         # staff 重复提交答案的问题
-        self.puzzle_status_by_key[submission.puzzle.model.key].submission_set.clear()
+        self.puzzle_state_by_key[submission.puzzle.model.key].submission_set.clear()
 
     def test_submission(self, puzzle_key: str, submission: str) -> SubmissionResult:
         """
         检查 submission 的结果，不更改状态
         """
-        test_rst = self.puzzle_status_by_key[puzzle_key].test_submission(submission)
+        test_rst = self.puzzle_state_by_key[puzzle_key].test_submission(submission)
         match test_rst.type:
             case 'pass':
                 test_rst.type = 'staff_pass'
@@ -63,7 +63,7 @@ class StaffTeamGameStatus(TeamGameStatus):
             {"status": 2, "image", "test.png"}
         后由 jinja2 渲染。
         """
-        return self.puzzle_status_by_key[puzzle_key].get_render_info()
+        return self.puzzle_state_by_key[puzzle_key].get_render_info()
 
     def add_unlock_puzzle(self, puzzle_key: str, unlock_ts: int, is_reloading: bool) -> None:
         assert False
@@ -72,17 +72,17 @@ class StaffTeamGameStatus(TeamGameStatus):
         assert False
 
     def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
-        if event.puzzle_key in self.puzzle_status_by_key:
+        if event.puzzle_key in self.puzzle_state_by_key:
             self.puzzle_actions[event.puzzle_key].append(event)
-            self.puzzle_status_by_key[event.puzzle_key].on_puzzle_action(event)
+            self.puzzle_state_by_key[event.puzzle_key].on_puzzle_action(event)
         else:
             self.team.game.log('warning', 'TeamGameStatus.on_puzzle_action', f'Unknown puzzle_key: {event.puzzle_key}')
 
     def get_submission_set(self, puzzle_key: str) -> set[str]:
-        return self.puzzle_status_by_key[puzzle_key].submission_set
+        return self.puzzle_state_by_key[puzzle_key].submission_set
 
     def get_correct_answers(self, puzzle_key: str) -> list[str]:
-        return self.puzzle_status_by_key[puzzle_key].correct_answers
+        return self.puzzle_state_by_key[puzzle_key].correct_answers
 
     def get_dyn_actions(self, puzzle_key: str) -> list[dict[str, Any]]:
-        return self.puzzle_status_by_key[puzzle_key].get_dyn_actions()
+        return self.puzzle_state_by_key[puzzle_key].get_dyn_actions()

@@ -77,9 +77,9 @@ class SpeedRunBoard(Board):
                 if team.is_hidden or team.is_banned:
                     return
 
-                assert puzzle.model.key in team.game_status.unlock_puzzle_keys, '答案正确时肯定已经通过了！'
+                assert puzzle.model.key in team.game_state.unlock_puzzle_keys, '答案正确时肯定已经通过了！'
                 time_cost = (
-                    int(submission.store.created_at / 1000) - team.game_status.unlock_puzzle_keys[puzzle.model.key]
+                    int(submission.store.created_at / 1000) - team.game_state.unlock_puzzle_keys[puzzle.model.key]
                 )
                 self.fast_teams.setdefault(puzzle.model.key, [])
                 record_list = self.fast_teams[puzzle.model.key]
