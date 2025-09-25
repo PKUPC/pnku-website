@@ -97,13 +97,9 @@ class TeamEventStore(Table):
 
     def validated_model(self) -> TeamEventStoreModel:
         """
-        assert model is validated
+        return pydantic 验证后的 model，可能会抛异常，需要处理。
         """
-        try:
-            model = TeamEventStoreModel.model_validate(self)
-        except ValidationError:
-            assert False
-        return model
+        return TeamEventStoreModel.model_validate(self)
 
     def validate(self) -> tuple[bool, ValidationError | None]:
         try:

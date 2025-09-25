@@ -5,6 +5,7 @@ from .http_tools import add_cookie
 from .jwt_tools import jwt_decode, jwt_encode
 from .logging import LogLevel, log_slow, make_logging_handlers
 from .media import media_wrapper, prepare_media_files, update_media_files
+from .pydantic_utils import validate_time_minute_str, validate_time_second_str
 from .recaptcha import check_recaptcha_response
 from .string_tools import (
     check_string,
@@ -48,4 +49,6 @@ __all__ = [
     'sys_status',
     'pure_render_template',
     'render_template',
+    'validate_time_minute_str',
+    'validate_time_second_str',
 ]
