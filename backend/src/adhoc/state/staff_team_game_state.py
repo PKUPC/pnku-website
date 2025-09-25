@@ -9,7 +9,9 @@ from .team_game_state import TeamGameState
 
 
 if TYPE_CHECKING:
-    from src.state import Puzzle, Submission, SubmissionResult, Team
+    from src.state import Puzzle, Submission, Team
+
+    from .team_puzzle_state import SubmissionResult
 
 
 class StaffTeamGameState(TeamGameState):

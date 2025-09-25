@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any
 
 from src import secret, utils
 from src.adhoc.constants import PuzzleVisibleStatusLiteral
-from src.state.submission_state import SubmissionResult
 from src.store import PuzzleActionEvent
 
 
@@ -18,6 +17,45 @@ if secret.DEBUG_MODE:
     COOLDOWN_TIME = 2
 else:
     COOLDOWN_TIME = 60
+
+
+class SubmissionResult:
+    def __init__(
+        self,
+        sub_type: str,
+        sub_info: str,
+        *,
+        trigger_value: str = '',
+        extra: str = '',
+        pass_after_meta: bool = False,
+        pass_after_finished: bool = False,
+    ) -> None:
+        self.type = sub_type
+        self.info = sub_info
+        self.trigger_value = trigger_value
+        self.extra = extra
+        self.pass_after_meta = pass_after_meta
+        self.pass_after_finished = pass_after_finished
+
+    def describe_status(self) -> str:
+        match self.type:
+            case 'wrong':
+                return '答案错误'
+            case 'pass':
+                return '答案正确'
+            case 'multipass':
+                return '答案正确'
+            case 'milestone':
+                return '里程碑'
+            case 'staff_wrong':
+                return '答案错误'
+            case 'staff_pass':
+                return '答案正确'
+            case _:
+                return ''
+
+    def __repr__(self) -> str:
+        return f'SubmissionResult[{self.type}, {self.info}, {self.trigger_value}, {self.extra}]'
 
 
 class TeamPuzzleState:

@@ -4,9 +4,8 @@ from collections.abc import Hashable
 from typing import TYPE_CHECKING
 
 from src import secret, utils
-from src.state.submission_state import SubmissionResult
 
-from ..team_puzzle_state import TeamPuzzleState
+from ..team_puzzle_state import SubmissionResult, TeamPuzzleState
 
 
 if TYPE_CHECKING:

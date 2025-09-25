@@ -6,7 +6,7 @@ from .game_state import Game
 from .hint_state import Hint, Hints
 from .message_state import Messages
 from .puzzle_state import Puzzle, Puzzles
-from .submission_state import Submission, SubmissionResult
+from .submission_state import Submission
 from .team_event_state import TeamEvent
 from .team_state import Team, Teams
 from .ticket_state import Ticket, Tickets
@@ -25,7 +25,6 @@ __all__ = [
     'Puzzle',
     'Puzzles',
     'Submission',
-    'SubmissionResult',
     'TeamEvent',
     'Team',
     'Teams',
