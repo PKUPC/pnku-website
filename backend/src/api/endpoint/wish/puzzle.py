@@ -350,10 +350,21 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
             )
             continue
 
+        # hash hint id
+        hashed_hint_id = worker.game_nocheck.hint_id_to_hash[hint.model.id]
+        if user.is_staff:
+            hashed_hint_id = hint.model.id
+
+        # 玩家冷却时看不到标题
+        if not user.is_staff and effective_after_ts > current_ts:
+            question = '这个提示以后再来探索吧！'
+        else:
+            question = hint.model.question
+
         rst.append(
             {
-                'id': hint.model.id,
-                'question': hint.model.question,
+                'id': hashed_hint_id,
+                'question': question,
                 'answer': hint.model.answer if (user.is_staff or hint.model.id in user.team.bought_hint_ids) else '',
                 'type': HintStore.HintType.dict().get(hint.model.type, '未知'),
                 'price': price,
@@ -411,12 +422,21 @@ async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: User 
     puzzle = worker.game_nocheck.puzzles.puzzle_by_key.get(puzzle_key, None)
     assert puzzle is not None
 
+    real_hint_id = body.hint_id
+    if not user.is_staff:
+        real_hint_id = worker.game_nocheck.hash_to_hint_id.get(body.hint_id, -1)
+        if real_hint_id == -1:
+            store_user_log(
+                req, 'api.puzzle.buy_hint', 'abnormal', 'hash_to_hint_id 失败。', {'body_hint_id': body.hint_id}
+            )
+            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '提示不存在！'}
+
     store_user_log(
         req,
         'api.puzzle.buy_hint',
         'buy_hint',
         '',
-        {'body_puzzle_key': body.puzzle_key, 'real_puzzle_key': puzzle_key, 'hint_id': body.hint_id},
+        {'body_puzzle_key': body.puzzle_key, 'real_puzzle_key': puzzle_key, 'hint_id': real_hint_id},
     )
 
     assert user.model.team_id is not None
@@ -426,7 +446,7 @@ async def buy_hint(req: Request, body: BuyHintParam, worker: Worker, user: User 
             client=worker.process_name,
             user_id=user.model.id,
             team_id=user.model.team_id,
-            hint_id=body.hint_id,
+            hint_id=real_hint_id,
             puzzle_key=puzzle_key,
         )
     )

@@ -66,6 +66,9 @@ class Game(WithGameLifecycle):
         self.hash_to_team_and_key: dict[str, tuple[int, str]] = {}
         self.puzzle_key_to_hash: dict[str, str] = {}
         self.hash_to_puzzle_key: dict[str, str] = {}
+        # hint id hash
+        self.hint_id_to_hash: dict[int, int] = {}
+        self.hash_to_hint_id: dict[int, int] = {}
         # submission 是一个特殊的状态
         # submission 应该是 team event 中的一种，但是合并进去又会让处理变得很麻烦
         # 这里的 submission 相当于是 SubmissionEvent 附带的一个状态对象，在 on_team_event 时更新

@@ -1,6 +1,6 @@
 from .email import send_email, send_reg_email
 from .enum import EnhancedEnum
-from .hash_tools import calc_md5, calc_sha1
+from .hash_tools import calc_md5, calc_sha1, hash_int
 from .http_tools import add_cookie
 from .jwt_tools import jwt_decode, jwt_encode
 from .logging import LogLevel, log_slow, make_logging_handlers
@@ -26,6 +26,7 @@ __all__ = [
     'EnhancedEnum',
     'calc_md5',
     'calc_sha1',
+    'hash_int',
     'add_cookie',
     'jwt_encode',
     'jwt_decode',
