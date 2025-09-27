@@ -37,6 +37,7 @@ class HintView(BaseView):
     }
 
     form_overrides = {
+        'answer': fields.MarkdownField,
         'effective_after_ts': fields.TimestampSField,
         'extra': HintExtraField,
     }
