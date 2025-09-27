@@ -5,6 +5,7 @@ import { KeyedMutator } from 'swr';
 
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import NamedIcon from '@/components/NamedIcon';
+import { SimpleTemplateStr } from '@/components/Template';
 import { WishError } from '@/components/WishError.tsx';
 import { useCooldown } from '@/hooks/useCooldown';
 import { GameStatusContext, useTheme } from '@/logic/contexts.ts';
@@ -183,7 +184,7 @@ function UnlockedHint({ hint }: { hint: Wish.Puzzle.HintItem }) {
                     <Tag>{hint.type}</Tag>
                 </span>
             ),
-            children: hint.answer,
+            children: <SimpleTemplateStr name="hint">{hint.answer}</SimpleTemplateStr>,
         },
     ];
     return <Collapse items={collapseItem} key={`hint-collapse-${hint.id}`} />;

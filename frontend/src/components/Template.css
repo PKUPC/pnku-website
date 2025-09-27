@@ -1,0 +1,7 @@
+/* 本文件用于覆盖特定类型的 template 的样式 */
+.template-hint {
+  p {
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+  }
+}

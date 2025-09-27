@@ -9,6 +9,7 @@ import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import { Reloader } from '@/components/Reloader';
 import { fetchTemplateFile } from '@/logic/wish';
 
+import './Template.css';
 import styles from './Template.module.css';
 
 export function SimpleTemplateStr({ name, children }: { name: string; children: string }) {
