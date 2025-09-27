@@ -8,7 +8,7 @@ import { PushClient } from '@/logic/WsClient';
 import { GameInfoContext, GameInfoContextType, GameStatusContext } from '@/logic/contexts.ts';
 
 export function PushDaemon({ info, reloadInfo }: GameInfoContextType) {
-    const { setNeedReloadAnnouncement, setHasNewMessage, setNeedReloadArea, updateCurrentAp } =
+    const { setNeedReloadAnnouncement, setHasNewMessage, setNeedReloadArea, updateAllCurrencies } =
         useContext(GameStatusContext);
     const [wsNotification, contextHolder] = notification.useNotification({
         stack: { threshold: 3 },
@@ -35,7 +35,7 @@ export function PushDaemon({ info, reloadInfo }: GameInfoContextType) {
                 setNeedReloadAnnouncement,
                 setHasNewMessage,
                 setNeedReloadArea,
-                updateCurrentAp,
+                updateAllCurrencies,
                 mutate,
             );
             return () => {
@@ -49,7 +49,7 @@ export function PushDaemon({ info, reloadInfo }: GameInfoContextType) {
         setHasNewMessage,
         setNeedReloadAnnouncement,
         setNeedReloadArea,
-        updateCurrentAp,
+        updateAllCurrencies,
         wsNotification,
     ]);
 

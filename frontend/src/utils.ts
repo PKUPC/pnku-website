@@ -191,39 +191,40 @@ export function decodeBase64ToObject(encoded: string): object | undefined {
     }
 }
 
-export function calcCurrentActionPoints(ap_increase_policy: [number, number][], current_ap_change: number) {
+// ATTENTION: 这是以前的货币计算方案
+// 在这个方案中，当前的货币是根据总消费 + 随时间的总增长计算的
+// 这个模式下限定了货币的增加模式，之后可能会修改
+export function calcCurrentActionPoints(increase_policy: [number, number][], balance_change: number) {
     const curMin = Math.floor(Date.now() / 1000 / 60);
     // console.log(curMin);
-    let ap = 0;
-    for (let i = 0; i < ap_increase_policy.length - 1; i++) {
-        if (curMin > ap_increase_policy[i + 1][0])
-            ap += (ap_increase_policy[i + 1][0] - ap_increase_policy[i][0]) * ap_increase_policy[i][1];
-        else if (curMin <= ap_increase_policy[i][0]) break;
+    let balance = 0;
+    for (let i = 0; i < increase_policy.length - 1; i++) {
+        if (curMin > increase_policy[i + 1][0])
+            balance += (increase_policy[i + 1][0] - increase_policy[i][0]) * increase_policy[i][1];
+        else if (curMin <= increase_policy[i][0]) break;
         else {
-            ap += (curMin - ap_increase_policy[i][0]) * ap_increase_policy[i][1];
+            balance += (curMin - increase_policy[i][0]) * increase_policy[i][1];
             break;
         }
     }
-    const lastIdx = ap_increase_policy.length - 1;
-    if (curMin > ap_increase_policy[lastIdx][0])
-        ap += (curMin - ap_increase_policy[lastIdx][0]) * ap_increase_policy[lastIdx][1];
-    // console.log(ap);
-    ap += current_ap_change;
-    console.log(ap_increase_policy, ap);
-    return ap;
+    const lastIdx = increase_policy.length - 1;
+    if (curMin > increase_policy[lastIdx][0])
+        balance += (curMin - increase_policy[lastIdx][0]) * increase_policy[lastIdx][1];
+    // console.log(balance);
+    balance += balance_change;
+    console.log(increase_policy, balance);
+    return balance;
 }
 
-export function getCurrentApIncrease(ap_increase_policy: [number, number][]) {
+export function getCurrentIncrease(increase_policy: [number, number][]) {
     const curMin = Math.floor(Date.now() / 1000 / 60);
-
-    if (curMin < ap_increase_policy[0][0]) return 0;
-    for (let i = 0; i < ap_increase_policy.length - 1; i++) {
-        if (curMin < ap_increase_policy[i + 1][0] && curMin >= ap_increase_policy[i][0])
-            return ap_increase_policy[i][1];
+    if (increase_policy.length === 0) return 0;
+    if (curMin < increase_policy[0][0]) return 0;
+    for (let i = 0; i < increase_policy.length - 1; i++) {
+        if (curMin < increase_policy[i + 1][0] && curMin >= increase_policy[i][0]) return increase_policy[i][1];
     }
     // 这里应该恒成立
-    if (curMin >= ap_increase_policy[ap_increase_policy.length - 1][0])
-        return ap_increase_policy[ap_increase_policy.length - 1][1];
+    if (curMin >= increase_policy[increase_policy.length - 1][0]) return increase_policy[increase_policy.length - 1][1];
     return 0;
 }
 

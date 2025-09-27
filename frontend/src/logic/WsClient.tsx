@@ -25,7 +25,7 @@ export class PushClient {
     // private setHasNewAnnouncement: GameStatusContextType["setHasNewAnnouncement"];
     private readonly setHasNewMessage: GameStatusContextType['setHasNewMessage'];
     private readonly setNeedReloadArea: GameStatusContextType['setNeedReloadArea'];
-    private readonly updateCurrentAp: GameStatusContextType['updateCurrentAp'];
+    private readonly updateAllCurrencies: GameStatusContextType['updateAllCurrencies'];
 
     private swrMutate: ScopedMutator;
 
@@ -36,7 +36,7 @@ export class PushClient {
         // setHasNewAnnouncement: GameStatusContextType["setHasNewAnnouncement"],
         setHasNewMessage: GameStatusContextType['setHasNewMessage'],
         setNeedReloadArea: GameStatusContextType['setNeedReloadArea'],
-        updateCurrentAp: GameStatusContextType['updateCurrentAp'],
+        updateAllCurrencies: GameStatusContextType['updateAllCurrencies'],
         swrMutate: ScopedMutator,
     ) {
         this.ws = null;
@@ -48,7 +48,7 @@ export class PushClient {
         this.setNeedReloadAnnouncement = setNeedReloadAnnouncement;
         this.setHasNewMessage = setHasNewMessage;
         this.setNeedReloadArea = setNeedReloadArea;
-        this.updateCurrentAp = updateCurrentAp;
+        this.updateAllCurrencies = updateAllCurrencies;
         this.swrMutate = swrMutate;
 
         setTimeout(() => {
@@ -112,8 +112,8 @@ export class PushClient {
             }
             case 'staff_action': {
                 switch (data.action) {
-                    case 'modify_ap': {
-                        this.updateCurrentAp();
+                    case 'modify_currency': {
+                        this.updateAllCurrencies();
                         break;
                     }
                 }
@@ -139,7 +139,7 @@ export class PushClient {
                             endpoint: 'puzzle/get_hints',
                             payload: { puzzle_key: data.puzzle_key },
                         }).then();
-                        this.updateCurrentAp();
+                        this.updateAllCurrencies();
                         break;
                     }
                     case 'submission': {

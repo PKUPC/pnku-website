@@ -231,10 +231,10 @@ export function useHeaderMenu(compact: boolean = false) {
         if (info.team?.gaming && info.game.isGameBegin) {
             submenuItems.push({
                 type: 'link',
-                href: '/team/ap-history',
+                href: '/team/submission-history',
                 icon: <EveryUserIcon />,
                 label: '队伍动态',
-                key: '/team/ap-history',
+                key: '/team/submission-history',
             });
         }
 

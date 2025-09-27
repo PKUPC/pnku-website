@@ -1,22 +1,24 @@
 import { AimOutlined, FundOutlined, QuestionCircleOutlined, ThunderboltOutlined } from '@ant-design/icons';
 
-import { BuildingIcon, InstructionIcon, VacationIcon } from '@/SvgIcons';
+import { BuildingIcon, EyeIcon, InstructionIcon, VacationIcon } from '@/SvgIcons';
 
-export default function NamedIcon({ iconName }: { iconName: string }) {
+export default function NamedIcon({ iconName, style }: { iconName: string; style?: React.CSSProperties }) {
     switch (iconName) {
         case 'ranking':
-            return <FundOutlined />;
+            return <FundOutlined style={style} />;
         case 'first-blood':
-            return <AimOutlined />;
+            return <AimOutlined style={style} />;
         case 'building':
-            return <BuildingIcon />;
+            return <BuildingIcon style={style} />;
         case 'instruction':
-            return <InstructionIcon />;
+            return <InstructionIcon style={style} />;
         case 'vacation':
-            return <VacationIcon />;
+            return <VacationIcon style={style} />;
         case 'thunder':
-            return <ThunderboltOutlined />;
+            return <ThunderboltOutlined style={style} />;
+        case 'attention':
+            return <EyeIcon style={style} />;
         default:
-            return <QuestionCircleOutlined />;
+            return <QuestionCircleOutlined style={style} />;
     }
 }

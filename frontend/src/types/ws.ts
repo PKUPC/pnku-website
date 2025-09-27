@@ -39,7 +39,7 @@ export namespace WsClient {
 
     export type StaffActionData = {
         type: 'staff_action';
-        action: 'modify_ap';
+        action: 'modify_currency';
         message: string;
     };
 

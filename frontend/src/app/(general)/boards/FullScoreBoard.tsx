@@ -263,7 +263,7 @@ export function FullScoreBoard({ data, reload }: { data: Wish.Game.FullBoard; re
     return (
         <div>
             <BoardReloader reload={reload} />
-            <TopStarPlot data={data} />
+            {data.topstars.length > 0 && <TopStarPlot data={data} />}
 
             <br />
             {myTeamInfo && (

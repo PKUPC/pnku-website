@@ -1,8 +1,7 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 
+import { useCurrencies } from '@/hooks/useCurrency';
 import { GameStatusContext, useSuccessGameInfo } from '@/logic/contexts.ts';
-import { wish } from '@/logic/wish';
-import { calcCurrentActionPoints, getCurrentApIncrease } from '@/utils.ts';
 
 export function GameStatusContextProvider({ children }: { children: ReactNode }) {
     const [needReloadAnnouncement, setNeedReloadAnnouncement] = useState<boolean>(false);
@@ -12,33 +11,12 @@ export function GameStatusContextProvider({ children }: { children: ReactNode })
     const [staffUnreadOnly, setStaffUnreadOnly] = useState<boolean>(false);
     const [staffTimeDesc, setStaffTimeDesc] = useState<boolean>(false);
     const [hasNewMessage, setHasNewMessage] = useState<boolean>(false);
-    const [currentAp, setCurrentAp] = useState<number>(0);
-    const [currentApIncrease, setCurrentApIncrease] = useState<number>(0);
-    const [currentApChange, setCurrentApChange] = useState<number>(0);
-    const [currentApIncreasePolicy, setCurrentApIncreasePolicy] = useState<[number, number][]>([[0, 0]]);
+
+    const { currencies, syncAllCurrencies, updateAllCurrencies } = useCurrencies();
+
     const info = useSuccessGameInfo();
 
-    const updateCurrentAp = useCallback(() => {
-        wish({ endpoint: 'game/team_ap_detail' }).then((res) => {
-            if (res.status !== 'error') {
-                const teamApChange = res.data.team_ap_change;
-                const apIncreasePolicy = res.data.ap_increase_policy;
-                if (JSON.stringify(apIncreasePolicy) !== JSON.stringify(currentApIncreasePolicy))
-                    setCurrentApIncreasePolicy(apIncreasePolicy);
-                setCurrentApChange(teamApChange);
-                const tCurrentAp = calcCurrentActionPoints(apIncreasePolicy, teamApChange);
-                setCurrentAp(tCurrentAp);
-                setCurrentApIncrease(getCurrentApIncrease(apIncreasePolicy));
-                console.log('update current ap: ' + tCurrentAp);
-            }
-        });
-    }, [currentApIncreasePolicy]);
-
-    const updateCurrentApWithTime = useCallback(() => {
-        if (currentApIncreasePolicy) setCurrentAp(calcCurrentActionPoints(currentApIncreasePolicy, currentApChange));
-    }, [currentApChange, currentApIncreasePolicy]);
-
-    const initUpdateCurrentRef = useRef(updateCurrentAp);
+    const initUpdateCurrentRef = useRef(syncAllCurrencies);
 
     useEffect(() => {
         if (!info.user || !info.team || info.user.group === 'staff') return;
@@ -47,13 +25,13 @@ export function GameStatusContextProvider({ children }: { children: ReactNode })
 
     useEffect(() => {
         if (!info.user || !info.team || info.user.group === 'staff') return;
-        console.log('set update ap interval');
-        const interval = setInterval(updateCurrentApWithTime, 20 * 1000);
+        console.log('set update currency interval');
+        const interval = setInterval(updateAllCurrencies, 20 * 1000);
         return () => {
-            console.log('clear update ap interval');
+            console.log('clear update currency interval');
             clearInterval(interval);
         };
-    }, [info, updateCurrentApWithTime]);
+    }, [info, updateAllCurrencies]);
 
     return (
         <GameStatusContext.Provider
@@ -72,9 +50,9 @@ export function GameStatusContextProvider({ children }: { children: ReactNode })
                 setNeedReloadPuzzle,
                 needReloadArea,
                 setNeedReloadArea,
-                currentAp,
-                currentApIncrease,
-                updateCurrentAp,
+                currencies,
+                syncAllCurrencies,
+                updateAllCurrencies,
             }}
         >
             {children}

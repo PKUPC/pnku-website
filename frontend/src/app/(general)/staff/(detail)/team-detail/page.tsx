@@ -1,7 +1,6 @@
 import { useSearchParams } from 'react-router';
+import { Fragment } from 'react/jsx-runtime';
 
-import { TeamApCard } from '@/app/(general)/staff/(detail)/team-detail/TeamApCard.tsx';
-import { TeamApHistoryTable } from '@/app/(general)/staff/(detail)/team-detail/TeamApHistoryTable.tsx';
 import { TeamBanListCard } from '@/app/(general)/staff/(detail)/team-detail/TeamBanListCard.tsx';
 import { TeamInfoCard } from '@/app/(general)/staff/(detail)/team-detail/TeamInfoCard.tsx';
 import { TeamPassedPuzzleTable } from '@/app/(general)/staff/(detail)/team-detail/TeamPassedPuzzleTable.tsx';
@@ -10,6 +9,9 @@ import NotFound from '@/app/NotFound.tsx';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useWishData } from '@/logic/swrWrappers';
+
+import { TeamCurrencyCard } from './TeamCurrencyCard';
+import { TeamCurrencyHistoryTable } from './TeamCurrencyHistoryTable';
 
 function TeamDetailBody({ tid }: { tid: number }) {
     const { data, mutate } = useWishData({
@@ -23,13 +25,17 @@ function TeamDetailBody({ tid }: { tid: number }) {
         <div>
             <TeamInfoCard data={data} reloadData={mutate} />
             <br />
-            <TeamApCard data={data} reloadData={mutate} />
-            <br />
             <TeamBanListCard data={data} reloadData={mutate} />
             <br />
             <TeamSubmissionsTable data={data.submissions} />
-            <br />
-            <TeamApHistoryTable history={data.ap_change_history} />
+            {data.currency_status.map((currency) => (
+                <Fragment key={currency.type}>
+                    <br />
+                    <TeamCurrencyCard team_id={tid} data={currency} reloadData={mutate} />
+                    <br />
+                    <TeamCurrencyHistoryTable currencyDetail={currency} />
+                </Fragment>
+            ))}
             <br />
             <TeamPassedPuzzleTable data={data.passed_puzzles} />
         </div>
