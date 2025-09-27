@@ -170,9 +170,6 @@ class Checker:
             return {'status': 'error', 'title': 'NOT_EFFECTIVE', 'message': '提示当前不可用'}
 
         for price in hint.current_price:
-            print('DEBUG!!!')
-            print(user.team.cur_currency_by_type(price.type))
-            print(price.price)
             if user.team.cur_currency_by_type(price.type) < price.price:
                 return {'status': 'error', 'title': 'NO_ENOUGH_MONEY', 'message': f'{price.type.value}不足，无法购买'}
 

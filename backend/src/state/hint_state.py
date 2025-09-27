@@ -4,6 +4,7 @@ import time
 
 from typing import TYPE_CHECKING
 
+from src import secret, utils
 from src.store import HintStore, HintStoreModel, PriceModel
 
 from .base import WithGameLifecycle
@@ -91,6 +92,14 @@ class Hint(WithGameLifecycle):
         self.model: HintStoreModel = store.validated_model()
         assert self.model.puzzle_key in self.game.puzzles.puzzle_by_key
         self.puzzle = self.game.puzzles.puzzle_by_key[self.model.puzzle_key]
+        self.add_hint_id_hash()
+
+    def add_hint_id_hash(self) -> None:
+        hind_id_hash = utils.hash_int(secret.HINT_ID_HASH_SALT, self.model.id, 8)
+        while hind_id_hash in self.game.hash_to_hint_id:
+            hind_id_hash = utils.hash_int(secret.HINT_ID_HASH_SALT, self.model.id, 8)
+        self.game.hint_id_to_hash[self.model.id] = hind_id_hash
+        self.game.hash_to_hint_id[hind_id_hash] = self.model.id
 
     def on_store_update(self, new_store: HintStore) -> None:
         self._store = new_store

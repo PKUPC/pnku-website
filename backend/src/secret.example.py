@@ -71,6 +71,7 @@ GLITTER_SSRF_TOKEN = 'xxx'
 ADMIN_2FA_COOKIE = 'xxx'
 MEDIA_HASH_SALT = 'xxx'
 PUZZLE_KEY_HASH_SALT = 'xxx'
+HINT_ID_HASH_SALT = 'xxx'
 
 ###
 # 部署设置
