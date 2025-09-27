@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from src import secret, utils
@@ -122,6 +123,13 @@ class Hint(WithGameLifecycle):
 
     def on_preparing_to_reload_team_event(self, reloading_type: str) -> None:
         pass
+
+    def render_desc(self) -> str:
+        return self._render_template()
+
+    @lru_cache(128)
+    def _render_template(self) -> str:
+        return utils.pure_render_template(self.model.answer)
 
     def __repr__(self) -> str:
         return self.model.__repr__()

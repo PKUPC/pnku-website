@@ -6,7 +6,7 @@ import json
 import time
 
 from collections.abc import Awaitable, Callable, Sequence
-from functools import cache
+from functools import lru_cache
 from typing import Any
 
 import zmq
@@ -33,7 +33,7 @@ from .glitter import ActionResult
 from .utils import make_callback_decorator
 
 
-@cache
+@lru_cache(maxsize=128)
 def make_datebase_error(message: str) -> dict[str, str]:
     return {'status': 'error', 'title': 'DATABASE_ERROR', 'message': message}
 

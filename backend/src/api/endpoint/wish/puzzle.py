@@ -361,11 +361,15 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
         else:
             question = hint.model.question
 
+        answer = ''
+        if user.is_staff or hint.model.id in user.team.bought_hint_ids:
+            answer = hint.render_desc()
+
         rst.append(
             {
                 'id': hashed_hint_id,
                 'question': question,
-                'answer': hint.model.answer if (user.is_staff or hint.model.id in user.team.bought_hint_ids) else '',
+                'answer': answer,
                 'type': HintStore.HintType.dict().get(hint.model.type, '未知'),
                 'price': price,
                 'unlock': user.is_staff or hint.model.id in user.team.bought_hint_ids,
