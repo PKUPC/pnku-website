@@ -3,8 +3,8 @@ import { Button, Collapse, CollapseProps, Empty, Modal, Tag, Tooltip, message } 
 import { useContext } from 'react';
 import { KeyedMutator } from 'swr';
 
-import { EyeIcon } from '@/SvgIcons';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import NamedIcon from '@/components/NamedIcon';
 import { WishError } from '@/components/WishError.tsx';
 import { useCooldown } from '@/hooks/useCooldown';
 import { GameStatusContext, useTheme } from '@/logic/contexts.ts';
@@ -26,19 +26,100 @@ function LockedHint({
 }) {
     const [messageApi, messageContextHolder] = message.useMessage();
     const [modalApi, modalContextHolder] = Modal.useModal();
-    const { currentAp, updateCurrentAp } = useContext(GameStatusContext);
+    const { currencies, syncAllCurrencies } = useContext(GameStatusContext);
     const [cooling, countdown] = useCooldown(hint.effective_after_ts);
     const { color } = useTheme();
+
+    // 处理价格信息
+    const processPriceInfo = () => {
+        if (!hint.price || hint.price.length === 0) {
+            return {
+                canPurchase: false,
+                reason: '状态异常，请咨询工作人员',
+                priceElement: <span>无法购买</span>,
+                missingCurrencies: [],
+                unknownCurrencies: [],
+            };
+        }
+
+        const missingCurrencies: string[] = [];
+        const unknownCurrencies: string[] = [];
+        let canPurchase = true;
+
+        // 检查每种货币
+        for (const priceItem of hint.price) {
+            const currency = currencies.find((c) => c.type === priceItem.type);
+            if (!currency) {
+                unknownCurrencies.push(priceItem.type);
+                canPurchase = false;
+            } else if (currency.balance < priceItem.price) {
+                const shortage = priceItem.price - currency.balance;
+                missingCurrencies.push(
+                    `${currency.name} 缺少 ${(shortage / currency.denominator).toFixed(currency.precision)}`,
+                );
+                canPurchase = false;
+            }
+        }
+
+        // 生成价格文本
+        const priceElements = hint.price.map((priceItem) => {
+            const currency = currencies.find((c) => c.type === priceItem.type);
+            if (currency) {
+                return (
+                    <span key={priceItem.type}>
+                        {(priceItem.price / currency.denominator).toFixed(currency.precision)} {currency.name}{' '}
+                        <NamedIcon
+                            iconName={currency.icon}
+                            style={{ color: 'transparent', transform: 'translateY(0.1em)' }}
+                        />
+                    </span>
+                );
+            }
+            return (
+                <span key={priceItem.type}>
+                    {priceItem.price} {priceItem.type}
+                </span>
+            );
+        });
+
+        const priceElement =
+            priceElements.length === 1 ? (
+                priceElements[0]
+            ) : (
+                <span>
+                    {priceElements.map((element, index) => (
+                        <span key={index}>
+                            {element}
+                            {index < priceElements.length - 1 && ' 和 '}
+                        </span>
+                    ))}
+                </span>
+            );
+
+        // 生成无法购买的原因
+        let reason = '';
+        if (unknownCurrencies.length > 0) {
+            reason = '需要未知的货币';
+        } else if (missingCurrencies.length > 0) {
+            reason = missingCurrencies.join('; ');
+        }
+
+        return {
+            canPurchase,
+            reason,
+            priceElement,
+            missingCurrencies,
+            unknownCurrencies,
+        };
+    };
+
+    const priceInfo = processPriceInfo();
 
     const showConfirm = (hint: Wish.Puzzle.HintItem) => {
         modalApi.confirm({
             title: '购买提示确认',
             icon: <ExclamationCircleFilled />,
-            content: (
-                <span>
-                    该提示花费： {hint.cost} 注意力 <EyeIcon style={{ color: 'transparent' }} /> 。
-                </span>
-            ),
+            content: <span>该提示花费：{priceInfo.priceElement}</span>,
             onOk() {
                 wish({
                     endpoint: 'puzzle/buy_hint',
@@ -49,23 +130,14 @@ function LockedHint({
                     } else {
                         messageApi.success({ content: '购买成功', key: 'BuyHint', duration: 2 }).then();
                         mutate().then();
-                        updateCurrentAp();
+                        syncAllCurrencies();
                     }
                 });
             },
         });
     };
 
-    const hintTooExpensive = currentAp < hint.cost;
-    const hintExpensiveNotice = '注意力数量不足，请获取更多注意力再来解锁';
-
-    // const buttonText = cooling ? format_ts_to_HMS(countdown) :
-    //     <span>购买（ {hint.cost} {<EyeIcon style={{color: "transparent"}}/>}）</span>;
-    const buttonText = (
-        <span>
-            购买（ {hint.cost} {<EyeIcon style={{ color: 'transparent' }} />}）
-        </span>
-    );
+    const buttonText = <span>购买（{priceInfo.priceElement}）</span>;
 
     const collapseItem: CollapseProps['items'] = [
         {
@@ -80,8 +152,8 @@ function LockedHint({
                 </span>
             ),
             extra: (
-                <Tooltip title={hintTooExpensive ? hintExpensiveNotice : ''}>
-                    <Button size="small" disabled={hintTooExpensive || cooling} onClick={() => showConfirm(hint)}>
+                <Tooltip title={!priceInfo.canPurchase ? priceInfo.reason : ''}>
+                    <Button size="small" disabled={!priceInfo.canPurchase || cooling} onClick={() => showConfirm(hint)}>
                         {buttonText}
                     </Button>
                 </Tooltip>

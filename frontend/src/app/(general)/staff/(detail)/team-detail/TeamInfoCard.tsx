@@ -2,7 +2,6 @@ import { CheckCircleOutlined, FlagOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, Tooltip, message } from 'antd';
 import { useEffect, useState } from 'react';
 
-import CollapseCard from '@/components/CollapseCard';
 import FancyCard from '@/components/FancyCard';
 import { GeneralTag } from '@/components/GeneralTag';
 import { ProfileAvatar } from '@/components/ProfileAvatar.tsx';
@@ -43,31 +42,6 @@ export function TeamInfoCard({ data }: { data: StaffTeamDetail; reloadData: () =
     const onUpdateTeamInfo = () => {
         message.error('NOT IMPLEMENT').then();
     };
-
-    const collapseItems = [
-        {
-            key: '1',
-            label: '队伍成员列表',
-            children: (
-                <>
-                    {data.members.map((item) => (
-                        <div key={item.id} className="not-last:border-b-[1px] py-3 px-1 text-sm flex">
-                            <div className="flex items-center gap-2 flex-grow">
-                                <ProfileAvatar src={item.avatar_url} alt={item.nickname} size={'2rem'} />
-                                {item.nickname}
-                                {data.leader_id === item.id && (
-                                    <Tooltip placement="top" title={'队长'}>
-                                        <FlagOutlined />
-                                    </Tooltip>
-                                )}
-                                <GeneralTag color="blue" bordered={false}>{`UID ${item.id}`}</GeneralTag>
-                            </div>
-                        </div>
-                    ))}
-                </>
-            ),
-        },
-    ];
 
     return (
         <div className={styles.teamInfoCard}>
@@ -120,7 +94,22 @@ export function TeamInfoCard({ data }: { data: StaffTeamDetail; reloadData: () =
             </FancyCard>
             <br />
 
-            <CollapseCard items={collapseItems} />
+            <FancyCard title="队伍成员列表">
+                {data.members.map((item) => (
+                    <div key={item.id} className="not-last:border-b-[1px] py-3 px-1 text-sm flex">
+                        <div className="flex items-center gap-2 flex-grow">
+                            <ProfileAvatar src={item.avatar_url} alt={item.nickname} size={'2rem'} />
+                            {item.nickname}
+                            {data.leader_id === item.id && (
+                                <Tooltip placement="top" title={'队长'}>
+                                    <FlagOutlined />
+                                </Tooltip>
+                            )}
+                            <GeneralTag color="blue" bordered={false}>{`UID ${item.id}`}</GeneralTag>
+                        </div>
+                    </div>
+                ))}
+            </FancyCard>
         </div>
     );
 }

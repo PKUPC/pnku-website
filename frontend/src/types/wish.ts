@@ -1,5 +1,11 @@
 import React from 'react';
 
+// ADHOC: 在这里修改各种 adhoc 类型定义
+export namespace Adhoc {
+    // api 交互时统一为小写，大写字母形式显示在 url 中很怪
+    export type CurrencyType = 'attention';
+}
+
 export namespace Wish {
     export type ErrorRes = { status: 'error'; message: string; title: string };
     export type InfoRes = { status: 'info'; message: string; title: string };
@@ -189,6 +195,14 @@ export namespace Wish {
             subColor: string;
         };
 
+        export type CurrencyInfo = {
+            type: Adhoc.CurrencyType;
+            name: string;
+            icon: string;
+            denominator: number;
+            precision: number;
+        };
+
         export type GameInfoApi = {
             request: {
                 endpoint: 'game/game_info';
@@ -205,6 +219,7 @@ export namespace Wish {
                           isPrologueUnlock: boolean;
                           isGameBegin: boolean;
                           isGameEnd: boolean;
+                          currencies: CurrencyInfo[];
                       };
                       feature: {
                           push: boolean;
@@ -256,14 +271,25 @@ export namespace Wish {
             response: ErrorRes | (SuccessRes & { data: ListArea[] });
         };
 
-        export type GetTeamApDetailApi = {
+        // ADHOC: 根据需求修改可选的货币类型
+        export type GetTeamCurrencyDetailApi = {
             request: {
-                endpoint: 'game/team_ap_detail';
-                payload?: undefined;
+                endpoint: 'game/team_currency_detail';
+                payload: { currency_type: Adhoc.CurrencyType };
             };
             response:
                 | ErrorRes
-                | (SuccessRes & { data: { team_ap_change: number; ap_increase_policy: [number, number][] } });
+                | (SuccessRes & {
+                      data: {
+                          type: string;
+                          name: string;
+                          icon: string;
+                          denominator: number;
+                          precision: number;
+                          change: number;
+                          increase_policy: [number, number][];
+                      };
+                  });
         };
 
         export type GameStartApi = {
@@ -315,7 +341,7 @@ export namespace Wish {
             | GetPuzzleListApi
             | GetScheduleApi
             | GetStoryListApi
-            | GetTeamApDetailApi
+            | GetTeamCurrencyDetailApi
             | GetTeamListApi;
     }
 
@@ -421,13 +447,14 @@ export namespace Wish {
             response: ErrorRes | (SuccessRes & { data: PuzzleDetailData });
         };
 
+        export type HintPrice = { type: Adhoc.CurrencyType; price: number };
+
         export type HintItem = {
             id: number;
             question: string;
             answer: string;
             type: string;
-            provider: string;
-            cost: number;
+            price: HintPrice[];
             unlock: boolean;
             effective_after_ts: number;
         };
@@ -493,7 +520,18 @@ export namespace Wish {
 
         export type StaffTeamDetailPassedPuzzles = { title: string; timestamp_s: number };
 
-        export type StaffTeamDetailApChangeHistory = { change: number; info: string; timestamp_ms: number };
+        export type StaffTeamDetailCurrencyHistory = { change: number; info: string; timestamp_s: number };
+
+        export type StaffTeamDetailCurrency = {
+            type: Adhoc.CurrencyType;
+            name: string;
+            icon: string;
+            denominator: number;
+            precision: number;
+            current: number;
+            change: number;
+            history: StaffTeamDetailCurrencyHistory[];
+        };
 
         export type StaffTeamDetail = {
             team_id: number;
@@ -506,9 +544,7 @@ export namespace Wish {
                 nickname: string;
                 avatar_url: string;
             }[];
-            ap_change: number;
-            ap_change_history: StaffTeamDetailApChangeHistory[];
-            cur_ap: number;
+            currency_status: StaffTeamDetailCurrency[];
             submissions: StaffTeamDetailSubmission[];
             passed_puzzles: StaffTeamDetailPassedPuzzles[];
             ban_list: {
@@ -529,7 +565,7 @@ export namespace Wish {
         export type VMe50Api = {
             request: {
                 endpoint: 'staff/v_me_50';
-                payload: { team_id: number; ap_change: number; reason: string };
+                payload: { team_id: number; type: Adhoc.CurrencyType; change: number; reason: string };
             };
             response: NormalRes;
         };
@@ -683,21 +719,21 @@ export namespace Wish {
             response: NormalRes;
         };
 
-        export type TeamApHistorySingleRecord = {
+        export type TeamCurrencyHistorySingleRecord = {
             change: number;
-            cur_ap: number;
+            current: number;
             info: string;
-            timestamp_ms: number;
+            timestamp_s: number;
         };
 
-        export type TeamApHistory = { history: TeamApHistorySingleRecord[] };
+        export type TeamCurrencyHistory = { history: TeamCurrencyHistorySingleRecord[] };
 
-        export type GetApChangeHistoryApi = {
+        export type GetCurrencyChangeHistoryApi = {
             request: {
-                endpoint: 'team/get_ap_change_history';
-                payload: undefined;
+                endpoint: 'team/get_currency_change_history';
+                payload: { currency_type: Adhoc.CurrencyType };
             };
-            response: ErrorRes | (SuccessRes & TeamApHistory);
+            response: ErrorRes | (SuccessRes & TeamCurrencyHistory);
         };
 
         export type TeamPuzzleStatisticsItem = {
@@ -755,7 +791,7 @@ export namespace Wish {
             | UpdateExtraTeamInfoApi
             | JoinTeamApi
             | ChangeLeaderApi
-            | GetApChangeHistoryApi
+            | GetCurrencyChangeHistoryApi
             | GetPuzzleStatisticsApi
             | GetSubmissionHistoryApi;
     }

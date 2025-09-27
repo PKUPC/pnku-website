@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 import { KeyedMutator } from 'swr';
 
 import { InfoError } from '@/errors.ts';
-import { Wish } from '@/types/wish.ts';
+import { Adhoc, Wish } from '@/types/wish.ts';
 
 type PuzzleListConfig = 'off' | 'show' | 'drawer';
 
@@ -14,10 +14,24 @@ type SiteSettingContextType = {
 // @ts-ignore
 const SiteSettingContext = createContext<SiteSettingContextType>(undefined);
 
+export type CurrencyDetail = {
+    type: Adhoc.CurrencyType;
+    name: string;
+    icon: string;
+    denominator: number;
+    precision: number;
+    balance: number;
+    currentIncrease: number;
+    syncCurrency: () => void;
+    updateCurrency: () => void;
+};
+
 type GameStatusContextType = {
-    currentAp: number;
-    currentApIncrease: number;
-    updateCurrentAp: () => void;
+    // 货币相关
+    currencies: CurrencyDetail[];
+    syncAllCurrencies: () => void;
+    updateAllCurrencies: () => void;
+    // 全局状态，主要用于 websocket 触发自动刷新
     needReloadAnnouncement: boolean;
     setNeedReloadAnnouncement: React.Dispatch<React.SetStateAction<boolean>>;
     needReloadPuzzle: boolean;

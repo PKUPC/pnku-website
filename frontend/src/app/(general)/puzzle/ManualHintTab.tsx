@@ -1,6 +1,5 @@
 import { Alert } from 'antd';
 
-import ApStatus from '@/app/(general)/puzzle/components/ApStatus';
 import { ManualHintList } from '@/app/(general)/puzzle/components/ManualHintList.tsx';
 import { RequestManualHintPanel } from '@/app/(general)/puzzle/components/RequestManualHintPanel.tsx';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
@@ -10,6 +9,8 @@ import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';
 import { Wish } from '@/types/wish.ts';
 import { format_ts, format_ts_to_HMS } from '@/utils.ts';
+
+import { CurrencyStatusList } from './components/CurrencyStatus';
 
 function DisabledInfo({ disabledReason }: { disabledReason: string }) {
     return <Alert type={'warning'} message={disabledReason} />;
@@ -59,7 +60,7 @@ export function ManualHintTab({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDe
 
     return (
         <div>
-            <ApStatus />
+            <CurrencyStatusList />
             <br />
             {banned && <Alert type={'error'} showIcon={true} description={bannedText} />}
             {!banned && (

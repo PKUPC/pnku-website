@@ -19,7 +19,7 @@ import { PuzzlePage } from '@/app/(general)/puzzle/page.tsx';
 import { SettingPage } from '@/app/(general)/setting/page.tsx';
 import { StoryPage } from '@/app/(general)/story/page.tsx';
 import { TeamLayout } from '@/app/(general)/team/TeamLayout.tsx';
-import { ApHistoryPage } from '@/app/(general)/team/ap-history/page.tsx';
+import { CurrencyHistoryPage } from '@/app/(general)/team/currency-history/page.tsx';
 import { PuzzleStatisticsPage } from '@/app/(general)/team/puzzle-statistics/page.tsx';
 import { SubmissionHistoryPage } from '@/app/(general)/team/submission-history/page.tsx';
 import { TicketDetailPage } from '@/app/(general)/ticket-detail/page.tsx';
@@ -120,7 +120,7 @@ const routes: RouteObject[] = [
                         element: <TeamLayout />,
                         children: [
                             { index: true, element: <Navigate to="/about/introduction" /> },
-                            { path: '/team/ap-history', element: <ApHistoryPage /> },
+                            { path: '/team/currency-history', element: <CurrencyHistoryPage /> },
                             { path: '/team/puzzle-statistics', element: <PuzzleStatisticsPage /> },
                             { path: '/team/submission-history', element: <SubmissionHistoryPage /> },
                         ],
