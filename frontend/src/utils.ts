@@ -210,7 +210,6 @@ export function calcCurrentBalance(base_balance: number, increase_policy: [numbe
     const lastIdx = increase_policy.length - 1;
     if (curMin > increase_policy[lastIdx][0])
         balance += (curMin - increase_policy[lastIdx][0]) * increase_policy[lastIdx][1];
-    // console.log(balance);
     console.log(increase_policy, balance);
     return balance;
 }
