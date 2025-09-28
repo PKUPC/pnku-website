@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 
 import { FirstBloodBoard } from '@/app/(general)/boards/FirstBloodBoard.tsx';
 import { FullScoreBoard } from '@/app/(general)/boards/FullScoreBoard.tsx';

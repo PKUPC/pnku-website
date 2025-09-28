@@ -1,6 +1,6 @@
 import { Carousel, ConfigProvider } from 'antd';
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 import { FooterContent } from '@/components/FooterContent.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';

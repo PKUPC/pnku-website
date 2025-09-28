@@ -1,7 +1,7 @@
 import { FlagOutlined } from '@ant-design/icons';
 import { Alert, Input, message } from 'antd';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import NotFound from '@/app/NotFound.tsx';
 import { FancySlimContainer } from '@/components/FancySlimContainer';

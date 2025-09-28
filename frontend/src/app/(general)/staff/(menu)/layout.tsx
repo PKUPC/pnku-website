@@ -1,5 +1,5 @@
 import { ExceptionOutlined, TeamOutlined } from '@ant-design/icons';
-import { useLocation, useOutlet } from 'react-router';
+import { useLocation, useOutlet } from 'react-router-dom';
 
 import { HistoryIcon } from '@/SvgIcons';
 import { TabsNavbar } from '@/components/TabsNavbar.tsx';

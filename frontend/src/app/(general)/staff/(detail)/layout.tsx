@@ -1,4 +1,4 @@
-import { useNavigate, useOutlet } from 'react-router';
+import { useNavigate, useOutlet } from 'react-router-dom';
 
 import { LeftCircleIcon } from '@/SvgIcons';
 import { ClickTitle } from '@/components/LinkTitle';

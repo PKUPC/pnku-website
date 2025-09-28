@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => {
                         vendor: [
                             'react',
                             'react-dom',
-                            'react-router',
+                            'react-router-dom',
                             'react-timeago',
                             'react-copy-to-clipboard',
                             'react-google-recaptcha',

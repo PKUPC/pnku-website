@@ -1,7 +1,7 @@
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { Alert, Button, Empty, Input, Tag, message } from 'antd';
 import { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 import FancyCard from '@/components/FancyCard.tsx';
 import { SimpleTemplateStr } from '@/components/Template';
