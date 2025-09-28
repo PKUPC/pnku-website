@@ -26,7 +26,7 @@ export function TeamCurrencyHistoryTable({ currencyDetail }: { currencyDetail: W
                 <Table
                     size="small"
                     dataSource={data}
-                    rowKey="timestamp_ms"
+                    rowKey="timestamp_s"
                     scroll={{
                         x: 'max-content',
                     }}
