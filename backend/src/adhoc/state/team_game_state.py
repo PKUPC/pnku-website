@@ -136,8 +136,8 @@ class TeamGameState:
         assert puzzle_key in self.puzzle_state_by_key
         return self.puzzle_state_by_key[puzzle_key].visible
 
-    def get_currency_increase_policy(self, currency_type: CurrencyType) -> list[tuple[int, int]]:
-        return self.currency_state_by_type[currency_type].get_increase_policy()
+    def get_currency_increase_policy_from_last_event(self, currency_type: CurrencyType) -> list[tuple[int, int]]:
+        return self.currency_state_by_type[currency_type].increase_policy_from_last_event()
 
     def get_current_balance(self, currency_type: CurrencyType) -> int:
         return self.currency_state_by_type[currency_type].current_balance()
