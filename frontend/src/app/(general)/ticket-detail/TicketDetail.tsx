@@ -1,7 +1,7 @@
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Button, Modal, Tag, message } from 'antd';
 import { Dispatch, SetStateAction } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { LeftCircleIcon } from '@/SvgIcons';
 import { ChatBox } from '@/components/ChatBox';

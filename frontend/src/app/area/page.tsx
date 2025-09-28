@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 
 import NotFound from '@/app/NotFound.tsx';
 import { Intro } from '@/app/area/Intro';

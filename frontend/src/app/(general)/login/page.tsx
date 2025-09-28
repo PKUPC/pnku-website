@@ -1,5 +1,5 @@
 import { Alert } from 'antd';
-import { redirect } from 'react-router';
+import { redirect } from 'react-router-dom';
 
 import { DevLogin } from '@/app/(general)/login/DevLogin.tsx';
 import { EmailLogin } from '@/app/(general)/login/EmailLogin.tsx';

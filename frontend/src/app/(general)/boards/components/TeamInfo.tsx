@@ -1,6 +1,6 @@
 import { Tooltip } from 'antd';
 import { Fragment } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { PeopleIcon } from '@/SvgIcons';
 import { TeamStatusTag } from '@/components/TeamStatusTag';

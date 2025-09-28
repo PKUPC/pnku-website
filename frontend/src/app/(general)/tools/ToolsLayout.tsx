@@ -1,5 +1,5 @@
 import { CloudUploadOutlined } from '@ant-design/icons';
-import { useLocation, useNavigate, useOutlet } from 'react-router';
+import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 
 import { LeftCircleIcon } from '@/SvgIcons';
 import NotFound from '@/app/NotFound.tsx';

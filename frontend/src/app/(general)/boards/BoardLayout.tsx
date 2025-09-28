@@ -1,4 +1,4 @@
-import { Navigate, useOutlet, useSearchParams } from 'react-router';
+import { Navigate, useOutlet, useSearchParams } from 'react-router-dom';
 
 import NotFound from '@/app/NotFound.tsx';
 import NamedIcon from '@/components/NamedIcon';

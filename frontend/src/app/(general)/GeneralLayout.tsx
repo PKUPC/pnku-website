@@ -1,4 +1,4 @@
-import { useOutlet } from 'react-router';
+import { useOutlet } from 'react-router-dom';
 
 import { Footer } from '@/components/Footer.tsx';
 

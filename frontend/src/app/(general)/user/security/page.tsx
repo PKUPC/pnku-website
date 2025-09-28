@@ -2,7 +2,7 @@ import { CheckCircleOutlined, ExclamationCircleFilled } from '@ant-design/icons'
 import { Alert, Button, Form, Input, Modal, message } from 'antd';
 import Md5 from 'crypto-js/md5';
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import FancyCard from '@/components/FancyCard';
 import { NeverError } from '@/errors';

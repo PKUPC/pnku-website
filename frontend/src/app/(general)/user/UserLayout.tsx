@@ -1,5 +1,5 @@
 import { LockOutlined } from '@ant-design/icons';
-import { redirect, useLocation, useOutlet } from 'react-router';
+import { redirect, useLocation, useOutlet } from 'react-router-dom';
 
 import { EveryUserIcon, IdCardIcon } from '@/SvgIcons';
 import { TabsNavbar } from '@/components/TabsNavbar.tsx';

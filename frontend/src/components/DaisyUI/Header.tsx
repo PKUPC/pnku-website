@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 import { GAME_LOGO, GAME_SHORT_TITLE, GAME_TITLE } from '@/constants.tsx';
 import { ButtonMenuItem, LinkMenuItem, SubMenuItem, useHeaderMenu } from '@/hooks/useHeaderMenu.tsx';

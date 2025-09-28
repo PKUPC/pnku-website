@@ -1,7 +1,7 @@
 import { UnorderedListOutlined } from '@ant-design/icons';
 import { Drawer, Empty, FloatButton } from 'antd';
 import { useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 
 import { PuzzleListSider } from '@/app/(general)/puzzle/components/PuzzleListSider';
 import { Wish } from '@/types/wish.ts';

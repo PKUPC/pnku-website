@@ -1,4 +1,4 @@
-import { useLocation, useOutlet } from 'react-router';
+import { useLocation, useOutlet } from 'react-router-dom';
 
 import { FaqIcon, IntroductionIcon, ToolsIcon } from '@/SvgIcons';
 import { TabsNavbar } from '@/components/TabsNavbar.tsx';

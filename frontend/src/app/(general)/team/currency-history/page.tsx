@@ -1,5 +1,5 @@
 import { Alert } from 'antd';
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 
 import NotFound from '@/app/NotFound.tsx';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
