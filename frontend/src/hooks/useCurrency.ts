@@ -3,13 +3,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { wish } from '@/logic/wish';
 import { Adhoc } from '@/types/wish';
-import { calcCurrentActionPoints, getCurrentIncrease } from '@/utils';
+import { calcCurrentBalance, getCurrentIncrease } from '@/utils';
 
 type CurrencyData = {
     balance: number;
     currentIncrease: number;
     increasePolicy: [number, number][];
-    change: number;
 };
 
 export function useCurrencies() {
@@ -29,17 +28,16 @@ export function useCurrencies() {
             });
 
             if (res.status !== 'error') {
-                const { change, increase_policy } = res.data;
-                const balance = calcCurrentActionPoints(increase_policy, change);
+                const { balance, increase_policy } = res.data;
                 const currentIncrease = getCurrentIncrease(increase_policy);
+                const currentBalance = calcCurrentBalance(balance, increase_policy);
 
                 setCurrencyData((prev) => ({
                     ...prev,
                     [currencyType]: {
-                        balance,
+                        balance: currentBalance,
                         currentIncrease,
                         increasePolicy: increase_policy,
-                        change,
                     },
                 }));
 
@@ -66,7 +64,7 @@ export function useCurrencies() {
                     ...prev,
                     [currencyType]: {
                         ...data,
-                        balance: calcCurrentActionPoints(data.increasePolicy, data.change),
+                        balance: calcCurrentBalance(data.balance, data.increasePolicy),
                     },
                 };
             }

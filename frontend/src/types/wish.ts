@@ -286,7 +286,7 @@ export namespace Wish {
                           icon: string;
                           denominator: number;
                           precision: number;
-                          change: number;
+                          balance: number;
                           increase_policy: [number, number][];
                       };
                   });

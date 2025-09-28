@@ -191,13 +191,13 @@ export function decodeBase64ToObject(encoded: string): object | undefined {
     }
 }
 
-// ATTENTION: 这是以前的货币计算方案
-// 在这个方案中，当前的货币是根据总消费 + 随时间的总增长计算的
-// 这个模式下限定了货币的增加模式，之后可能会修改
-export function calcCurrentActionPoints(increase_policy: [number, number][], balance_change: number) {
+/**
+ * 新版货币计算方案中，不再从头到尾算，直接用当前余额 + 随时间的总增长计算
+ */
+
+export function calcCurrentBalance(base_balance: number, increase_policy: [number, number][]) {
     const curMin = Math.floor(Date.now() / 1000 / 60);
-    // console.log(curMin);
-    let balance = 0;
+    let balance = base_balance;
     for (let i = 0; i < increase_policy.length - 1; i++) {
         if (curMin > increase_policy[i + 1][0])
             balance += (increase_policy[i + 1][0] - increase_policy[i][0]) * increase_policy[i][1];
@@ -211,7 +211,6 @@ export function calcCurrentActionPoints(increase_policy: [number, number][], bal
     if (curMin > increase_policy[lastIdx][0])
         balance += (curMin - increase_policy[lastIdx][0]) * increase_policy[lastIdx][1];
     // console.log(balance);
-    balance += balance_change;
     console.log(increase_policy, balance);
     return balance;
 }

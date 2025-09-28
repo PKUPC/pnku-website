@@ -40,7 +40,7 @@ function CurrencyChangeHistory({ currencyType }: { currencyType: Adhoc.CurrencyT
             <Table
                 size="small"
                 dataSource={data.history.slice().reverse()}
-                rowKey="timestamp_ms"
+                rowKey="timestamp_s"
                 scroll={{
                     x: 'max-content',
                 }}
