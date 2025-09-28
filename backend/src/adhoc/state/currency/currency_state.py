@@ -39,6 +39,24 @@ class CurrencyState:
         self.total_change: int = 0
         self.change_event: list[CurrencyEvent] = []
 
+    def last_timestamp_s(self) -> int:
+        """
+        返回上次货币变动事件的时间。
+        """
+        last_timestamp_s = self.team_game_state.gaming_timestamp_s
+        if last_timestamp_s < 0:
+            last_timestamp_s = 0
+        if len(self.change_event) == 0:
+            return last_timestamp_s
+        return self.change_event[-1].timestamp_s
+
+    @abstractmethod
+    def balance_until_last_event(self) -> int:
+        """
+        返回直到上一次货币变动事件为止的货币值。
+        """
+        raise NotImplementedError()
+
     @abstractmethod
     def current_balance(self) -> int:
         """
@@ -51,7 +69,10 @@ class CurrencyState:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_increase_policy(self) -> list[tuple[int, int]]:
+    def increase_policy_from_last_event(self) -> list[tuple[int, int]]:
+        """
+        从上次货币变动事件开始的货币增长策略。
+        """
         raise NotImplementedError()
 
     @abstractmethod
