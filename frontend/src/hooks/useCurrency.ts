@@ -6,6 +6,7 @@ import { Adhoc } from '@/types/wish';
 import { calcCurrentBalance, getCurrentIncrease } from '@/utils';
 
 type CurrencyData = {
+    baseBalance: number;
     balance: number;
     currentIncrease: number;
     increasePolicy: [number, number][];
@@ -35,6 +36,7 @@ export function useCurrencies() {
                 setCurrencyData((prev) => ({
                     ...prev,
                     [currencyType]: {
+                        baseBalance: balance,
                         balance: currentBalance,
                         currentIncrease,
                         increasePolicy: increase_policy,
@@ -64,7 +66,7 @@ export function useCurrencies() {
                     ...prev,
                     [currencyType]: {
                         ...data,
-                        balance: calcCurrentBalance(data.balance, data.increasePolicy),
+                        balance: calcCurrentBalance(data.baseBalance, data.increasePolicy),
                     },
                 };
             }
