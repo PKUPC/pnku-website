@@ -32,6 +32,8 @@ class CurrencyEvent:
         self.hidden_currency_change: dict[CurrencyType, int] = {}
         # 当前变化后的货币值
         self.current_currency: dict[CurrencyType, int] = defaultdict(int)
+        # 随时间变化的货币值
+        self.time_based_currency_change: dict[CurrencyType, int] = defaultdict(int)
         # 时间
         self.timestamp_s: int = event.model.created_at // 1000
 

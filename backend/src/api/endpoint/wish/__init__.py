@@ -1,7 +1,7 @@
 from collections.abc import Awaitable, Callable
 from functools import wraps
 from inspect import isawaitable
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, Field
 from sanic import Blueprint, HTTPResponse, Request, response
@@ -10,6 +10,10 @@ from sanic.models.handler_types import RouteHandler
 
 from src.custom import store_user_log
 from src.state import User
+
+
+if TYPE_CHECKING:
+    from src.logic import Worker
 
 
 ACCEPTED_WISH_VERS = ['wish.2023.v6', 'wish.sp.2023.v1']
@@ -82,14 +86,12 @@ def wish_checker(
 
     # print(inner_check_list)
 
-    # print(inner_check_list)
-
     def decorator(fn: WishHandler) -> WishHandler:
         @wraps(fn)
         async def wrapped(req: Request, *args: Any, **kwargs: Any) -> dict[str, Any]:
             if 'worker' not in kwargs:
                 return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
-            worker = kwargs['worker']
+            worker: Worker = kwargs['worker']
             if worker.game is None:
                 return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
 
