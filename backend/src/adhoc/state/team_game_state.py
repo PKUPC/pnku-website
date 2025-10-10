@@ -140,7 +140,7 @@ class TeamGameState:
         return self.currency_state_by_type[currency_type].increase_policy_from_last_event()
 
     def get_current_balance(self, currency_type: CurrencyType) -> int:
-        return self.currency_state_by_type[currency_type].current_balance()
+        return self.currency_state_by_type[currency_type].current_balance
 
     def get_currency_history(self, currency_type: CurrencyType) -> list[dict[str, str | int]]:
         return self.currency_state_by_type[currency_type].get_currency_history()

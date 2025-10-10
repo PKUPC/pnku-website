@@ -78,7 +78,7 @@ async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker
         precision = CurrencyTypeToClass[currency_type].precision
 
         current = team.game_state.get_current_balance(currency_type)
-        change = team.game_state.currency_state_by_type[currency_type].total_change
+        change = team.game_state.currency_state_by_type[currency_type].accumulated_event_changes
         history = team.get_currency_change_list_by_type(currency_type)
 
         # 统一前端展示，从系统视角来看所有货币都直接用一个 int 和 denominator, precision 表示

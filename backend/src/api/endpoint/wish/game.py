@@ -437,7 +437,7 @@ async def get_team_currency_detail(
         'icon': currency_class.icon,
         'denominator': currency_class.denominator,
         'precision': currency_class.precision,
-        'balance': user.team.game_state.currency_state_by_type[currency_type].balance_until_last_event(),
+        'balance': user.team.game_state.currency_state_by_type[currency_type].balance_until_last_event,
         'increase_policy': user.team.game_state.get_currency_increase_policy_from_last_event(currency_type),
     }
     return {'data': result}
