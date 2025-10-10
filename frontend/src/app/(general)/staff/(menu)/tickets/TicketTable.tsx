@@ -1,6 +1,6 @@
 import { SyncOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { TableParams, getFromSessionStorage, saveToSessionStorage } from '@/app/(general)/staff/(menu)/common';
@@ -32,8 +32,8 @@ export function TicketTable({
     }
     const [tableParams, setTableParams] = useState<TableParams>(oldTableParams);
     const [messageApi, contextHolder] = message.useMessage();
-
-    console.log(tableParams);
+    // 单独存储 totalNum，避免 totalNum 的更新触发重新请求数据
+    const [totalNum, setTotalNum] = useState(0);
 
     const loadData = useCallback(() => {
         setLoading(true);
@@ -60,14 +60,7 @@ export function TicketTable({
             } else {
                 setData(res.data.list);
                 setLoading(false);
-                const nextConfig = {
-                    ...tableParams,
-                    pagination: {
-                        ...tableParams.pagination,
-                        total: res.data.total_num,
-                    },
-                };
-                if (JSON.stringify(nextConfig) !== JSON.stringify(tableParams)) setTableParams(nextConfig);
+                setTotalNum(res.data.total_num);
             }
         });
     }, [messageApi, tableParams]);
@@ -76,70 +69,81 @@ export function TicketTable({
         loadData();
     }, [loadData]);
 
-    const handleTableChange: TableProps<StaffTicketInfo>['onChange'] = (pagination, filters, sorter) => {
-        console.log(pagination);
-        console.log(filters);
-        console.log(sorter);
-        if (pagination.pageSize !== tableParams.pagination?.pageSize) setData([]);
-        const nextTableParams = {
-            pagination,
-            filters,
-            sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
-            sortField: Array.isArray(sorter) ? undefined : sorter.field,
+    const handleTableChange = useCallback<NonNullable<TableProps<StaffTicketInfo>['onChange']>>(
+        (pagination, filters, sorter) => {
+            console.log(pagination);
+            console.log(filters);
+            console.log(sorter);
+            if (pagination.pageSize !== tableParams.pagination?.pageSize) setData([]);
+            const nextTableParams = {
+                pagination,
+                filters,
+                sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
+                sortField: Array.isArray(sorter) ? undefined : sorter.field,
+            };
+            if (JSON.stringify(tableParams) !== JSON.stringify(nextTableParams)) {
+                saveToSessionStorage('staffTicketsTableParams', nextTableParams);
+                setTableParams(nextTableParams);
+                console.log(nextTableParams);
+            }
+        },
+        [tableParams],
+    );
+
+    const columns: TableColumnsType<StaffTicketInfo> = useMemo(
+        () => [
+            { title: 'id', dataIndex: 'ticket_id' },
+            {
+                title: '队伍',
+                dataIndex: 'team_name',
+                key: 'team_id',
+                render: (value, item) => <Link to={`/staff/team-detail?tid=${item.team_id}`}>{value}</Link>,
+                filters: team_filters,
+                filterSearch: true,
+                filteredValue: tableParams.filters?.team_id ? tableParams.filters.team_id : undefined,
+            },
+            {
+                title: '最后回复时间',
+                dataIndex: 'last_message_ts',
+                render: (value) => format_ts(value),
+                sorter: true,
+                sortOrder: tableParams.sortField === 'last_message_ts' ? tableParams.sortOrder : undefined,
+            },
+            { title: '类型', dataIndex: 'ticket_type' },
+            { title: '主题', dataIndex: 'subject' },
+            {
+                title: '状态',
+                dataIndex: 'status',
+                filters: status_filters,
+                filteredValue: tableParams.filters?.status ? tableParams.filters.status : undefined,
+            },
+            {
+                title: '已回复',
+                dataIndex: 'staff_replied',
+                render: (value) => (value ? '是' : '否'),
+                filters: [
+                    { text: '否', value: false },
+                    { text: '是', value: true },
+                ],
+                filteredValue: tableParams.filters?.staff_replied ? tableParams.filters.staff_replied : undefined,
+            },
+            {
+                title: '操作',
+                key: 'action',
+                render: (_, record: StaffTicketInfo) => (
+                    <Button onClick={() => navigate(`/ticket-detail?id=${record.ticket_id}`)}>查看详情</Button>
+                ),
+            },
+        ],
+        [team_filters, status_filters, tableParams, navigate],
+    );
+
+    const paginationConfig = useMemo(() => {
+        return {
+            ...tableParams.pagination,
+            total: totalNum,
         };
-        if (JSON.stringify(tableParams) !== JSON.stringify(nextTableParams)) {
-            saveToSessionStorage('staffTicketsTableParams', nextTableParams);
-            setTableParams(nextTableParams);
-            console.log(nextTableParams);
-        }
-    };
-
-    console.log(data.length, tableParams);
-
-    const columns: TableColumnsType<StaffTicketInfo> = [
-        { title: 'id', dataIndex: 'ticket_id' },
-        {
-            title: '队伍',
-            dataIndex: 'team_name',
-            key: 'team_id',
-            render: (value, item) => <Link to={`/staff/team-detail?tid=${item.team_id}`}>{value}</Link>,
-            filters: team_filters,
-            filterSearch: true,
-            filteredValue: tableParams.filters?.team_id ? tableParams.filters.team_id : undefined,
-        },
-        {
-            title: '最后回复时间',
-            dataIndex: 'last_message_ts',
-            render: (value) => format_ts(value),
-            sorter: true,
-            sortOrder: tableParams.sortField === 'last_message_ts' ? tableParams.sortOrder : undefined,
-        },
-        { title: '类型', dataIndex: 'ticket_type' },
-        { title: '主题', dataIndex: 'subject' },
-        {
-            title: '状态',
-            dataIndex: 'status',
-            filters: status_filters,
-            filteredValue: tableParams.filters?.status ? tableParams.filters.status : undefined,
-        },
-        {
-            title: '已回复',
-            dataIndex: 'staff_replied',
-            render: (value) => (value ? '是' : '否'),
-            filters: [
-                { text: '否', value: false },
-                { text: '是', value: true },
-            ],
-            filteredValue: tableParams.filters?.staff_replied ? tableParams.filters.staff_replied : undefined,
-        },
-        {
-            title: '操作',
-            key: 'action',
-            render: (_, record: StaffTicketInfo) => (
-                <Button onClick={() => navigate(`/ticket-detail?id=${record.ticket_id}`)}>查看详情</Button>
-            ),
-        },
-    ];
+    }, [tableParams.pagination, totalNum]);
 
     return (
         <>
@@ -159,16 +163,18 @@ export function TicketTable({
                     </Button>
                 </div>
 
+                {
+                    /* 没有数据时不会显示分页，提供一个占位 div */
+                    totalNum === 0 && <div className="h-[56px] w-full"></div>
+                }
+
                 <Table<StaffTicketInfo>
                     size="small"
                     bordered
                     columns={columns}
                     rowKey="ticket_id"
                     dataSource={data}
-                    pagination={{
-                        ...tableParams.pagination,
-                        position: ['topLeft'],
-                    }}
+                    pagination={paginationConfig}
                     loading={loading}
                     onChange={handleTableChange}
                     scroll={{

@@ -1,6 +1,6 @@
 import { SyncOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { TableParams, getFromSessionStorage, saveToSessionStorage } from '@/app/(general)/staff/(menu)/common';
@@ -33,6 +33,8 @@ export function SubmissionTable({
     }
     const [tableParams, setTableParams] = useState<TableParams>(oldTableParams);
     const [messageApi, contextHolder] = message.useMessage();
+    // 单独存储 totalNum，避免 totalNum 的更新触发重新请求数据
+    const [totalNum, setTotalNum] = useState(0);
 
     const loadData = useCallback(() => {
         setLoading(true);
@@ -59,14 +61,7 @@ export function SubmissionTable({
             } else {
                 setData(res.data.list);
                 setLoading(false);
-                const nextConfig = {
-                    ...tableParams,
-                    pagination: {
-                        ...tableParams.pagination,
-                        total: res.data.total_num,
-                    },
-                };
-                if (JSON.stringify(nextConfig) !== JSON.stringify(tableParams)) setTableParams(nextConfig);
+                setTotalNum(res.data.total_num);
             }
         });
     }, [tableParams, messageApi]);
@@ -75,61 +70,74 @@ export function SubmissionTable({
         loadData();
     }, [loadData]);
 
-    const handleTableChange: TableProps<StaffSubmissionInfo>['onChange'] = (pagination, filters, sorter) => {
-        console.log(pagination);
-        console.log(filters);
-        console.log(sorter);
-        if (pagination.pageSize !== tableParams.pagination?.pageSize) setData([]);
-        const nextTableParams = {
-            pagination,
-            filters,
-            sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
-            sortField: Array.isArray(sorter) ? undefined : sorter.field,
-        };
-        if (JSON.stringify(tableParams) !== JSON.stringify(nextTableParams)) {
-            saveToSessionStorage('staffSubmissionsTableParams', nextTableParams);
-            setTableParams(nextTableParams);
-        }
-    };
+    const handleTableChange = useCallback<NonNullable<TableProps<StaffSubmissionInfo>['onChange']>>(
+        (pagination, filters, sorter) => {
+            console.log(pagination);
+            console.log(filters);
+            console.log(sorter);
+            if (pagination.pageSize !== tableParams.pagination?.pageSize) setData([]);
+            const nextTableParams = {
+                pagination,
+                filters,
+                sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
+                sortField: Array.isArray(sorter) ? undefined : sorter.field,
+            };
+            if (JSON.stringify(tableParams) !== JSON.stringify(nextTableParams)) {
+                saveToSessionStorage('staffSubmissionsTableParams', nextTableParams);
+                setTableParams(nextTableParams);
+            }
+        },
+        [tableParams],
+    );
 
     console.log(tableParams);
 
-    const columns: TableColumnsType<StaffSubmissionInfo> = [
-        { title: 'id', dataIndex: 'idx' },
-        {
-            title: '提交时间',
-            dataIndex: 'timestamp_s',
-            render: (value) => format_ts(value),
-            sorter: true,
-            sortOrder: tableParams.sortField === 'timestamp_s' ? tableParams.sortOrder : undefined,
-        },
-        {
-            title: '题目',
-            dataIndex: 'puzzle',
-            render: (value, item) => <Link to={`/puzzle?key=${item.puzzle_key}`}>{value}</Link>,
-            filters: puzzle_filters,
-            filterSearch: true,
-            filteredValue: tableParams.filters?.puzzle ? tableParams.filters.puzzle : undefined,
-        },
-        {
-            title: '队伍',
-            dataIndex: 'team',
-            key: 'team_id',
-            render: (value, item) => <Link to={`/staff/team-detail?tid=${item.team_id}`}>{value}</Link>,
-            filters: team_filters,
-            filterSearch: true,
-            filteredValue: tableParams.filters?.team_id ? tableParams.filters.team_id : undefined,
-        },
-        { title: '提交人', dataIndex: 'user' },
-        { title: '提交内容', dataIndex: 'origin' },
-        {
-            title: '状态',
-            dataIndex: 'status',
-            filters: status_filters,
-            filteredValue: tableParams.filters?.status ? tableParams.filters.status : undefined,
-        },
-        { title: '信息', dataIndex: 'info' },
-    ];
+    const columns: TableColumnsType<StaffSubmissionInfo> = useMemo(
+        () => [
+            { title: 'id', dataIndex: 'idx' },
+            {
+                title: '提交时间',
+                dataIndex: 'timestamp_s',
+                render: (value) => format_ts(value),
+                sorter: true,
+                sortOrder: tableParams.sortField === 'timestamp_s' ? tableParams.sortOrder : undefined,
+            },
+            {
+                title: '题目',
+                dataIndex: 'puzzle',
+                render: (value, item) => <Link to={`/puzzle?key=${item.puzzle_key}`}>{value}</Link>,
+                filters: puzzle_filters,
+                filterSearch: true,
+                filteredValue: tableParams.filters?.puzzle ? tableParams.filters.puzzle : undefined,
+            },
+            {
+                title: '队伍',
+                dataIndex: 'team',
+                key: 'team_id',
+                render: (value, item) => <Link to={`/staff/team-detail?tid=${item.team_id}`}>{value}</Link>,
+                filters: team_filters,
+                filterSearch: true,
+                filteredValue: tableParams.filters?.team_id ? tableParams.filters.team_id : undefined,
+            },
+            { title: '提交人', dataIndex: 'user' },
+            { title: '提交内容', dataIndex: 'origin' },
+            {
+                title: '状态',
+                dataIndex: 'status',
+                filters: status_filters,
+                filteredValue: tableParams.filters?.status ? tableParams.filters.status : undefined,
+            },
+            { title: '信息', dataIndex: 'info' },
+        ],
+        [puzzle_filters, team_filters, status_filters, tableParams],
+    );
+
+    const paginationConfig = useMemo(() => {
+        return {
+            ...tableParams.pagination,
+            total: totalNum,
+        };
+    }, [tableParams.pagination, totalNum]);
 
     return (
         <>
@@ -148,16 +156,19 @@ export function SubmissionTable({
                         <SyncOutlined /> 刷新
                     </Button>
                 </div>
+
+                {
+                    /* 没有数据时不会显示分页，提供一个占位 div */
+                    totalNum === 0 && <div className="h-[56px] w-full"></div>
+                }
+
                 <Table<StaffSubmissionInfo>
                     size="small"
                     bordered
                     columns={columns}
                     rowKey="idx"
                     dataSource={data}
-                    pagination={{
-                        ...tableParams.pagination,
-                        position: ['topLeft'],
-                    }}
+                    pagination={paginationConfig}
                     loading={loading}
                     onChange={handleTableChange}
                     scroll={{
