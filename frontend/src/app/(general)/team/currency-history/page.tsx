@@ -31,7 +31,8 @@ function CurrencyChangeHistory({ currencyType }: { currencyType: Adhoc.CurrencyT
                 else return '--';
             },
         },
-        { title: '变动后数量', dataIndex: 'current' },
+        { title: '随时间增长', dataIndex: 'time_based_change' },
+        { title: '当前余额', dataIndex: 'current' },
         { title: '备注', dataIndex: 'info' },
     ];
 

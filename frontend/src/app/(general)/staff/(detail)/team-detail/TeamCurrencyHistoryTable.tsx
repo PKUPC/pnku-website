@@ -17,6 +17,8 @@ export function TeamCurrencyHistoryTable({ currencyDetail }: { currencyDetail: W
                 else return '--';
             },
         },
+        { title: '随时间增长', dataIndex: 'time_based_change' },
+        { title: '当前余额', dataIndex: 'current' },
         { title: '备注', dataIndex: 'info' },
     ];
     const data = currencyDetail.history.slice().reverse();

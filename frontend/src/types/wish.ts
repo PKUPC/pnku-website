@@ -520,7 +520,12 @@ export namespace Wish {
 
         export type StaffTeamDetailPassedPuzzles = { title: string; timestamp_s: number };
 
-        export type StaffTeamDetailCurrencyHistory = { change: number; info: string; timestamp_s: number };
+        export type StaffTeamDetailCurrencyHistory = {
+            timestamp_s: number;
+            change: string;
+            time_based_change: string;
+            info: string;
+        };
 
         export type StaffTeamDetailCurrency = {
             type: Adhoc.CurrencyType;
@@ -720,10 +725,11 @@ export namespace Wish {
         };
 
         export type TeamCurrencyHistorySingleRecord = {
-            change: number;
-            current: number;
-            info: string;
             timestamp_s: number;
+            change: string;
+            time_based_change: string;
+            current: string;
+            info: string;
         };
 
         export type TeamCurrencyHistory = { history: TeamCurrencyHistorySingleRecord[] };
