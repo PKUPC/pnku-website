@@ -1,21 +1,23 @@
 import type { TableColumnsType, TableProps } from 'antd';
-import { ComponentType, Suspense, lazy } from 'react';
+import { ComponentType, Suspense, lazy, memo } from 'react';
 
 import { AppErrorBoundary } from '@/app/AppErrorBoundary.tsx';
 import { Loading } from '@/components/DaisyUI/Loading.tsx';
 
 type AnyObject = Record<PropertyKey, any>;
 
-function TableLoader<RecordType extends AnyObject>(props: TableProps<RecordType>) {
-    const Table = lazy<ComponentType<TableProps<RecordType>>>(() => import('@/components/lazy/Table'));
+const LazyTable = lazy<ComponentType<TableProps<AnyObject>>>(() => import('@/components/lazy/Table'));
+
+function TableLoaderComponent<RecordType extends AnyObject>(props: TableProps<RecordType>) {
     return (
         <AppErrorBoundary>
             <Suspense fallback={<Loading />}>
-                <Table {...props} />
+                <LazyTable {...props} />
             </Suspense>
         </AppErrorBoundary>
     );
 }
+const TableLoader = memo(TableLoaderComponent) as typeof TableLoaderComponent;
 
 export { TableLoader };
 export type { TableProps, TableColumnsType };
