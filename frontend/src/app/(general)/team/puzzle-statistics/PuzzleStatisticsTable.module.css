@@ -1,5 +1,4 @@
 .puzzleStatisticsTable {
-  --small-board: 650px;
   .areaTitle {
     display: inline;
     font-size: 16px;
@@ -11,7 +10,7 @@
 
   .areaTd {
     width: 140px;
-    @media (max-width: var(--small-board)) {
+    @media (max-width: 650px) {
       width: 102px;
     }
   }

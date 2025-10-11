@@ -1,30 +1,28 @@
 .simpleScoreBoard {
-  --small-board: 650px;
-
   .largeRank {
     width: 60px;
-    @media (max-width: var(--small-board)) {
+    @media (max-width: 650px) {
       display: none;
     }
   }
 
   .smallRank {
     width: 36px;
-    @media (min-width: calc(var(--small-board) + 1px)) {
+    @media (min-width: calc(650px + 1px)) {
       display: none;
     }
   }
 
   .largeTeam {
     width: calc(100% - 300px);
-    @media (max-width: var(--small-board)) {
+    @media (max-width: 650px) {
       display: none;
     }
   }
 
   .smallTeam {
     width: calc(100% - 300px);
-    @media (min-width: calc(var(--small-board) + 1px)) {
+    @media (min-width: calc(650px + 1px)) {
       display: none;
     }
   }
