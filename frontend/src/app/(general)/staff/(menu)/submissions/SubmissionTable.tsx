@@ -4,7 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { TableParams, getFromSessionStorage, saveToSessionStorage } from '@/app/(general)/staff/(menu)/common';
-import { TableLoader as Table, type TableColumnsType, type TableProps } from '@/components/lazy/TableLoader';
+import {
+    TableLoader as Table,
+    type TableColumnsType,
+    type TablePaginationConfig,
+    type TableProps,
+} from '@/components/lazy/TableLoader';
 import { useReloadButton } from '@/hooks/useReloadButton';
 import { wish } from '@/logic/wish';
 import { Wish } from '@/types/wish.ts';
@@ -132,10 +137,11 @@ export function SubmissionTable({
         [puzzle_filters, team_filters, status_filters, tableParams],
     );
 
-    const paginationConfig = useMemo(() => {
+    const paginationConfig = useMemo<TablePaginationConfig>(() => {
         return {
             ...tableParams.pagination,
             total: totalNum,
+            position: ['topLeft'],
         };
     }, [tableParams.pagination, totalNum]);
 
