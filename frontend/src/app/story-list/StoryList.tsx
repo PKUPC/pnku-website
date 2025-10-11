@@ -1,6 +1,6 @@
 import { Empty } from 'antd';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { FancySlimContainer } from '@/components/FancySlimContainer';
 import { Wish } from '@/types/wish.ts';

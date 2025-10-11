@@ -1,7 +1,7 @@
 import { NotificationOutlined } from '@ant-design/icons';
 import { Tag } from 'antd';
 import React from 'react';
-import { redirect } from 'react-router-dom';
+import { redirect } from 'react-router';
 
 import { SimpleTemplateStr } from '@/components/Template';
 import TimestampAgo from '@/components/TimestampAgo';

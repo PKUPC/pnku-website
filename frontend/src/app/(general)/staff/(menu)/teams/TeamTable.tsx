@@ -1,7 +1,7 @@
 import { CheckCircleTwoTone, ExclamationCircleTwoTone, SyncOutlined } from '@ant-design/icons';
 import { Button, Space, Switch, message } from 'antd';
 import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { TableLoader as Table, type TableColumnsType } from '@/components/lazy/TableLoader';
 import { useReloadButton } from '@/hooks/useReloadButton';

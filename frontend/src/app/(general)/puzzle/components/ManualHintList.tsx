@@ -1,6 +1,6 @@
 import { DeliveredProcedureOutlined, FieldTimeOutlined, SelectOutlined } from '@ant-design/icons';
 import { Button, Col, Empty, Row, Tag } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import styles from '@/app/(general)/puzzle/ManualHintTab.module.css';
 import FancyCard from '@/components/FancyCard';

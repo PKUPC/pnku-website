@@ -1,4 +1,4 @@
-import { useRouteError } from 'react-router-dom';
+import { useRouteError } from 'react-router';
 
 import { GeneralError } from '@/components/GeneralError';
 import { InfoError, NeverError } from '@/errors';

@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { LeftCircleIcon } from '@/SvgIcons';
 import NotFound from '@/app/NotFound.tsx';

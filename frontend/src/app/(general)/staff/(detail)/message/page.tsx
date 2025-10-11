@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import { MessageBox } from '@/app/(general)/info/message/MessageBox';
 import NotFound from '@/app/NotFound.tsx';

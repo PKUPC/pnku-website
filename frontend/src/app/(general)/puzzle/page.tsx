@@ -1,6 +1,6 @@
 import { Alert, Empty, FloatButton } from 'antd';
 import { useContext } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { LeftCircleIcon } from '@/SvgIcons';
 import { TabContainer } from '@/app/(general)/puzzle/TabContainer.tsx';
