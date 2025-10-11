@@ -102,7 +102,7 @@ export function useHeaderMenu(compact: boolean = false) {
         if (info.game.boards.length > 0) {
             const boardItem = {
                 type: 'link',
-                href: `/boards?name=${info.game.boards[0]}`,
+                href: `/boards/${info.game.boards[0]}`,
                 label: '排行榜',
                 key: '/boards',
                 icon: <RankingIcon />,
@@ -167,7 +167,7 @@ export function useHeaderMenu(compact: boolean = false) {
         if (info.game.boards.length > 0) {
             const boardItem = {
                 type: 'link',
-                href: `/boards?name=${info.game.boards[0]}`,
+                href: `/boards/${info.game.boards[0]}`,
                 label: '排行榜',
                 key: '/boards',
                 icon: <RankingIcon />,

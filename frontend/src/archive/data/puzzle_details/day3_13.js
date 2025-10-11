@@ -327,7 +327,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day3',
+    return: '/area/day3',
     area_name: '第三日',
     desc: '<div class="flavor-text center" style="width: 650px; max-width: 100%; margin: auto">\n零维国<br>\n欢迎您的光临\n</div>\n\n<p><br></p>\n<div class="template-antd-image puzzle-image" data-src="/media/puzzle/day3_13/1_v3.webp" alt="">\n</div>\n\n<p><br></p>\n<p><center></p>\n<p>要清点数清这些英语单词，当然是要用最喜欢的加密方式啦！</p>\n<p></center></p>',
 };

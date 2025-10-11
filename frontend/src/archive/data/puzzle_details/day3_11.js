@@ -327,7 +327,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day3',
+    return: '/area/day3',
     area_name: '第三日',
     desc: '<div class="flavor-text center" style="width: 650px; max-width: 100%; margin: auto">\n    迅捷地冒出<br>\n    悠长地唤醒回忆\n</div>\n<p><br>\n<img class="puzzle-image" src="/media/puzzle/day3_11/1_v2.webp" alt=""></p>',
 };

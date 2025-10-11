@@ -1,6 +1,6 @@
 import { Alert, Empty, FloatButton } from 'antd';
 import { useContext } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { LeftCircleIcon } from '@/SvgIcons';
 import { TabContainer } from '@/app/(general)/puzzle/TabContainer.tsx';
@@ -17,7 +17,7 @@ import { useWishData } from '@/logic/swrWrappers';
 import styles from './page.module.css';
 
 export function PuzzlePage() {
-    const [params] = useSearchParams();
+    const params = useParams();
     const info = useSuccessGameInfo();
     const { usePuzzleList } = useContext(SiteSettingContext);
     const navigate = useNavigate();
@@ -26,7 +26,7 @@ export function PuzzlePage() {
     if (info.team?.extra_status === 'hidden')
         hideInfo = <Alert type={'warning'} showIcon={true} message={'您的队伍已经在排行榜上隐藏！'} />;
 
-    const curKey = params.get('key') ?? 'none';
+    const curKey = params.puzzleKey ?? 'none';
 
     const { data } = useWishData({
         endpoint: 'puzzle/get_detail',

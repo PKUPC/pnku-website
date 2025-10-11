@@ -110,7 +110,7 @@ export function SubmissionTable({
             {
                 title: '题目',
                 dataIndex: 'puzzle',
-                render: (value, item) => <Link to={`/puzzle?key=${item.puzzle_key}`}>{value}</Link>,
+                render: (value, item) => <Link to={`/puzzle/body/${item.puzzle_key}`}>{value}</Link>,
                 filters: puzzle_filters,
                 filterSearch: true,
                 filteredValue: tableParams.filters?.puzzle ? tableParams.filters.puzzle : undefined,
@@ -119,7 +119,7 @@ export function SubmissionTable({
                 title: '队伍',
                 dataIndex: 'team',
                 key: 'team_id',
-                render: (value, item) => <Link to={`/staff/team-detail?tid=${item.team_id}`}>{value}</Link>,
+                render: (value, item) => <Link to={`/staff/team-detail/${item.team_id}`}>{value}</Link>,
                 filters: team_filters,
                 filterSearch: true,
                 filteredValue: tableParams.filters?.team_id ? tableParams.filters.team_id : undefined,

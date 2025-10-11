@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 import { Fragment } from 'react/jsx-runtime';
 
 import { TeamBanListCard } from '@/app/(general)/staff/(detail)/team-detail/TeamBanListCard.tsx';
@@ -43,8 +43,8 @@ function TeamDetailBody({ tid }: { tid: number }) {
 }
 
 export function StaffTeamDetailPage() {
-    const [searchParams] = useSearchParams();
-    const tid = searchParams.get('tid');
+    const params = useParams();
+    const tid = params.teamId;
     if (!tid || isNaN(+tid)) {
         return <NotFound />;
     }

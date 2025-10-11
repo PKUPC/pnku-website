@@ -327,7 +327,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day3',
+    return: '/area/day3',
     area_name: '第三日',
     desc: '<style>\nhr {\n    margin: 10px 0;\n}\n</style>\n\n<div class="flavor-text center">\n<p>都，非常奇怪</p>\n<p>（本题所有答案均为有意义的简单词语或汉字）</p>\n</div>\n<p><br></p>\n<p>REPLACEME</p>',
 };

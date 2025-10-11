@@ -327,7 +327,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day3',
+    return: '/area/day3',
     area_name: '第三日',
     desc: '<div class="flavor-text center" style="width: 650px; max-width: 100%; margin: auto">\n落枫有意，霜雪无情<br>\n沉眠的意象远隔无数山水<br>\n作客他处，遥相对视<br>\n</div>\n<p><br>\n<img class="puzzle-image" src="/media/puzzle/day3_15/1_v2.webp" alt=""></p>',
 };

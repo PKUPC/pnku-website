@@ -1,7 +1,6 @@
 import { FlagOutlined } from '@ant-design/icons';
 import { Alert, Input, message } from 'antd';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
 import { FancySlimContainer } from '@/components/FancySlimContainer';
@@ -64,16 +63,10 @@ function IntroAnswerInput() {
     const wishArgs = useMemo(() => ({ content: inputAnswer }), [inputAnswer]);
     const { reloadInfo } = useContext(GameInfoContext);
     const { setNeedReloadArea } = useContext(GameStatusContext);
-    const navigate = useNavigate();
 
     const doSubmit = () => {
         if (!inputAnswer) {
             messageApi.error({ content: '提交内容不能为空！', key: 'DO_SUBMIT', duration: 4 }).then();
-            return;
-        }
-        if (inputAnswer.toUpperCase() === 'MYGO') {
-            messageApi.success({ content: 'MyGO!!!!!', key: 'MYGO' }).then();
-            navigate('/area?dst=intro&mygo=run');
             return;
         }
         setOpen(true);

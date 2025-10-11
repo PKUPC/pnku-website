@@ -99,7 +99,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day2',
+    return: '/area/day2',
     area_name: '第二日',
     desc: '<div class="flavor-text center">\n<p>“这是我收藏的聊天记录。</p>\n<p>即便时间的隔阂阻碍了彼此，</p>\n<p>我们依旧可以从现有的信息中窥测未来。”</p>\n</div>\n\n<p>REPLACEME</p>',
 };

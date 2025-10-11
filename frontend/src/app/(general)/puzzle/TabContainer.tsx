@@ -1,11 +1,13 @@
 import { FileDoneOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useMemo } from 'react';
+import { useLocation, useParams } from 'react-router';
 
 import { HintIcon, HistoryIcon, SearchIcon, TextIcon } from '@/SvgIcons';
 import { HintTab } from '@/app/(general)/puzzle/HintTab.tsx';
 import { ManualHintTab } from '@/app/(general)/puzzle/ManualHintTab.tsx';
 import { SolutionTab } from '@/app/(general)/puzzle/SolutionTab.tsx';
 import { SubmissionTab } from '@/app/(general)/puzzle/SubmissionTab.tsx';
+import NotFound from '@/app/NotFound';
 import { TabsNavbar } from '@/components/TabsNavbar.tsx';
 import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
@@ -15,63 +17,64 @@ import { format_ts } from '@/utils.ts';
 import { PuzzleTab } from './PuzzleTab';
 import styles from './TabContainer.module.css';
 
-type TabKeyItem = 'body' | 'submissions' | 'hints' | 'manual-hints' | 'solution';
-
 export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetailData }) {
     const info = useSuccessGameInfo();
-    const [tabKey, setTabKey] = useState<TabKeyItem>('body');
+    const { pathname } = useLocation();
+    const params = useParams();
+    const component = params.component;
+    const puzzleKey = params.puzzleKey;
 
-    const items = [
-        {
-            type: 'button',
-            label: '题目',
-            icon: <TextIcon />,
-            key: 'body',
-            onClick: () => setTabKey('body'),
-        },
-    ];
+    const items = useMemo(() => {
+        const items = [
+            {
+                type: 'link',
+                label: '题目',
+                icon: <TextIcon />,
+                key: '/puzzle/body/' + puzzleKey,
+            },
+        ];
 
-    if (!ARCHIVE_MODE)
+        if (!ARCHIVE_MODE)
+            items.push({
+                type: 'link',
+                label: '提交记录',
+                icon: <HistoryIcon />,
+                key: '/puzzle/submissions/' + puzzleKey,
+            });
+
         items.push({
-            type: 'button',
-            label: '提交记录',
-            icon: <HistoryIcon />,
-            key: 'submissions',
-            onClick: () => setTabKey('submissions'),
+            type: 'link',
+            label: '观测',
+            icon: <SearchIcon />,
+            key: '/puzzle/hints/' + puzzleKey,
         });
 
-    items.push({
-        type: 'button',
-        label: '观测',
-        icon: <SearchIcon />,
-        key: 'hints',
-        onClick: () => setTabKey('hints'),
-    });
+        if (!ARCHIVE_MODE && info.user?.group === 'player' && !info.feature.playground)
+            items.push({
+                type: 'link',
+                label: '神谕',
+                icon: <HintIcon />,
+                key: '/puzzle/manual-hints/' + puzzleKey,
+            });
 
-    if (!ARCHIVE_MODE && info.user?.group === 'player' && !info.feature.playground)
-        items.push({
-            type: 'button',
-            label: '神谕',
-            icon: <HintIcon />,
-            key: 'manual-hints',
-            onClick: () => setTabKey('manual-hints'),
-        });
+        if (ARCHIVE_MODE || info.user?.group === 'staff')
+            items.push({
+                type: 'link',
+                label: '解析',
+                icon: <FileDoneOutlined />,
+                key: '/puzzle/solution/' + puzzleKey,
+            });
+        return items;
+    }, [info, puzzleKey]);
 
-    if (ARCHIVE_MODE || info.user?.group === 'staff')
-        items.push({
-            type: 'button',
-            label: '解析',
-            icon: <FileDoneOutlined />,
-            key: 'solution',
-            onClick: () => setTabKey('solution'),
-        });
+    console.log(pathname);
 
-    let children;
-    if (tabKey === 'body') children = <PuzzleTab puzzleData={puzzleData} />;
-    else if (tabKey === 'submissions') children = <SubmissionTab puzzleData={puzzleData} />;
-    else if (tabKey === 'hints') children = <HintTab puzzleData={puzzleData} />;
-    else if (tabKey === 'manual-hints') children = <ManualHintTab puzzleData={puzzleData} />;
-    else if (tabKey == 'solution') children = <SolutionTab puzzleData={puzzleData} />;
+    let children = <NotFound />;
+    if (component === 'body') children = <PuzzleTab puzzleData={puzzleData} />;
+    else if (component === 'submissions') children = <SubmissionTab puzzleData={puzzleData} />;
+    else if (component === 'hints') children = <HintTab puzzleData={puzzleData} />;
+    else if (component === 'manual-hints') children = <ManualHintTab puzzleData={puzzleData} />;
+    else if (component == 'solution') children = <SolutionTab puzzleData={puzzleData} />;
 
     return (
         <div className={styles.tabContainer}>
@@ -82,7 +85,7 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
                 )}
             </div>
 
-            <TabsNavbar items={items} selectedKeys={[tabKey]} />
+            <TabsNavbar items={items} selectedKeys={[pathname]} />
             <br />
             {children}
         </div>

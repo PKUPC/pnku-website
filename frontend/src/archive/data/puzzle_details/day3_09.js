@@ -327,7 +327,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day3',
+    return: '/area/day3',
     area_name: '第三日',
     desc: '<div class="flavor-text center" style="width: 650px; max-width: 100%; margin: auto">\n    每当盛夏时分\n</div>\n<p><br></p>\n<div class="template-antd-image puzzle-image" data-src="/media/puzzle/day3_09/1.webp" alt=""></div>',
 };

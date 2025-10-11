@@ -1,4 +1,4 @@
-import { Navigate, useOutlet, useSearchParams } from 'react-router';
+import { Navigate, useOutlet, useParams } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
 import NamedIcon from '@/components/NamedIcon';
@@ -9,19 +9,18 @@ import { useSuccessGameInfo } from '@/logic/contexts.ts';
 function BoardLayoutBody() {
     const outlet = useOutlet();
     const info = useSuccessGameInfo();
-    const [searchParams] = useSearchParams();
-    const cur_key = searchParams.get('key');
+    const params = useParams();
+    const curKey = params.boardName;
 
-    console.log(cur_key);
+    console.log(curKey);
 
-    if (!cur_key || !info.game.boards.map((item) => item.key).includes(cur_key))
-        if (info.game.boards.length > 0)
-            return <Navigate to={`/boards?key=${info.game.boards[0].key}`} replace={true} />;
+    if (!curKey || !info.game.boards.map((item) => item.key).includes(curKey))
+        if (info.game.boards.length > 0) return <Navigate to={`/boards/${info.game.boards[0].key}`} replace={true} />;
         else return <NotFound />;
 
     const items = info.game.boards.map((item) => ({
         type: 'link',
-        href: `/boards?key=${item.key}`,
+        href: `/boards/${item.key}`,
         label: item.name,
         key: item.key,
         icon: <NamedIcon iconName={item.icon} />,
@@ -29,7 +28,7 @@ function BoardLayoutBody() {
 
     return (
         <div>
-            <TabsNavbar items={items} selectedKeys={[cur_key ?? 'NONE']} />
+            <TabsNavbar items={items} selectedKeys={curKey ? [curKey] : undefined} />
             <br />
             {outlet}
         </div>
