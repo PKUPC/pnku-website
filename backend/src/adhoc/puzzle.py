@@ -22,13 +22,13 @@ def get_more_puzzle_detail(puzzle: Puzzle, user: User | None = None) -> dict[str
     rst: dict[str, Any] = {}
     match puzzle.model.category:
         case 'day1':
-            rst['return'] = '/area?dst=day1'
+            rst['return'] = '/area/day1'
             rst['area_name'] = '第一日'
         case 'day2':
-            rst['return'] = '/area?dst=day2'
+            rst['return'] = '/area/day2'
             rst['area_name'] = '第二日'
         case 'day3':
-            rst['return'] = '/area?dst=day3'
+            rst['return'] = '/area/day3'
             rst['area_name'] = '第三日'
         case _:
             rst['return'] = '/'
