@@ -1,4 +1,4 @@
-import type { TableColumnsType, TableProps } from 'antd';
+import type { TableColumnsType, TablePaginationConfig, TableProps } from 'antd';
 import { ComponentType, Suspense, lazy, memo } from 'react';
 
 import { AppErrorBoundary } from '@/app/AppErrorBoundary.tsx';
@@ -20,4 +20,4 @@ function TableLoaderComponent<RecordType extends AnyObject>(props: TableProps<Re
 const TableLoader = memo(TableLoaderComponent) as typeof TableLoaderComponent;
 
 export { TableLoader };
-export type { TableProps, TableColumnsType };
+export type { TableProps, TableColumnsType, TablePaginationConfig };
