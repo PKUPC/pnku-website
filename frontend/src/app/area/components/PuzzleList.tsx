@@ -60,7 +60,7 @@ export function PuzzleList({
                 return (
                     <Fragment key={puzzle.puzzle_key !== '' ? puzzle.puzzle_key : puzzle.title}>
                         <Link
-                            to={`/puzzle?key=${puzzle.puzzle_key}`}
+                            to={`/puzzle/body/${puzzle.puzzle_key}`}
                             className={
                                 (isDisabled ? 'puzzle-row-disabled' : 'puzzle-row') +
                                 (isSelect ? ' puzzle-row-select' : '')

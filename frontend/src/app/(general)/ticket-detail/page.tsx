@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { TicketDetail } from '@/app/(general)/ticket-detail/TicketDetail.tsx';
 import NotFound from '@/app/NotFound.tsx';
@@ -30,11 +30,11 @@ function TicketBody({ tid }: { tid: number }) {
 
 export function TicketDetailPage() {
     const info = useSuccessGameInfo();
-    const [searchParams] = useSearchParams();
+    const params = useParams();
+    const tid = params.ticketId;
 
     if (!info.user) return <NotFound />;
     if (info.user?.group !== 'staff' && (!info.team?.gaming || !info.game.isGameBegin)) return <NotFound />;
-    const tid = searchParams.get('id');
     if (!tid || isNaN(+tid)) return <NotFound />;
 
     return <TicketBody tid={parseInt(tid)} />;

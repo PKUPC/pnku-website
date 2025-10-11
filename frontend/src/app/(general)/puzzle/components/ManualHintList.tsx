@@ -21,7 +21,7 @@ function ManualHintItem({ hintData }: { hintData: Wish.Ticket.TicketInfo }) {
                     <Button
                         icon={<SelectOutlined />}
                         type="link"
-                        onClick={() => navigate(`/ticket-detail?id=${hintData.ticket_id}`)}
+                        onClick={() => navigate(`/ticket-detail/${hintData.ticket_id}`)}
                     >
                         查看
                     </Button>

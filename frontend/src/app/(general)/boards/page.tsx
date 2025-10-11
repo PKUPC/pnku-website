@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { FirstBloodBoard } from '@/app/(general)/boards/FirstBloodBoard.tsx';
 import { FullScoreBoard } from '@/app/(general)/boards/FullScoreBoard.tsx';
@@ -9,9 +9,9 @@ import { WishError } from '@/components/WishError.tsx';
 import { useWishData } from '@/logic/swrWrappers';
 
 export function BoardPage() {
-    const [searchParams] = useSearchParams();
-    const cur_key = searchParams.get('key');
-    const { data, mutate } = useWishData({ endpoint: 'game/get_board', payload: { board_key: cur_key ?? '' } });
+    const params = useParams();
+    const curKey = params.boardName;
+    const { data, mutate } = useWishData({ endpoint: 'game/get_board', payload: { board_key: curKey ?? '' } });
 
     if (!data)
         if (!data)

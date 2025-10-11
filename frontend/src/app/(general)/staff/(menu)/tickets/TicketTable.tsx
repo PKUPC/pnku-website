@@ -136,7 +136,7 @@ export function TicketTable({
                 title: '操作',
                 key: 'action',
                 render: (_, record: StaffTicketInfo) => (
-                    <Button onClick={() => navigate(`/ticket-detail?id=${record.ticket_id}`)}>查看详情</Button>
+                    <Button onClick={() => navigate(`/ticket-detail/${record.ticket_id}`)}>查看详情</Button>
                 ),
             },
         ],

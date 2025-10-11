@@ -327,7 +327,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day3',
+    return: '/area/day3',
     area_name: '第三日',
     desc: '<div class="flavor-text center" style="width: 650px; max-width: 100%; margin: auto">\n新年到来之日的文字<br> \n镌刻过去的故事\n</div>\n<p><br>\n<img class="puzzle-image" src="/media/puzzle/day3_14/1.webp" alt=""></p>',
 };

@@ -333,7 +333,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day3',
+    return: '/area/day3',
     area_name: '第三日',
     clipboard: [
         {

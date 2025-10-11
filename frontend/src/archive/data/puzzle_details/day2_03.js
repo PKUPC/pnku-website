@@ -99,7 +99,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day2',
+    return: '/area/day2',
     area_name: '第二日',
     desc: '<div class="flavor-text center">\n“我超级喜欢这个收藏品！它每个小时都会变一下。<br>\n不过和人生一样，有些答案只有到了生命的最后一刻才会知道。”\n</div>\n\n<p><img class="puzzle-image" src="REPLACEME1" alt=""></p>\n<hr/>\n<p><img class="puzzle-image" src="REPLACEME2" alt=""></p>\n<hr/>\n<p><img class="puzzle-image" src="REPLACEME3" alt=""></p>\n<hr/>\n<p><img class="puzzle-image" src="REPLACEME4" alt=""></p>\n<hr/>\n<p><img class="puzzle-image" src="REPLACEME5" alt=""></p>\n<hr/>\n<p><img class="puzzle-image" src="REPLACEME6" alt=""></p>\n<hr/>\n<div class="hint center">\n注意：在正式比赛过程中（2024-07-19 20:00 ~ 2024-07-28 20:00），本题每过一小时题面会换一次。\n<br/>\n在这一归档版本中题目仍然是一小时换一次，从 2024-07-19 20:00 开始计算。\n</div>',
 };

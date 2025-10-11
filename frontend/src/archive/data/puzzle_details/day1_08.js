@@ -123,7 +123,7 @@ const data = {
             ],
         },
     ],
-    return: '/area?dst=day1',
+    return: '/area/day1',
     area_name: '第一日',
     desc: '<p><img class="puzzle-image" src="/media/puzzle/day1_08/1.webp" alt=""></p>\n<p><br></p>\n<p><img class="puzzle-image" src="/media/puzzle/day1_08/2_v2.webp" alt=""></p>\n<p><br></p>\n<p><img class="puzzle-image" src="/media/puzzle/day1_08/3_v2.webp" alt=""></p>',
 };

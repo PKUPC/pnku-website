@@ -54,8 +54,8 @@ export function TeamTable({ teamIntoList, reload }: { teamIntoList: TeamInfoStaf
             render: (_: undefined, record) => {
                 return (
                     <Space.Compact>
-                        <Button onClick={() => navigate(`/staff/message?tid=${record.team_id}`)}>回复站内信</Button>
-                        <Button onClick={() => navigate(`/staff/team-detail?tid=${record.team_id}`)}>队伍详情</Button>
+                        <Button onClick={() => navigate(`/staff/message/${record.team_id}`)}>回复站内信</Button>
+                        <Button onClick={() => navigate(`/staff/team-detail/${record.team_id}`)}>队伍详情</Button>
                     </Space.Compact>
                 );
             },

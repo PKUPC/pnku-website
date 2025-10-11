@@ -57,7 +57,7 @@ const routes: RouteObject[] = [
         children: [
             { path: '/', element: <Navigate to={'/home'} replace={true} /> },
             { path: '/home', element: <HomePage /> },
-            { path: '/area', element: <AreaPage /> },
+            { path: '/area/:areaName', element: <AreaPage /> },
             { path: '/puzzle-list', element: <PuzzleListPage /> },
             { path: '/story-list', element: <StoryListPage /> },
             {
@@ -69,12 +69,12 @@ const routes: RouteObject[] = [
                     { path: '/setting', element: <SettingPage /> },
                     {
                         element: <PuzzleLayout />,
-                        children: [{ path: '/puzzle', element: <PuzzlePage /> }],
+                        children: [{ path: '/puzzle/:component/:puzzleKey', element: <PuzzlePage /> }],
                     },
                     { path: '/story', element: <StoryPage /> },
-                    { path: '/ticket-detail', element: <TicketDetailPage /> },
+                    { path: '/ticket-detail/:ticketId', element: <TicketDetailPage /> },
                     {
-                        path: '/boards',
+                        path: '/boards/:boardName',
                         element: <BoardLayout />,
                         children: [{ element: <BoardPage />, index: true }],
                     },
@@ -176,7 +176,7 @@ const routes: RouteObject[] = [
                                 },
                                 children: [
                                     {
-                                        path: '/staff/message',
+                                        path: '/staff/message/:teamId',
                                         async lazy() {
                                             const { StaffMessagePage } = await import(
                                                 '@/app/(general)/staff/StaffLayout.tsx'
@@ -185,7 +185,7 @@ const routes: RouteObject[] = [
                                         },
                                     },
                                     {
-                                        path: '/staff/team-detail',
+                                        path: '/staff/team-detail/:teamId',
                                         async lazy() {
                                             const { StaffTeamDetailPage } = await import(
                                                 '@/app/(general)/staff/StaffLayout.tsx'

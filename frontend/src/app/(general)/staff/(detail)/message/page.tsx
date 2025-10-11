@@ -1,11 +1,11 @@
-import { useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { MessageBox } from '@/app/(general)/info/message/MessageBox';
 import NotFound from '@/app/NotFound.tsx';
 
 export function StaffMessagePage() {
-    const [searchParams] = useSearchParams();
-    const tid = searchParams.get('tid');
+    const params = useParams();
+    const tid = params.teamId;
     if (!tid || isNaN(+tid)) {
         return <NotFound />;
     }

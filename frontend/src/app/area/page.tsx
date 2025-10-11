@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
 import { Intro } from '@/app/area/Intro';
@@ -30,9 +30,9 @@ function AreaRouter({ areaName }: { areaName: string }) {
 }
 
 export function AreaPage() {
-    const [params] = useSearchParams();
-    const dst = params.get('dst') ?? '';
-    if (dst === '') return <NotFound />;
+    const params = useParams();
+    const dst = params.areaName;
+    if (!dst) return <NotFound />;
 
     return (
         <div className="mt-12 bg-base-300">
