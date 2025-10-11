@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import { Fragment } from 'react/jsx-runtime';
 
 import { TeamBanListCard } from '@/app/(general)/staff/(detail)/team-detail/TeamBanListCard.tsx';

@@ -1,4 +1,4 @@
-import { useOutlet } from 'react-router-dom';
+import { useOutlet } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
 import { ARCHIVE_MODE } from '@/constants.tsx';

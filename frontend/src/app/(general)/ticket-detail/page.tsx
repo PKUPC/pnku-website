@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import { TicketDetail } from '@/app/(general)/ticket-detail/TicketDetail.tsx';
 import NotFound from '@/app/NotFound.tsx';
