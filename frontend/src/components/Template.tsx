@@ -1,7 +1,7 @@
 import { ConfigProvider, Image } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import parse from 'html-react-parser';
-import { useEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
 
 import NotFound from '@/app/NotFound.tsx';
@@ -19,36 +19,54 @@ export function SimpleTemplateStr({ name, children }: { name: string; children: 
 export function TemplateStr({ name, children }: { name: string; children: string }) {
     const templateRef = useRef<HTMLDivElement>(null);
 
-    const result = parse(children, {
-        replace: (domNode) => {
-            if (domNode.type === 'tag' && domNode.tagName === 'div' && domNode.attribs?.class) {
-                if (domNode.attribs.class.includes('template-antd-image')) {
-                    const src = domNode.attribs['data-src'];
-                    if (src) {
-                        return (
-                            <div className={domNode.attribs.class} data-src={src}>
-                                <ConfigProvider locale={zhCN}>
-                                    <Image src={src} alt={'image'} />
-                                </ConfigProvider>
-                            </div>
-                        );
+    const result = useMemo(
+        () =>
+            parse(children, {
+                replace: (domNode) => {
+                    if (domNode.type === 'tag' && domNode.tagName === 'div' && domNode.attribs?.class) {
+                        if (domNode.attribs.class.includes('template-antd-image')) {
+                            const src = domNode.attribs['data-src'];
+                            if (src) {
+                                return (
+                                    <div className={domNode.attribs.class} data-src={src}>
+                                        <ConfigProvider locale={zhCN}>
+                                            <Image src={src} alt={'image'} />
+                                        </ConfigProvider>
+                                    </div>
+                                );
+                            }
+                        }
                     }
-                }
-            }
-        },
-    });
+                },
+            }),
+        [children],
+    );
 
-    useEffect(() => {
-        if (templateRef.current) {
-            console.log('TemplateStr -> useEffect: run script');
-            console.log(templateRef.current);
-            const userScripts = Array.from(templateRef.current.getElementsByTagName('script'));
-            userScripts.forEach((element) => {
-                const userScript = element.innerHTML;
+    const executeScripts = useCallback(() => {
+        if (!templateRef.current) return;
+
+        console.log('TemplateStr -> executeScripts: run script');
+        const userScripts = Array.from(templateRef.current.getElementsByTagName('script'));
+
+        userScripts.forEach((element, index) => {
+            const userScript = element.innerHTML.trim();
+            if (!userScript) return;
+
+            const scriptHash = `${name}-${index}-${btoa(encodeURIComponent(userScript)).slice(0, 10)}`;
+
+            try {
                 window.eval(userScript);
-            });
-        }
-    }, []);
+                console.log(`Script ${scriptHash} executed successfully`);
+            } catch (error) {
+                console.error(`Script execution error for ${scriptHash}:`, error);
+            }
+        });
+    }, [name]);
+
+    useLayoutEffect(() => {
+        const timer = setTimeout(executeScripts, 0);
+        return () => clearTimeout(timer);
+    }, [children, executeScripts]);
 
     console.log('template rendered!');
     return (
