@@ -9,7 +9,7 @@ dependencies = [
     "bleach>=6.1,<7.0",
     "bleach-allowlist>=1.0,<2.0",
     "Flask>=3.1,<4.0",
-    "Flask-Admin==2.0.0a4",  # 1.6.1 is too old ...
+    "Flask-Admin==2.0.0a5",  # 1.6.1 is too old ...
     "Flask-SQLAlchemy>=3.1,<4.0",
     "sanic[ext]>=25.3.0,<26.0",
     "pydantic>=2.9.2,<3.0",
