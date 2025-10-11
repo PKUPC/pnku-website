@@ -617,14 +617,10 @@ class StateContainerBase(ABC):
             'gaming': '游戏中',
         }
 
-        TEAM_STATISTICS = {
-            'count_1': '1 人',
-            'count_2': '2 人',
-            'count_3': '3 人',
-            'count_4': '4 人',
-            'count_5': '5 人',
-            'average': '平均人数',
-        }
+        TEAM_STATISTICS = {}
+        for i in range(1, secret.TEAM_MAX_MEMBER + 1):
+            TEAM_STATISTICS[f'count_{i}'] = f'{i} 人'
+        TEAM_STATISTICS['average'] = '平均人数'
 
         users_cnt_by_group: dict[str, dict[str, int]] = {}
         for key in USER_STATUS:
@@ -663,16 +659,10 @@ class StateContainerBase(ABC):
             elif team.gaming:
                 teams_cnt['gaming'] += 1
 
-            if len(team.members) == 1:
-                teams_statistic_cnt['count_1'] += 1
-            elif len(team.members) == 2:
-                teams_statistic_cnt['count_2'] += 1
-            elif len(team.members) == 3:
-                teams_statistic_cnt['count_3'] += 1
-            elif len(team.members) == 4:
-                teams_statistic_cnt['count_4'] += 1
-            elif len(team.members) == 5:
-                teams_statistic_cnt['count_5'] += 1
+            member_len = len(team.members)
+            count_key = f'count_{member_len}'
+            if count_key in teams_statistic_cnt:
+                teams_statistic_cnt[count_key] += 1
 
         teams_cnt['dissolved'] = len(self._game.teams.dissolved_list)
         if teams_cnt['total'] > 0:

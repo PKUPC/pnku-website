@@ -5,7 +5,7 @@ from flask import current_app, flash, redirect, url_for
 from flask.typing import ResponseReturnValue
 from flask_admin import AdminIndexView, expose
 
-from src import utils
+from src import secret, utils
 from src.logic.reducer import Reducer
 
 
@@ -25,14 +25,8 @@ TEAM_STATUS = {
     'gaming': '游戏中',
 }
 
-TEAM_STATISTICS = {
-    'count_1': '1 人',
-    'count_2': '2 人',
-    'count_3': '3 人',
-    'count_4': '4 人',
-    'count_5': '5 人',
-    'average': '平均人数',
-}
+TEAM_STATISTICS = {f'count_{i}': f'{i} 人' for i in range(1, secret.TEAM_MAX_MEMBER + 1)}
+TEAM_STATISTICS['average'] = '平均人数'
 
 TELEMETRY_FIELDS = {
     'last_update': '更新时间',
@@ -62,6 +56,7 @@ class StatusView(AdminIndexView):  # type: ignore[misc]
         }
 
         users_cnt_by_group, teams_cnt, teams_statistic_cnt = reducer.collect_game_stat()
+        print(teams_statistic_cnt)
 
         return self.render(  # type: ignore[no-any-return]
             'status.html',
