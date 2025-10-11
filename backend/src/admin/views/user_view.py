@@ -4,13 +4,12 @@ from typing import Any
 
 import flask_admin
 
-from flask import current_app, flash
+from flask import flash
 from markupsafe import Markup
 
 from src import store
 from src.admin import fields
 from src.logic import glitter
-from src.logic.reducer import Reducer
 
 from .base_view import BaseView
 
@@ -21,16 +20,6 @@ class UserInfoField(flask_admin.form.JSONField):  # type: ignore[misc]
 
 class LoginPropertiesField(flask_admin.form.JSONField):  # type: ignore[misc]
     widget = fields.JsonFormattedInput()
-
-
-def _user_nickname_formatter(_view: Any, _context: Any, model: store.UserStore, _name: str) -> str:
-    reducer: Reducer = current_app.config['reducer_obj']
-    user = reducer.game_nocheck.users.user_by_id.get(model.id, None)
-
-    if user is None:
-        return '[NONE]' + f'{model.user_info.get("nickname", "NONE")}'
-
-    return f'{user.model.user_info.nickname}'
 
 
 class UserView(BaseView):

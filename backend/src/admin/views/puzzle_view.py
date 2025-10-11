@@ -4,7 +4,7 @@ from typing import Any
 
 import flask_admin
 
-from flask import current_app, flash, make_response, redirect, request
+from flask import flash, make_response, redirect, request
 from flask.typing import ResponseReturnValue
 from flask_admin import expose
 from flask_admin.actions import action
@@ -17,6 +17,7 @@ from src.logic import glitter
 from src.logic.reducer import Reducer
 from src.store import PuzzleStore
 
+from ..utils import run_reducer_callback
 from .base_view import BaseView
 
 
@@ -98,44 +99,47 @@ class PuzzleView(BaseView):
         if request.method == 'GET':
             return self.render('import_puzzle.html')  # type: ignore[no-any-return]
         else:
-            reducer: Reducer = current_app.config['reducer_obj']
             puzzles = json.loads(request.form['imported_data'])
 
-            touched_ids = []
-            failed_puzzles = []
+            def task(reducer: Reducer) -> tuple[int, int, int, list[int], list[str]]:
+                touched_ids = []
+                failed_puzzles = []
 
-            with reducer.SqlSession() as session:
-                n_added = 0
-                n_modified = 0
-                n_failed = 0
-                for puzzle_data in puzzles:
-                    puzzle: PuzzleStore | None = session.execute(
-                        select(PuzzleStore).where(PuzzleStore.key == puzzle_data['key'])
-                    ).scalar()
+                with reducer.SqlSession() as session:
+                    n_added = 0
+                    n_modified = 0
+                    n_failed = 0
+                    for puzzle_data in puzzles:
+                        puzzle: PuzzleStore | None = session.execute(
+                            select(PuzzleStore).where(PuzzleStore.key == puzzle_data['key'])
+                        ).scalar()
 
-                    add_flag = False
-                    if puzzle is None:
-                        puzzle = PuzzleStore()
-                        add_flag = True
+                        add_flag = False
+                        if puzzle is None:
+                            puzzle = PuzzleStore()
+                            add_flag = True
 
-                    self._import_puzzle(puzzle_data, puzzle)
+                        self._import_puzzle(puzzle_data, puzzle)
 
-                    rst, _ = puzzle.validate()
-                    if not rst:
-                        n_failed += 1
-                        failed_puzzles.append(puzzle_data['key'])
-                        continue
+                        rst, _ = puzzle.validate()
+                        if not rst:
+                            n_failed += 1
+                            failed_puzzles.append(puzzle_data['key'])
+                            continue
 
-                    if add_flag:
-                        n_added += 1
-                    else:
-                        n_modified += 1
+                        if add_flag:
+                            n_added += 1
+                        else:
+                            n_modified += 1
 
-                    session.add(puzzle)
-                    session.flush()
-                    touched_ids.append(puzzle.id)
+                        session.add(puzzle)
+                        session.flush()
+                        touched_ids.append(puzzle.id)
 
-                session.commit()
+                    session.commit()
+                    return n_added, n_modified, n_failed, touched_ids, failed_puzzles
+
+            n_added, n_modified, n_failed, touched_ids, failed_puzzles = run_reducer_callback(task)
 
             for puzzle_id in touched_ids:
                 self.emit_event(glitter.EventType.UPDATE_PUZZLE, puzzle_id)
@@ -151,10 +155,13 @@ class PuzzleView(BaseView):
 
     @action('export', 'Export JSON')
     def action_export(self, puzzle_ids: list[int]) -> ResponseReturnValue:
-        reducer: Reducer = current_app.config['reducer_obj']
-        puzzles = [
-            self._export_puzzle(reducer.game_nocheck.puzzles.puzzle_by_id[int(ch_id)]._store) for ch_id in puzzle_ids
-        ]
+        def task(reducer: Reducer) -> list[dict[str, Any]]:
+            return [
+                self._export_puzzle(reducer.game_nocheck.puzzles.puzzle_by_id[int(ch_id)]._store)
+                for ch_id in puzzle_ids
+            ]
+
+        puzzles = run_reducer_callback(task)
 
         resp = make_response(json.dumps(puzzles, indent=1, ensure_ascii=False), 200)
         resp.mimetype = 'text/plain'

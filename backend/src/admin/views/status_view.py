@@ -1,12 +1,16 @@
 import asyncio
 import time
 
+from typing import Any
+
 from flask import current_app, flash, redirect, url_for
 from flask.typing import ResponseReturnValue
 from flask_admin import AdminIndexView, expose
 
 from src import secret, utils
 from src.logic.reducer import Reducer
+
+from ..utils import run_reducer_callback
 
 
 USER_STATUS = {
@@ -43,8 +47,15 @@ TELEMETRY_FIELDS = {
 class StatusView(AdminIndexView):  # type: ignore[misc]
     @expose('/')
     def index(self) -> ResponseReturnValue:
-        reducer: Reducer = current_app.config['reducer_obj']
-        reducer.received_telemetries[reducer.process_name] = (time.time(), reducer.collect_telemetry())
+        def get_received_telemetries(reducer: Reducer) -> list[tuple[str, tuple[float, dict[str, Any]]]]:
+            reducer.received_telemetries[reducer.process_name] = (time.time(), reducer.collect_telemetry())
+            return list(reducer.received_telemetries.items())
+
+        received_telemetries = run_reducer_callback(get_received_telemetries)
+
+        users_cnt_by_group, teams_cnt, teams_statistic_cnt = run_reducer_callback(
+            lambda reducer: reducer.collect_game_stat()
+        )
 
         st = utils.sys_status()
         sys_status = {
@@ -55,7 +66,6 @@ class StatusView(AdminIndexView):  # type: ignore[misc]
             'disk': f'used={st["disk_used"]:.2f}G, free={st["disk_free"]:.2f}G',
         }
 
-        users_cnt_by_group, teams_cnt, teams_statistic_cnt = reducer.collect_game_stat()
         print(teams_statistic_cnt)
 
         return self.render(  # type: ignore[no-any-return]
@@ -73,27 +83,20 @@ class StatusView(AdminIndexView):  # type: ignore[misc]
                     'last_update': f'{int(time.time() - last_update):d}s',
                     **tel_dict,
                 }
-                for worker_name, (last_update, tel_dict) in sorted(reducer.received_telemetries.items())
+                for worker_name, (last_update, tel_dict) in sorted(received_telemetries)
             },
         )
 
     @expose('/clear_telemetry')
     def clear_telemetry(self) -> ResponseReturnValue:
-        reducer: Reducer = current_app.config['reducer_obj']
-        reducer.received_telemetries.clear()
+        run_reducer_callback(lambda reducer: reducer.received_telemetries.clear())
 
         flash('已清空遥测数据', 'success')
         return redirect(url_for('.index'))
 
     @expose('/test_push')
     def test_push(self) -> ResponseReturnValue:
-        loop: asyncio.AbstractEventLoop = current_app.config['reducer_loop']
-        reducer: Reducer = current_app.config['reducer_obj']
-
-        async def run_push() -> None:
-            reducer.log('error', 'admin.test_push', '这是一条测试消息')
-
-        asyncio.run_coroutine_threadsafe(run_push(), loop)
+        run_reducer_callback(lambda reducer: reducer.log('error', 'admin.test_push', '这是一条测试消息'))
 
         flash('已发送测试消息', 'success')
         return redirect(url_for('.index'))

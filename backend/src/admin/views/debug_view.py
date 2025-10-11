@@ -1,8 +1,16 @@
-from flask import current_app, make_response
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from flask import make_response
 from flask.typing import ResponseReturnValue
 from flask_admin import BaseView, expose
 
-from src.logic.reducer import Reducer
+from ..utils import run_reducer_callback
+
+
+if TYPE_CHECKING:
+    from src.logic.reducer import Reducer
 
 
 class DebugView(BaseView):  # type: ignore[misc]
@@ -12,17 +20,19 @@ class DebugView(BaseView):  # type: ignore[misc]
 
     @expose('/get_puzzles_state')
     def get_puzzles_state(self) -> ResponseReturnValue:
-        reducer: Reducer = current_app.config['reducer_obj']
+        def task(reducer: Reducer) -> str:
+            puzzle_structure = reducer._game.puzzles.puzzles_by_structure
+            rst = ''
+            for category in puzzle_structure:
+                rst += category + ':\n'
+                for subcategory in puzzle_structure[category]:
+                    rst += f'    {subcategory}:\n'
+                    for puzzle in puzzle_structure[category][subcategory]:
+                        rst += f'        {puzzle.model.key}: {puzzle.model.sorting_index} | {puzzle.model.title}\n'
+            return rst
 
-        puzzle_structure = reducer._game.puzzles.puzzles_by_structure
-        rst = ''
-        for category in puzzle_structure:
-            rst += category + ':\n'
-            for subcategory in puzzle_structure[category]:
-                rst += f'    {subcategory}:\n'
-                for puzzle in puzzle_structure[category][subcategory]:
-                    rst += f'        {puzzle.model.key}: {puzzle.model.sorting_index} | {puzzle.model.title}\n'
+        result = run_reducer_callback(task)
 
-        resp = make_response(rst, 200)
+        resp = make_response(result, 200)
         resp.mimetype = 'text/plain'
         return resp
