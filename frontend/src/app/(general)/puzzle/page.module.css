@@ -1,5 +1,4 @@
 .puzzleWithListContainer {
-  --single-row-breakpoint: 765px;
   display: flex;
   flex-direction: row;
   gap: 18px;
@@ -14,7 +13,7 @@
     min-width: 0;
   }
 
-  @media (max-width: var(--single-row-breakpoint)) {
+  @media (max-width: 765px) {
     display: block;
 
     :global(.puzzle-sidebar) {
