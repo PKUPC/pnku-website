@@ -111,7 +111,7 @@ async def auth_su(_req: Request, query: AuthSuParam, worker: Worker, user: User 
     if user is None or not secret.IS_ADMIN(user.model.id):
         raise AuthError('没有权限')
     if worker.game is None:
-        raise AuthError('服务暂时不可用')
+        raise AuthError('服务繁忙，请稍后再试！')
 
     su_user = worker.game.users.user_by_id.get(query.uid, None)
     if su_user is None:

@@ -109,7 +109,7 @@ TEMPLATE_LIST = [
 @wish_response
 async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[str, Any]:
     if worker.game is None:
-        return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
+        return {'status': 'error', 'title': 'NO_GAME', 'message': '服务繁忙，请稍后再试！'}
 
     cur_tick = worker.game.cur_tick
 
@@ -276,7 +276,7 @@ async def get_announcements(_req: Request, worker: Worker, user: User | None) ->
 @wish_response
 async def get_schedule(_req: Request, worker: Worker) -> dict[str, Any]:
     if worker.game is None:
-        return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
+        return {'status': 'error', 'title': 'NO_GAME', 'message': '服务繁忙，请稍后再试！'}
 
     return {
         'data': [
