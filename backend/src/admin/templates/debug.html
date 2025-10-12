@@ -1,9 +1,18 @@
 {% extends 'admin/master.html' %}
 
 {% block body %}
-    <h2>Export Reducer State</h2>
+    <p>
+        <a href="hello_world">hello_world</a>
+    </p>
+
+    <h3>Export Reducer State</h3>
     <p>
         <a href="get_puzzles_state" target="_blank">reducer.game.puzzles.puzzle_by_key</a>
     </p>
 
+    <h3>Emit Event</h3>
+    <p>
+        <a href="emit_reinit_game_event">emit_reinit_game_event (debug mode only)</a>
+    </p>
+    
 {% endblock %}

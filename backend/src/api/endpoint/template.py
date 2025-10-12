@@ -81,7 +81,7 @@ def is_safe_path(path: str) -> bool:
 @bp.route('/<filename:path>')
 async def get_template(req: Request, filename: str, worker: Worker, user: User | None) -> HTTPResponse:
     if worker.game is None:
-        return response.text('服务暂时不可用', status=403)
+        return response.text('服务繁忙，请稍后再试！', status=503)
 
     # 更改了模板检查，在 template 下的文件都能访问，并且支持子文件夹
     p = (TEMPLATE_PATH / f'{filename}.md').resolve()

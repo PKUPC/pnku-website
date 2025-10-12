@@ -93,7 +93,7 @@ def wish_checker(
                 return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
             worker: Worker = kwargs['worker']
             if worker.game is None:
-                return {'status': 'error', 'title': 'NO_GAME', 'message': '服务暂时不可用'}
+                return {'status': 'error', 'title': 'NO_GAME', 'message': '服务繁忙，请稍后再试！'}
 
             for check in inner_check_list:
                 if check == 'user_login':

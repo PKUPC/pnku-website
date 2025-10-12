@@ -54,7 +54,7 @@ async def _register_or_login(
 ) -> HTTPResponse:
     if worker.game is None:
         worker.log('warning', 'api.auth.register_or_login', 'game is not available')
-        raise AuthError('服务暂时不可用')
+        raise AuthError('服务繁忙，请稍后再试！')
     user = worker.game.users.user_by_login_key.get(login_key)
 
     if user is None:  # reg new user
@@ -95,7 +95,7 @@ async def _register_or_reset(
 
     if worker.game is None:
         worker.log('warning', 'api.auth.register_with_email', 'game is not available')
-        raise AuthError('服务暂时不可用')
+        raise AuthError('服务繁忙，请稍后再试！')
 
     login_key = 'email:' + email
     user = worker.game.users.user_by_login_key.get(login_key)
@@ -203,7 +203,7 @@ async def _login_with_email(
 ) -> HTTPResponse:
     if worker.game is None:
         worker.log('warning', 'api.auth.login_with_email', 'game is not available')
-        raise AuthError('服务暂时不可用')
+        raise AuthError('服务繁忙，请稍后再试！')
 
     user = worker.game.users.user_by_login_key.get(login_key)
 
