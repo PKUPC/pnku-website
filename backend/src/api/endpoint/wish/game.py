@@ -11,6 +11,7 @@ from sanic_ext import validate
 
 from src import adhoc, secret, utils
 from src.adhoc.constants.enums import CurrencyType
+from src.adhoc.constants.misc import PUZZLE_AREA_NAMES, VALID_AREA_NAMES
 from src.adhoc.state.currency import CurrencyTypeToClass
 from src.custom import store_user_log
 from src.logic import Worker, glitter
@@ -42,7 +43,7 @@ async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker
 
     not_found = {'status': 'error', 'title': 'NOT FOUND', 'message': '不存在的区域'}
 
-    if body.area_name not in ['intro', 'day1', 'day2', 'day3']:
+    if body.area_name not in VALID_AREA_NAMES:
         return not_found
 
     if user.is_staff:
@@ -56,7 +57,7 @@ async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '游戏未开始！'}
 
     # 检查是否未解锁
-    if body.area_name in ['intro', 'day1', 'day2', 'day3']:
+    if body.area_name in VALID_AREA_NAMES:
         if body.area_name == 'intro' and not worker.game_nocheck.is_intro_unlock():
             return not_found
         if body.area_name not in user.team.game_state.unlock_areas:
@@ -78,7 +79,7 @@ async def get_puzzle_list(req: Request, worker: Worker, user: User | None) -> di
     assert user is not None
     assert user.is_staff or user.team is not None
 
-    area_list = ['day1', 'day2', 'day3']
+    area_list = PUZZLE_AREA_NAMES
 
     rst_data = []
 

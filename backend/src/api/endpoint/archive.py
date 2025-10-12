@@ -6,6 +6,7 @@ from typing import Any
 from sanic import Blueprint, HTTPResponse, Request, response
 
 from src import adhoc, secret, utils
+from src.adhoc.constants import PUZZLE_AREA_NAMES, VALID_AREA_NAMES
 from src.logic import Worker
 from src.state import Hint
 from src.store import HintStore
@@ -139,7 +140,7 @@ if secret.USE_ARCHIVE_API:
     @bp.route('/area_detail.json')
     async def area_detail_json(_req: Request, worker: Worker) -> HTTPResponse:
         user_1 = worker.game_nocheck.users.user_by_id[1]
-        areas = ['intro', 'day1', 'day2', 'day3']
+        areas = VALID_AREA_NAMES
         result_dict = {area_name: adhoc.get_area_info(area_name, user_1, worker) for area_name in areas}
         return response.text(json.dumps(result_dict, ensure_ascii=False, indent=4))
 
@@ -220,7 +221,7 @@ if secret.USE_ARCHIVE_API:
     @bp.route('/puzzle_list.json')
     async def puzzle_list_json(_req: Request, worker: Worker) -> HTTPResponse:
         user_1 = worker.game_nocheck.users.user_by_id[1]
-        area_list = ['day1', 'day2', 'day3']
+        area_list = PUZZLE_AREA_NAMES
         rst_data = []
         for area_name in area_list:
             rst_data.append(adhoc.get_area_info(area_name, user_1, worker))

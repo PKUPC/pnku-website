@@ -12,6 +12,7 @@ from sanic_ext import validate
 
 from src import adhoc, secret, utils
 from src.adhoc.constants import CurrencyType
+from src.adhoc.constants.misc import PUZZLE_AREA_NAMES
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
@@ -525,10 +526,8 @@ async def get_puzzle_statistics(req: Request, worker: Worker, user: User | None)
         return {'status': 'error', 'title': 'NOT_IMPLEMENT', 'message': 'staff 暂时无法调用这个接口'}
     assert user.team is not None
 
-    area_list = ['day1', 'day2', 'day3']
-
     res = []
-    for area_name in area_list:
+    for area_name in PUZZLE_AREA_NAMES:
         if area_name in user.team.game_state.unlock_areas:
             puzzle_structure = worker.game_nocheck.puzzles.puzzles_by_structure.get(area_name, {})
             res_dict: dict[str, Any] = {'name': adhoc.AREA_NAME.get(area_name, 'NONE'), 'puzzles': []}
