@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from src import utils
+from src.adhoc.constants import AREA_NAME
 from src.store import SubmissionEvent
 
 from .base import Board
@@ -28,9 +29,6 @@ class SpeedRunBoard(Board):
         else:
             self.etag_normal = utils.gen_random_str(24)
 
-        # ADHOC!!
-        AREA_NAME = {'day1': '素青', 'day2': '秋蝉', 'day3': '临水'}
-
         def _get_by_idx(key: str, idx: int) -> dict[str, Any] | None:
             if idx + 1 > len(self.fast_teams.get(key, [])):
                 return None
@@ -54,7 +52,7 @@ class SpeedRunBoard(Board):
                         for puzzle in self._game.puzzles.puzzle_by_area.get(area, [])
                     ],
                 }
-                for area in ['day1', 'day2', 'day3']  # 这里保证一下顺序
+                for area in AREA_NAME.keys()
             ]
         }
 

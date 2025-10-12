@@ -5,7 +5,14 @@ from .messages import (
     make_buy_hint_message,
     make_modify_currency_message,
 )
-from .misc import AREA_NAME, MANUAL_HINT_COOLDOWN, PUZZLE_CATEGORY_LIST, STAFF_DISPLAY_NAME
+from .misc import (
+    AREA_NAME,
+    MANUAL_HINT_COOLDOWN,
+    PUZZLE_AREA_NAMES,
+    PUZZLE_CATEGORY_LIST,
+    STAFF_DISPLAY_NAME,
+    VALID_AREA_NAMES,
+)
 
 
 __all__ = [
@@ -17,6 +24,8 @@ __all__ = [
     'PUZZLE_CATEGORY_LIST',
     'STAFF_DISPLAY_NAME',
     'AREA_NAME',
+    'VALID_AREA_NAMES',
+    'PUZZLE_AREA_NAMES',
     'make_buy_hint_message',
     'make_modify_currency_message',
     'describe_buy_hint_message',

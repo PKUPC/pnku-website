@@ -16,8 +16,7 @@ if TYPE_CHECKING:
 
 class SimpleScoreBoard(Board):
     """
-    一种简单的只按照分数排名的排行榜
-    添加排行榜时需要同步更新 puzzle.on_simple_board, team.last_success_submission_by_board, team.score_by_board
+    一种简单的只按照分数排名的排行榜（MiaoHunt 2023 中使用，现在没有维护）
     """
 
     def __init__(self, key: str, name: str, desc: str | None, game: Game):

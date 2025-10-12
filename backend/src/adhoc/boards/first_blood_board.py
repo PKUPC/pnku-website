@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from src import utils
+from src.adhoc.constants import AREA_NAME
 from src.store import SubmissionEvent
 
 from .base import Board
@@ -28,13 +29,10 @@ class FirstBloodBoard(Board):
         else:
             self.etag_normal = utils.gen_random_str(24)
 
-        # ADHOC!!
-        area_key_to_title = {'day1': '素青', 'day2': '秋蝉', 'day3': '临水'}
-
         return {
             'list': [
                 {
-                    'name': area_key_to_title.get(area, 'NONE'),
+                    'name': AREA_NAME.get(area, 'NONE'),
                     'list': [
                         {
                             'title': puzzle.model.title,
@@ -49,7 +47,7 @@ class FirstBloodBoard(Board):
                         for submission in [self.puzzle_board.get(puzzle, None)]
                     ],
                 }
-                for area in ['day1', 'day2', 'day3']  # 这里保证一下顺序
+                for area in AREA_NAME.keys()
             ]
         }
 
