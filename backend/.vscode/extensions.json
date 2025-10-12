@@ -3,7 +3,8 @@
         "ms-python.python",
         "ms-python.debugpy",
         "ms-python.mypy-type-checker",
-        "charliermarsh.ruff"
+        "charliermarsh.ruff",
+        "gruntfuggly.todo-tree",
     ],
     "unwantedRecommendations": [
         "ms-python.vscode-pylance",

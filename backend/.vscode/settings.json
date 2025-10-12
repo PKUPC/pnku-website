@@ -1,0 +1,27 @@
+{
+    "todo-tree.general.tags": [
+        "TODO",
+        "ATTENTION", 
+        "ADHOC",
+    ],
+    "todo-tree.highlights.customHighlight": {
+        "TODO": {
+            "icon": "clock",
+            "iconColour": "#4A90E2",
+            "foreground": "#4A90E2",
+            "background": "#E8F4FD"
+        },
+        "ATTENTION": {
+            "icon": "alert",
+            "iconColour": "#F5A623",
+            "foreground": "#D68910",
+            "background": "#FEF9E7"
+        },
+        "ADHOC": {
+            "icon": "star",
+            "iconColour": "#7B68EE",
+            "foreground": "#6C5CE7",
+            "background": "#F4F3FF"
+        }
+    }
+}
