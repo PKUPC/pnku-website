@@ -20,7 +20,7 @@ from .constants import (
 )
 from .game_start_reply import game_start_reply
 from .hint import hint_cd_after_puzzle_unlock
-from .puzzle import gen_puzzles_by_structure, get_more_puzzle_detail
+from .puzzle import gen_puzzles_by_structure, get_extra_puzzle_detail
 from .storys import get_story_list
 
 
@@ -37,7 +37,7 @@ __all__ = [
     'get_simple_area',
     'get_unlock_areas_info',
     'gen_puzzles_by_structure',
-    'get_more_puzzle_detail',
+    'get_extra_puzzle_detail',
     'hint_cd_after_puzzle_unlock',
     'get_story_list',
     'game_start_reply',

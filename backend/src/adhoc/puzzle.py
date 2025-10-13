@@ -18,7 +18,11 @@ def gen_puzzles_by_structure(sorted_puzzles: list[Puzzle]) -> dict[str, dict[str
     return puzzles_by_structure
 
 
-def get_more_puzzle_detail(puzzle: Puzzle, user: User | None = None) -> dict[str, Any]:
+def get_extra_puzzle_detail(puzzle: Puzzle, user: User | None = None) -> dict[str, Any]:
+    """
+    在 wish/puzzle/get_detail 接口中会调用这个函数获取附加的题目属性。
+    有什么特殊属性都可以加在这里然后在前端处理。
+    """
     rst: dict[str, Any] = {}
     match puzzle.model.category:
         case 'day1':

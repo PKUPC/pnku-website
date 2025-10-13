@@ -164,7 +164,7 @@ if secret.USE_ARCHIVE_API:
                 'actions': puzzle.model.describe_actions(),
                 'status': puzzle_status,
                 'puzzle_list': puzzle_list,
-                **adhoc.get_more_puzzle_detail(puzzle),
+                **adhoc.get_extra_puzzle_detail(puzzle),
             }
             if len(puzzle.model.clipboard) > 0:
                 result_dict[puzzle_key]['clipboard'] = [x.model_dump() for x in puzzle.model.clipboard]
