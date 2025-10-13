@@ -9,6 +9,7 @@ from sanic.server.websockets.impl import WebsocketImplProtocol
 from websockets.protocol import State
 
 from src import secret
+from src.adhoc.constants import messages
 from src.api import get_cur_user
 from src.custom import store_user_log
 from src.store import AnnouncementStore
@@ -74,7 +75,10 @@ async def push(req: Request, ws: WebsocketImplProtocol) -> None:
                         continue
 
                     msg_type = msg.get('type')
-                    payload = deepcopy(msg['payload'])
+                    if 'payload' in msg:
+                        payload = deepcopy(msg['payload'])
+                    else:
+                        payload = {}
 
                     match msg_type:
                         case 'normal':
@@ -105,6 +109,25 @@ async def push(req: Request, ws: WebsocketImplProtocol) -> None:
                                         await ws.send(json.dumps(payload))
                         case 'first_blood':
                             pass
+                        case 'puzzle_errata':
+                            puzzle_key = msg['puzzle_key']
+                            puzzle_title = worker.game_nocheck.puzzles.puzzle_by_key[puzzle_key].model.title
+                            payload['type'] = 'puzzle_errata'
+                            payload['message'] = messages.make_puzzle_errata_message(puzzle_title)
+
+                            if user.is_staff:
+                                payload['puzzle_key'] = puzzle_key
+                                store_user_log(req, 'ws.send', 'type_puzzle_errata', '', payload)
+                                await ws.send(json.dumps(payload))
+                            elif (
+                                user.team is not None
+                                and worker.game_nocheck.is_game_begin()
+                                and puzzle_key in user.team.game_state.unlock_puzzle_keys
+                            ):
+                                hashed_puzzle_key = worker.game_nocheck.hash_puzzle_key(user.team.model.id, puzzle_key)
+                                payload['puzzle_key'] = hashed_puzzle_key
+                                store_user_log(req, 'ws.send', 'type_puzzle_errata', '', payload)
+                                await ws.send(json.dumps(payload))
 
     finally:
         worker.log('debug', 'api.ws.push', f'disconnected from {user}')

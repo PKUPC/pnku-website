@@ -3,6 +3,7 @@ import json
 from typing import Any
 
 import flask_admin
+import wtforms
 
 from flask import flash, make_response, redirect, request
 from flask.typing import ResponseReturnValue
@@ -10,6 +11,7 @@ from flask_admin import expose
 from flask_admin.actions import action
 from sqlalchemy import select
 from wtforms import Form
+from wtforms.validators import Optional
 
 from src import adhoc
 from src.admin import fields
@@ -21,8 +23,24 @@ from ..utils import run_reducer_callback
 from .base_view import BaseView
 
 
+class ErrataMarkdownField(wtforms.TextAreaField):
+    widget = fields.SyntaxHighlightInput('markdown')
+
+
+class ContentMarkdownField(wtforms.TextAreaField):
+    widget = fields.SyntaxHighlightInput('markdown')
+
+
 class ClipboardField(flask_admin.form.JSONField):  # type: ignore[misc]
     widget = fields.JsonFormattedInput()
+
+
+class PuzzleTriggersField(flask_admin.form.JSONField):  # type: ignore[misc]
+    widget = fields.JsonListInputWithSnippets(PuzzleStore.TRIGGER_SNIPPETS)
+
+
+class PuzzleActionsField(flask_admin.form.JSONField):  # type: ignore[misc]
+    widget = fields.JsonListInputWithSnippets(PuzzleStore.ACTION_SNIPPETS)
 
 
 class PuzzleView(BaseView):
@@ -30,7 +48,7 @@ class PuzzleView(BaseView):
     can_delete = False
     can_create = False
 
-    column_exclude_list = ['content_template', 'clipboard']
+    column_exclude_list = ['errata_template', 'content_template', 'clipboard']
     column_default_sort = 'sorting_index'
     column_formatters = {
         'actions': lambda _v, _c, model, _n: '；'.join([f'[{a["type"]}] {a["name"]}' for a in model.actions]),
@@ -43,10 +61,13 @@ class PuzzleView(BaseView):
     column_descriptions = {
         'key': '题目唯一 ID，将会显示在 URL 中，比赛中不要随意修改，否则会导致已有提交失效',
         'sorting_index': '越小越靠前',
-        'content_template': '支持 Markdown 和 Jinja2 模板（group: Optional[str]、tick: int）',
+        'errata_template': '勘误部分，本质也是题面的一部分，会跟 content_template 拼接在一起显示，但是这部分的修改会向玩家发送一条实时通知。',
+        'content_template': '支持 Markdown 和 Jinja2 模板。',
         'puzzle_metadata': '题目的其他元信息',
         'actions': '题面底部展示的动作列表',
     }
+
+    form_args = {'errata_template': {'validators': [Optional()], 'filters': [lambda x: x or ''], 'default': ''}}
 
     form_widget_args = {
         'key': {
@@ -54,10 +75,11 @@ class PuzzleView(BaseView):
         }
     }
     form_overrides = {
-        'content_template': fields.MarkdownField,
+        'content_template': ContentMarkdownField,
+        'errata_template': ErrataMarkdownField,
         'puzzle_metadata': fields.JsonField,
-        'actions': fields.PuzzleActionsField,
-        'triggers': fields.PuzzleTriggersField,
+        'actions': PuzzleActionsField,
+        'triggers': PuzzleTriggersField,
         'clipboard': ClipboardField,
     }
     form_choices = {
@@ -72,6 +94,7 @@ class PuzzleView(BaseView):
             'category': puzzle.category,
             'subcategory': puzzle.subcategory,
             'sorting_index': puzzle.sorting_index,
+            'errata_template': puzzle.errata_template,
             'content_template': puzzle.content_template,
             'clipboard': puzzle.clipboard,
             'puzzle_metadata': puzzle.puzzle_metadata,
@@ -175,7 +198,6 @@ class PuzzleView(BaseView):
 
     def on_form_prefill(self, *args: Any, **kwargs: Any) -> None:
         flash('警告：比赛过程中修改题目信息需要重新载入游戏（目前需要手动重启）', 'warning')
-        # flash('警告：增删题目或者修改 flags、effective_after 字段会重算排行榜', 'warning')
 
     def on_model_change(self, form: Any, model: PuzzleStore, is_created: bool) -> None:
         rst, e = model.validate()
