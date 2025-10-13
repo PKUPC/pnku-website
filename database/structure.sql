@@ -124,6 +124,7 @@ CREATE TABLE `puzzle`  (
   `category` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `subcategory` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `sorting_index` int(11) NOT NULL,
+  `errata_template` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `content_template` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `clipboard` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
   `puzzle_metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
