@@ -127,10 +127,21 @@ class Puzzle(WithGameLifecycle):
                     self.attempted_teams.add(submission.team)
 
     def on_store_reload(self, store: PuzzleStore) -> None:
+        # 目前的设计中暂时不允许在线上修改 puzzle key（因为没必要），这里的检查暂时没用。
         if store.key != self._store.key:
             self.game.need_reload_team_event = True
         if str(store.triggers) != str(self._store.triggers):
             self.game.need_reload_team_event = True
+
+        # 勘误部分修改后会向玩家发送一条实时通知
+        if store.errata_template != self._store.errata_template:
+            self.game.worker.emit_ws_message(
+                {
+                    'type': 'puzzle_errata',
+                    'puzzle_key': self.model.key,
+                }
+            )
+
         self._store = store
         self.model = self._store.validated_model()
 
@@ -223,7 +234,7 @@ class Puzzle(WithGameLifecycle):
                 render_dict[item[0]] = item[1]
         print('rendering', self.model.title, render_dict)
         try:
-            return utils.render_template(self.model.content_template, render_dict)
+            return utils.render_template(self.model.errata_template + self.model.content_template, render_dict)
         except Exception as e:
             self.game.worker.log(
                 'error',

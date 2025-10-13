@@ -8,7 +8,7 @@ import wtforms
 
 from markupsafe import Markup
 
-from .. import store, utils
+from .. import utils
 
 
 def timestamp_s_formatter(_view: Any, _context: Any, model: Any, name: str) -> str:
@@ -229,11 +229,3 @@ class PythonField(wtforms.fields.TextAreaField):
 # `JsonField` should be used for a JSON sqlalchemy type, while `JsonTextField` should be used for a string type.
 class JsonField(flask_admin.form.JSONField):  # type: ignore[misc]
     widget = JsonFormattedInput()
-
-
-class PuzzleTriggersField(flask_admin.form.JSONField):  # type: ignore[misc]
-    widget = JsonListInputWithSnippets(store.PuzzleStore.TRIGGER_SNIPPETS)
-
-
-class PuzzleActionsField(flask_admin.form.JSONField):  # type: ignore[misc]
-    widget = JsonListInputWithSnippets(store.PuzzleStore.ACTION_SNIPPETS)

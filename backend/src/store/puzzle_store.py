@@ -47,6 +47,7 @@ class PuzzleStoreModel(BaseModel):
     category: str
     subcategory: str
     sorting_index: int
+    errata_template: str
     content_template: str
     clipboard: list[ClipboardModel]
     puzzle_metadata: PuzzleMetadataModel
@@ -90,6 +91,7 @@ class PuzzleStore(Table):
     category: Mapped[str] = mapped_column(String(128), nullable=False)
     subcategory: Mapped[str] = mapped_column(String(128), nullable=False, default='normal')
     sorting_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    errata_template: Mapped[str] = mapped_column(Text, nullable=False)
     content_template: Mapped[str] = mapped_column(Text, nullable=False)
     # 游戏的一些元信息，包括作者、游戏特殊设置等等
     puzzle_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)

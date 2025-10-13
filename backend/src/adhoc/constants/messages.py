@@ -31,6 +31,10 @@ def make_buy_hint_message(teammate: str, puzzle_title: str, price: list[PriceMod
     return f'你的队友 {teammate} 花费了 {cost_str} 购买了题目《{puzzle_title}》的提示。'
 
 
+def make_puzzle_errata_message(puzzle_title: str) -> str:
+    return f'题目《{puzzle_title}》的题面进行了修正，请前往查看。'
+
+
 def describe_staff_modify_currency(currency_type: CurrencyType, delta: int, reason: str) -> str:
     action = '增加' if delta > 0 else '扣除'
     return f'工作人员{action}了你们队伍的{currency_type.value}，原因是：{reason}'
