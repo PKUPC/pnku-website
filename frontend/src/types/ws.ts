@@ -67,6 +67,12 @@ export namespace WsClient {
         status: 'OPEN' | 'CLOSED';
     };
 
+    export type PuzzleErrata = {
+        type: 'puzzle_errata';
+        puzzle_key: string;
+        message: string;
+    };
+
     export type WsData =
         | NewAnnouncementData
         | UpdateAnnouncements
@@ -78,5 +84,6 @@ export namespace WsClient {
         | StaffActionData
         | NewTicketData
         | NewTicketMessageData
-        | TicketStatusUpdate;
+        | TicketStatusUpdate
+        | PuzzleErrata;
 }

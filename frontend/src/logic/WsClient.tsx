@@ -263,6 +263,15 @@ export class PushClient {
                 this.setHasNewMessage(true);
                 break;
             }
+            case 'puzzle_errata': {
+                PushClient.notification.success({
+                    ...notificationConfig,
+                    icon: <RocketOutlined />,
+                    message: '谜题勘误提醒',
+                    description: data.message,
+                });
+                break;
+            }
         }
     }
 
