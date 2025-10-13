@@ -35,7 +35,7 @@ export function ImageList({ data }: { data: Wish.Upload.UploadedImageItem[] }) {
                 {data.map((item, index) => {
                     return (
                         <Col key={index} xl={8} sm={12} xs={24}>
-                            <div className="w-60 m-auto rounded-box bordered border-[1px]">
+                            <div className="w-60 m-auto rounded-box bordered border">
                                 <div className="w-full">
                                     <Image src={item.url} alt={'image'} height={'18.75rem'} width={'15rem'} />
                                 </div>

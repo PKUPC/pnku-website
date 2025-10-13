@@ -1,7 +1,7 @@
 import { InfoCircleTwoTone } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { TableLoader as Table, type TableColumnsType } from '@/components/lazy/TableLoader';
 import { useSuccessGameInfo, useTheme } from '@/logic/contexts.ts';

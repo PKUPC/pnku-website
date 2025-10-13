@@ -42,7 +42,7 @@ export function Message({ message }: { message: MessageInfo }) {
             }
         >
             <SimpleTemplateStr name="message">{message.content}</SimpleTemplateStr>
-            <div className="italic text-sm text-base-content text-opacity-60">
+            <div className="italic text-sm text-base-content/60">
                 {' '}
                 发送于 {new Date(message.timestamp_s * 1000).toLocaleString()}
             </div>
@@ -94,7 +94,7 @@ export function ChatBox({
             />
             <br />
 
-            <div className="border-base-300 rounded-box bordered border-[1px] p-4 mb-4 bg-base-200/30">
+            <div className="border-base-300 rounded-box bordered border p-4 mb-4 bg-base-200/30">
                 <Input.TextArea
                     value={disabled ? (disabledReason ?? '已禁用') : inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}

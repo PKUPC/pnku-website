@@ -5,7 +5,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
 
 import NotFound from '@/app/NotFound.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { Reloader } from '@/components/Reloader';
 import { fetchTemplateFile } from '@/logic/wish';
 

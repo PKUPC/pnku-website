@@ -2,7 +2,7 @@ import { Alert } from 'antd';
 import { useSearchParams } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { TableLoader as Table, type TableColumnsType } from '@/components/lazy/TableLoader';
 import { NeverError } from '@/errors';

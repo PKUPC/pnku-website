@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 
 import { TicketDetail } from '@/app/(general)/ticket-detail/TicketDetail.tsx';
 import NotFound from '@/app/NotFound.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { GameStatusContext, useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';

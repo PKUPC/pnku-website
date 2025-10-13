@@ -1,6 +1,6 @@
 import { TeamList } from '@/app/(general)/plaza/TeamList.tsx';
 import NotFound from '@/app/NotFound.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';

@@ -1,5 +1,5 @@
 import { SubmissionTable } from '@/app/(general)/staff/(menu)/submissions/SubmissionTable.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useWishData } from '@/logic/swrWrappers';
 

@@ -2,7 +2,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 
 import { PuzzleStatisticsTable } from '@/app/(general)/team/puzzle-statistics/PuzzleStatisticsTable';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useWishData } from '@/logic/swrWrappers';
 import { Wish } from '@/types/wish.ts';

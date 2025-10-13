@@ -6,7 +6,7 @@ import { TeamInfoCard } from '@/app/(general)/staff/(detail)/team-detail/TeamInf
 import { TeamPassedPuzzleTable } from '@/app/(general)/staff/(detail)/team-detail/TeamPassedPuzzleTable.tsx';
 import { TeamSubmissionsTable } from '@/app/(general)/staff/(detail)/team-detail/TeamSubmissionsTable.tsx';
 import NotFound from '@/app/NotFound.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useWishData } from '@/logic/swrWrappers';
 

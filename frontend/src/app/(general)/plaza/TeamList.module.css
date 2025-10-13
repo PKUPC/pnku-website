@@ -1,3 +1,5 @@
+@import '@/globals.css';
+
 .teamCard {
   padding: 20px;
   background-color: #ffffff;

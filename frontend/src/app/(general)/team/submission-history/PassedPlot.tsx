@@ -1,7 +1,8 @@
 import { Suspense, lazy } from 'react';
 
 import { AppErrorBoundary } from '@/app/AppErrorBoundary.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
+import { useTheme } from '@/logic/contexts';
 import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
 
@@ -14,6 +15,7 @@ type PointItem = {
 };
 
 export default function PassedPlot({ passedSubmissions }: { passedSubmissions: Wish.Team.TeamPassedSubmission[] }) {
+    const { color } = useTheme();
     const points: PointItem[] = [];
 
     const timeRange = [
@@ -46,10 +48,17 @@ export default function PassedPlot({ passedSubmissions }: { passedSubmissions: W
                         x: {
                             labelFormatter: (x: number) => format_ts(x),
                             grid: false,
+                            labelAlign: 'horizontal',
+                            labelOpacity: 0.6,
+                            labelFill: color.baseContent,
                         },
                         y: {
                             gridLineDash: [0, 0],
-                            gridStrokeOpacity: 0.5,
+                            gridStrokeOpacity: 0.4,
+                            gridLineWidth: 1,
+                            gridStroke: color.baseContent,
+                            labelOpacity: 0.6,
+                            labelFill: color.baseContent,
                         },
                     }}
                     interaction={{
@@ -57,6 +66,25 @@ export default function PassedPlot({ passedSubmissions }: { passedSubmissions: W
                             position: 'top-right',
                             sort: (x: PointItem) => -x.score,
                             showMarkers: false,
+                            crosshairsYStroke: color.baseContent,
+                            crosshairsXStroke: null,
+                            css: {
+                                '.g2-tooltip': {
+                                    background: color.base200,
+                                },
+                                '.g2-tooltip-title': {
+                                    color: color.baseContent,
+                                    opacity: 0.7,
+                                },
+                                '.g2-tooltip-list-item-name-label': {
+                                    color: color.baseContent,
+                                    opacity: 0.7,
+                                },
+                                '.g2-tooltip-list-item-value': {
+                                    color: color.baseContent,
+                                    opacity: 0.7,
+                                },
+                            },
                         },
                     }}
                     legend={{
@@ -76,6 +104,7 @@ export default function PassedPlot({ passedSubmissions }: { passedSubmissions: W
                             layout: {
                                 justifyContent: 'center',
                             },
+                            itemLabelFill: color.baseContent,
                         },
                     }}
                     tooltip={{

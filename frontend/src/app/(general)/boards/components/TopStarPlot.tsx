@@ -1,7 +1,8 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 
 import { AppErrorBoundary } from '@/app/AppErrorBoundary.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
+import { useTheme } from '@/logic/contexts';
 import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
 
@@ -21,6 +22,7 @@ export default function TopStarPlot({ data }: { data: Wish.Game.FullBoard }) {
     const [loading, setLoading] = useState(true);
     const [finalData, setFinalData] = useState<PointItem[]>([]);
     const [timeRange, setTimeRange] = useState<[number, number]>([-1, -1]);
+    const { color } = useTheme();
 
     useEffect(() => {
         setLoading(true);
@@ -81,7 +83,7 @@ export default function TopStarPlot({ data }: { data: Wish.Game.FullBoard }) {
                 {loading ? (
                     <Loading style={{ height: 350 }} />
                 ) : (
-                    <div className={'min-h-[21.875rem]'}>
+                    <div className={'min-h-87.5'}>
                         <Line
                             height={350}
                             data={finalData}
@@ -96,10 +98,17 @@ export default function TopStarPlot({ data }: { data: Wish.Game.FullBoard }) {
                                     grid: false,
                                     minLimit: timeRange[0],
                                     maxLimit: timeRange[1],
+                                    labelAlign: 'horizontal',
+                                    labelOpacity: 0.6,
+                                    labelFill: color.baseContent,
                                 },
                                 y: {
                                     gridLineDash: [0, 0],
-                                    gridStrokeOpacity: 0.5,
+                                    gridStrokeOpacity: 0.4,
+                                    gridLineWidth: 1,
+                                    gridStroke: color.baseContent,
+                                    labelOpacity: 0.6,
+                                    labelFill: color.baseContent,
                                 },
                             }}
                             interaction={{
@@ -107,6 +116,25 @@ export default function TopStarPlot({ data }: { data: Wish.Game.FullBoard }) {
                                     position: 'top-right',
                                     sort: (x: PointItem) => -x.score,
                                     showMarkers: false,
+                                    crosshairsYStroke: color.baseContent,
+                                    crosshairsXStroke: null,
+                                    css: {
+                                        '.g2-tooltip': {
+                                            background: color.base200,
+                                        },
+                                        '.g2-tooltip-title': {
+                                            color: color.baseContent,
+                                            opacity: 0.7,
+                                        },
+                                        '.g2-tooltip-list-item-name-label': {
+                                            color: color.baseContent,
+                                            opacity: 0.7,
+                                        },
+                                        '.g2-tooltip-list-item-value': {
+                                            color: color.baseContent,
+                                            opacity: 0.7,
+                                        },
+                                    },
                                 },
                             }}
                             legend={{
@@ -126,6 +154,7 @@ export default function TopStarPlot({ data }: { data: Wish.Game.FullBoard }) {
                                     layout: {
                                         justifyContent: 'center',
                                     },
+                                    itemLabelFill: color.baseContent,
                                 },
                             }}
                             tooltip={{

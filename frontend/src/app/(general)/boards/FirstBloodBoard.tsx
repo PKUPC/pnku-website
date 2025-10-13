@@ -38,7 +38,7 @@ export function FirstBloodBoard({ data }: { data: Wish.Game.FirstBloodBoard }) {
 
     const columns: TableColumnsType<TableItem> = [
         {
-            className: 'w-[6.4rem] xl:w-[10rem] align-top',
+            className: 'w-[6.4rem] xl:w-40 align-top',
             title: '区域',
             dataIndex: 'area_title',
             render: (text) => {

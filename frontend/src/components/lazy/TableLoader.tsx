@@ -2,7 +2,7 @@ import type { TableColumnsType, TablePaginationConfig, TableProps } from 'antd';
 import { ComponentType, Suspense, lazy, memo } from 'react';
 
 import { AppErrorBoundary } from '@/app/AppErrorBoundary.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 
 type AnyObject = Record<PropertyKey, any>;
 

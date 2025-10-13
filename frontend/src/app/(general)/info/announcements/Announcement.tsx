@@ -28,7 +28,7 @@ export function Announcement({
     if (!ARCHIVE_MODE && !info.game.login) redirect('/home');
     return (
         <div
-            className="rounded-box border-[1px] overflow-hidden"
+            className="rounded-box border overflow-hidden"
             id={`announcement-${announcement.id}`}
             style={{
                 borderColor,
@@ -42,7 +42,7 @@ export function Announcement({
                     <span className="font-bold" style={{ color: headerTextColor }}>
                         <NotificationOutlined /> {announcement.title}
                     </span>
-                    <span className="text-[0.75rem] ml-2 text-base-content text-opacity-60">
+                    <span className="text-[0.75rem] ml-2 text-base-content/60">
                         {' '}
                         发布于 <TimestampAgo ts={announcement.publish_at} />
                     </span>

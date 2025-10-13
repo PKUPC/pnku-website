@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { EveryUserIcon } from '@/SvgIcons';
 import styles from '@/app/(general)/plaza/TeamList.module.css';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import InfoBox from '@/components/InfoBox';
+import { Loading } from '@/components/Loading.tsx';
 import { ProfileAvatar } from '@/components/ProfileAvatar.tsx';
 import { useTheme } from '@/logic/contexts.ts';
 import { Wish } from '@/types/wish.ts';

@@ -6,32 +6,32 @@ import { SiteThemeType, ThemeContext, ThemeContextType, enabledThemes } from '@/
 function getColorFromCssVar(cssVar: string) {
     const color = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
     if (color === '') return '#ffffff';
-    const colorObj = new Color(`oklch(${color})`);
+    const colorObj = new Color(`${color}`);
     return colorObj.to('srgb').toString({ format: 'hex' });
 }
 
 function getCurrentColor() {
     return {
-        primary: getColorFromCssVar('--p'),
-        primaryContent: getColorFromCssVar('--pc'),
-        secondary: getColorFromCssVar('--s'),
-        secondaryContent: getColorFromCssVar('--sc'),
-        accent: getColorFromCssVar('--a'),
-        accentContent: getColorFromCssVar('--ac'),
-        neutral: getColorFromCssVar('--n'),
-        neutralContent: getColorFromCssVar('--nc'),
-        base100: getColorFromCssVar('--b1'),
-        base200: getColorFromCssVar('--b2'),
-        base300: getColorFromCssVar('--b3'),
-        baseContent: getColorFromCssVar('--bc'),
-        info: getColorFromCssVar('--in'),
-        infoContent: getColorFromCssVar('--inc'),
-        success: getColorFromCssVar('--su'),
-        successContent: getColorFromCssVar('--suc'),
-        warning: getColorFromCssVar('--wa'),
-        warningContent: getColorFromCssVar('--wac'),
-        error: getColorFromCssVar('--er'),
-        errorContent: getColorFromCssVar('--erc'),
+        primary: getColorFromCssVar('--color-primary'),
+        primaryContent: getColorFromCssVar('--color-primary-content'),
+        secondary: getColorFromCssVar('--color-secondary'),
+        secondaryContent: getColorFromCssVar('--color-secondary-content'),
+        accent: getColorFromCssVar('--color-accent'),
+        accentContent: getColorFromCssVar('--color-accent-content'),
+        neutral: getColorFromCssVar('--color-neutral'),
+        neutralContent: getColorFromCssVar('--color-neutral-content'),
+        base100: getColorFromCssVar('--color-base-100'),
+        base200: getColorFromCssVar('--color-base-200'),
+        base300: getColorFromCssVar('--color-base-300'),
+        baseContent: getColorFromCssVar('--color-base-content'),
+        info: getColorFromCssVar('--color-info'),
+        infoContent: getColorFromCssVar('--color-info-content'),
+        success: getColorFromCssVar('--color-success'),
+        successContent: getColorFromCssVar('--color-success-content'),
+        warning: getColorFromCssVar('--color-warning'),
+        warningContent: getColorFromCssVar('--color-warning-content'),
+        error: getColorFromCssVar('--color-error'),
+        errorContent: getColorFromCssVar('--color-error-content'),
     };
 }
 
@@ -60,9 +60,9 @@ function getCssVariableAsPx(variableName: string): number {
 function getCurrentStyle(): ThemeContextType['style'] {
     console.log(window.getComputedStyle(document.documentElement).fontSize);
     return {
-        roundedBoxPx: getCssVariableAsPx('--rounded-box'),
-        roundedBtnPx: getCssVariableAsPx('--rounded-btn'),
-        roundedBadgePx: getCssVariableAsPx('--rounded-badge'),
+        radiusSelector: getCssVariableAsPx('--radius-selector'),
+        radiusField: getCssVariableAsPx('--radius-field'),
+        radiusBox: getCssVariableAsPx('--radius-box'),
     };
 }
 

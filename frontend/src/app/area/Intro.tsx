@@ -78,7 +78,7 @@ function IntroAnswerInput() {
             <Toy />
             <Input.Search
                 size="large"
-                addonBefore={'提交答案：'}
+                addonBefore={'答案：'}
                 placeholder={'... ...'}
                 enterButton={
                     <>
@@ -145,7 +145,7 @@ function IntroBody({ areaData }: { areaData: Wish.Game.IntroArea }) {
                     pointerEvents: 'none',
                 }}
             />
-            <FancySlimContainer title={areaData.extra.areaTitle} extraClassName="relative -mt-[40vh] z-[1]">
+            <FancySlimContainer title={areaData.extra.areaTitle} extraClassName="relative -mt-[40vh] z-1">
                 <FancySlimContainer.SubTitle subTitle={areaData.extra.areaSubtitle} />
                 <TemplateFile name={areaData.template} />
                 {component}

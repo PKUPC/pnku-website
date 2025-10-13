@@ -5,6 +5,7 @@
     "editor.quickSuggestions": {
         "strings": "on"
     },
+    "tailwindCSS.experimental.configFile": "src/globals.css",
     "todo-tree.general.tags": [
         "TODO",
         "ATTENTION",

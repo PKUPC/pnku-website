@@ -33,7 +33,7 @@ export function Message({ message }: { message: Wish.Message.MessageInfo }) {
             }
         >
             <SimpleTemplateStr name="message">{message.content}</SimpleTemplateStr>
-            <div className="italic text-sm text-base-content text-opacity-60">
+            <div className="italic text-sm text-base-content/60">
                 {' '}
                 发送于 {new Date(message.timestamp_s * 1000).toLocaleString()}
             </div>
@@ -135,7 +135,7 @@ export function MessageBox({ teamId }: { teamId: number }) {
                 </>
             )}
             {!banned && (
-                <div className="border-base-300 rounded-box bordered border-[1px] p-4 mb-4 bg-base-200/30">
+                <div className="border-base-300 rounded-box bordered border p-4 mb-4 bg-base-200/30">
                     <Input.TextArea
                         value={banned ? bannedText : inputMsg}
                         onChange={(e) => setInputMsg(e.target.value)}
