@@ -66,8 +66,6 @@ class StatusView(AdminIndexView):  # type: ignore[misc]
             'disk': f'used={st["disk_used"]:.2f}G, free={st["disk_free"]:.2f}G',
         }
 
-        print(teams_statistic_cnt)
-
         return self.render(  # type: ignore[no-any-return]
             'status.html',
             sys_status=sys_status,

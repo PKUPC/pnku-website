@@ -259,7 +259,7 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
         'actions': puzzle.model.describe_actions() + dyn_actions,
         'status': puzzle_status,
         'puzzle_list': puzzle_list,
-        **adhoc.get_more_puzzle_detail(puzzle, user),
+        **adhoc.get_extra_puzzle_detail(puzzle, user),
     }
 
     if not user.is_staff:

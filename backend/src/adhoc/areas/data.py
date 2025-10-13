@@ -1,50 +1,9 @@
 from src import utils
 
 
-EXTRA_DATA = {
-    'intro': {
-        'areaImage': utils.media_wrapper('areas/intro/intro.webp'),
-        'areaLogoImage': utils.media_wrapper('areas/intro/intro_logo.svg'),
-        'areaTitle': '序章',
-        'areaSubtitle': '第零日',
-        'bgFocusPositionX': 5,
-        'bgFocusPositionY': 0,
-        'subColor': 'hsl(321.82, 73.33%, 94.12%)',
-        'mainColor': 'hsl(220.85, 85.45%, 67.65%)',
-    },
-    'day1': {
-        'areaImage': utils.media_wrapper('areas/day1/day1.webp'),
-        'areaLogoImage': utils.media_wrapper('areas/day1/logo_day1.svg'),
-        'areaTitle': '素青',
-        'areaSubtitle': '第一日',
-        'bgFocusPositionX': 5,
-        'bgFocusPositionY': 0,
-        'subColor': 'hsl(321.82, 73.33%, 94.12%)',
-        'mainColor': 'hsl(220.85, 85.45%, 67.65%)',
-    },
-    'day2': {
-        'areaImage': utils.media_wrapper('areas/day2/day2.webp'),
-        'areaLogoImage': utils.media_wrapper('areas/day2/logo_day2.svg'),
-        'areaTitle': '秋蝉',
-        'areaSubtitle': '第二日',
-        'bgFocusPositionX': 5,
-        'bgFocusPositionY': 0,
-        'subColor': 'hsl(57.69, 72.22%, 71.76%)',
-        'mainColor': 'hsl(176.3, 91.5%, 41.4%)',
-    },
-    'day3': {
-        'areaImage': utils.media_wrapper('areas/day3/day3.webp'),
-        'areaLogoImage': utils.media_wrapper('areas/day3/logo_day3.svg'),
-        'areaTitle': '临水',
-        'areaSubtitle': '第三日',
-        'bgFocusPositionX': 5,
-        'bgFocusPositionY': 0,
-        'subColor': 'hsl(195, 96.55%, 77.25%)',
-        'mainColor': 'hsl(242.18, 93.22%, 65.29%)',
-    },
-}
-
-AREA_LIST = [
+# 不同状态下的 Intro 页状态
+INTRO_LIST = [
+    # 未登录用户 or 序章还没开放
     {
         'bgUrl': utils.media_wrapper('areas/intro/intro.webp'),
         'title': 'P&KU 3',
@@ -59,6 +18,7 @@ AREA_LIST = [
         'mainColor': '#AAFAF9',
         'subColor': '#F4BCFC',
     },
+    # 序章开放到游戏开始前
     {
         'bgUrl': utils.media_wrapper('areas/intro/intro.webp'),
         'title': 'P&KU 3',
@@ -73,6 +33,7 @@ AREA_LIST = [
         'mainColor': '#AAFAF9',
         'subColor': '#F4BCFC',
     },
+    # 游戏开始后 or staff
     {
         'bgUrl': utils.media_wrapper('areas/intro/intro.webp'),
         'title': 'P&KU 3',
@@ -87,6 +48,10 @@ AREA_LIST = [
         'mainColor': '#AAFAF9',
         'subColor': '#F4BCFC',
     },
+]
+
+
+AREA_LIST = [
     {
         'bgUrl': utils.media_wrapper('areas/day1/day1.webp'),
         'title': '第一日',
@@ -130,3 +95,47 @@ AREA_LIST = [
         'mainColor': 'hsl(242.18, 93.22%, 65.29%)',
     },
 ]
+
+
+EXTRA_DATA = {
+    'intro': {
+        'areaImage': utils.media_wrapper('areas/intro/intro.webp'),
+        'areaLogoImage': utils.media_wrapper('areas/intro/intro_logo.svg'),
+        'areaTitle': '序章',
+        'areaSubtitle': '第零日',
+        'bgFocusPositionX': 5,
+        'bgFocusPositionY': 0,
+        'subColor': 'hsl(321.82, 73.33%, 94.12%)',
+        'mainColor': 'hsl(220.85, 85.45%, 67.65%)',
+    },
+    'day1': {
+        'areaImage': utils.media_wrapper('areas/day1/day1.webp'),
+        'areaLogoImage': utils.media_wrapper('areas/day1/logo_day1.svg'),
+        'areaTitle': '素青',
+        'areaSubtitle': '第一日',
+        'bgFocusPositionX': 5,
+        'bgFocusPositionY': 0,
+        'subColor': 'hsl(321.82, 73.33%, 94.12%)',
+        'mainColor': 'hsl(220.85, 85.45%, 67.65%)',
+    },
+    'day2': {
+        'areaImage': utils.media_wrapper('areas/day2/day2.webp'),
+        'areaLogoImage': utils.media_wrapper('areas/day2/logo_day2.svg'),
+        'areaTitle': '秋蝉',
+        'areaSubtitle': '第二日',
+        'bgFocusPositionX': 5,
+        'bgFocusPositionY': 0,
+        'subColor': 'hsl(57.69, 72.22%, 71.76%)',
+        'mainColor': 'hsl(176.3, 91.5%, 41.4%)',
+    },
+    'day3': {
+        'areaImage': utils.media_wrapper('areas/day3/day3.webp'),
+        'areaLogoImage': utils.media_wrapper('areas/day3/logo_day3.svg'),
+        'areaTitle': '临水',
+        'areaSubtitle': '第三日',
+        'bgFocusPositionX': 5,
+        'bgFocusPositionY': 0,
+        'subColor': 'hsl(195, 96.55%, 77.25%)',
+        'mainColor': 'hsl(242.18, 93.22%, 65.29%)',
+    },
+}
