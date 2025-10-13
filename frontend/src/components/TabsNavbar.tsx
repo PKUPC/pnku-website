@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router';
 
-import styles from './TabsNavbar.module.css';
+import { cn } from '@/utils';
 
 export type MenuItem = {
     type: string;
@@ -21,9 +21,13 @@ export function TabsNavbar({ selectedKeys, items }: { selectedKeys?: string[]; i
                         <Link to={item.href ?? item.key} key={item.key}>
                             <div
                                 role="tab"
-                                className={
-                                    styles.tab + (selectedKeys?.includes(item.key) ? ' ' + styles.tabActive : '')
-                                }
+                                className={cn(
+                                    'relative inline-block p-2',
+                                    'after:content-[""] after:absolute after:-bottom-0.5 after:left-1 after:right-1 after:border-b-2 after:border-b-base-200',
+                                    selectedKeys?.includes(item.key)
+                                        ? 'after:border-b-base-content hover:after:border-b-base-content'
+                                        : 'after:border-b-base-content/0 hover:after:border-b-base-content/60',
+                                )}
                             >
                                 {item.icon}
                                 <span className="ml-1">{item.label}</span>
@@ -35,11 +39,13 @@ export function TabsNavbar({ selectedKeys, items }: { selectedKeys?: string[]; i
                         <div
                             key={item.key}
                             role="tab"
-                            className={
-                                'cursor-pointer ' +
-                                styles.tab +
-                                (selectedKeys?.includes(item.key) ? ' ' + styles.tabActive : '')
-                            }
+                            className={cn(
+                                'cursor-pointer relative inline-block p-2',
+                                'after:content-[""] after:absolute after:-bottom-0.5 after:left-1 after:right-1 after:border-b-2 after:border-b-base-200',
+                                selectedKeys?.includes(item.key)
+                                    ? 'after:border-b-base-content hover:after:border-b-base-content'
+                                    : 'after:border-b-base-content/0 hover:after:border-b-base-content/60',
+                            )}
                             onClick={item.onClick}
                         >
                             {item.icon}

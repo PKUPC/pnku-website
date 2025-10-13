@@ -54,7 +54,7 @@ export function ListArea({ areaData }: { areaData: Wish.Game.ListArea }) {
             />
             <FancySlimContainer
                 title={areaDataExtra.areaTitle}
-                extraClassName="relative -mt-[40vh] z-[1]"
+                extraClassName="relative -mt-[40vh] z-1"
                 logoUrl={areaDataExtra.areaLogoImage}
             >
                 <div ref={storyRef}></div>

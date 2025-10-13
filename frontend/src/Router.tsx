@@ -36,7 +36,8 @@ import { AreaPage } from '@/app/area/page.tsx';
 import { HomePage } from '@/app/home/page.tsx';
 import { PuzzleListPage } from '@/app/puzzle-list/page.tsx';
 import { StoryListPage } from '@/app/story-list/page.tsx';
-import { Header } from '@/components/DaisyUI/Header.tsx';
+import { Loading } from '@/components/Loading.tsx';
+import { Header } from '@/components/layout/Header.tsx';
 
 function AppLayout() {
     console.debug('Rendering AppLayout');
@@ -54,6 +55,7 @@ const routes: RouteObject[] = [
     {
         element: <AppLayout />,
         errorElement: <RouterErrorBoundary />,
+        hydrateFallbackElement: <Loading />,
         children: [
             { path: '/', element: <Navigate to={'/home'} replace={true} /> },
             { path: '/home', element: <HomePage /> },

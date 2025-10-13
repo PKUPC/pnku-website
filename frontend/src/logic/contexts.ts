@@ -100,9 +100,9 @@ type ThemeContextType = {
         errorContent: string;
     };
     style: {
-        roundedBoxPx: number;
-        roundedBtnPx: number;
-        roundedBadgePx: number;
+        radiusSelector: number;
+        radiusField: number;
+        radiusBox: number;
     };
 };
 // @ts-ignore

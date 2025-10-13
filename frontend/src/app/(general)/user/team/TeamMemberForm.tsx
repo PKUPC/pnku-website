@@ -96,8 +96,8 @@ export function TeamMemberForm() {
             <FancyCard title="队伍成员列表">
                 <div>
                     {info.team.members.map((item) => (
-                        <div key={item.id} className="not-last:border-b-[1px] py-3 px-1 text-sm flex">
-                            <div className="flex items-center gap-2 flex-grow">
+                        <div key={item.id} className="not-last:border-b py-3 px-1 text-sm flex">
+                            <div className="flex items-center gap-2 grow">
                                 <ProfileAvatar src={item.avatar_url} alt={item.nickname} size={'2rem'} />
                                 {item.nickname}
                                 {leader_id === item.id && leaderIcon}

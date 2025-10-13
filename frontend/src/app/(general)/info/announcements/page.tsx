@@ -2,7 +2,7 @@ import { Empty } from 'antd';
 import { useContext, useEffect } from 'react';
 
 import { Announcement } from '@/app/(general)/info/announcements/Announcement';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { GameStatusContext } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';

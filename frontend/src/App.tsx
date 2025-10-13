@@ -14,8 +14,6 @@ import { wish } from '@/logic/wish.ts';
 import { setup } from '@/setup.ts';
 import { mixColor } from '@/utils.ts';
 
-import './globals.css';
-
 setup();
 
 function InnerLayout({ children }: { children: React.ReactNode }) {
@@ -67,9 +65,9 @@ function App({ children }: { children: ReactNode }) {
                     colorWarning: color.warning,
                     colorWarningBg: mixColor(color.base100, color.warning, 0.1),
                     colorWarningBorder: mixColor(color.base300, color.warning, 0.7),
-                    borderRadius: style.roundedBtnPx,
-                    borderRadiusLG: style.roundedBoxPx,
-                    borderRadiusSM: style.roundedBtnPx,
+                    borderRadius: style.radiusSelector,
+                    borderRadiusLG: style.radiusBox,
+                    borderRadiusSM: style.radiusField,
                 },
             }}
         >

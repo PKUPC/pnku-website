@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Loading } from '@/components/DaisyUI/Loading';
+import { Loading } from '@/components/Loading';
 import { WishError } from '@/components/WishError';
 import { useWishContext } from '@/logic/swrWrappers';
 

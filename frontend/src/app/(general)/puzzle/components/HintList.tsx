@@ -3,7 +3,7 @@ import { Button, Collapse, CollapseProps, Empty, Modal, Tag, Tooltip, message } 
 import { useContext } from 'react';
 import { KeyedMutator } from 'swr';
 
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import NamedIcon from '@/components/NamedIcon';
 import { SimpleTemplateStr } from '@/components/Template';
 import { WishError } from '@/components/WishError.tsx';

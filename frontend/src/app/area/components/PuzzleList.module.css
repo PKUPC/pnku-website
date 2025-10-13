@@ -10,26 +10,26 @@
     height: calc(26px + var(--icon-scale));
     width: 100%;
 
-    border-bottom: 1px solid oklch(var(--b3));
+    border-bottom: 1px solid var(--color-base-300);
 
     &:first-child {
-      border-top-left-radius: var(--rounded-btn);
-      border-top-right-radius: var(--rounded-btn);
+      border-top-left-radius: var(--radius-selector);
+      border-top-right-radius: var(--radius-selector);
     }
 
     &:last-child {
-      border-bottom-left-radius: var(--rounded-btn);
-      border-bottom-right-radius: var(--rounded-btn);
+      border-bottom-left-radius: var(--radius-selector);
+      border-bottom-right-radius: var(--radius-selector);
       border-bottom: 0;
     }
 
     &:not(:global(.puzzle-row-select)):hover {
-      background-color: oklch(var(--b2));
+      background-color: var(--color-base-200);
     }
   }
 
   :global(.puzzle-row-select) {
-    background-color: oklch(var(--b3));
+    background-color: var(--color-base-300);
   }
 
   :global(.puzzle-row-disabled) {
@@ -40,16 +40,16 @@
     background: repeating-linear-gradient(-45deg, #eee, #eee 10px, #f8f8f8 10px, #f8f8f8 20px);
     width: 100%;
 
-    border-bottom: 1px solid oklch(var(--b3));
+    border-bottom: 1px solid var(--color-base-300);
 
     &:first-child {
-      border-top-left-radius: var(--rounded-btn);
-      border-top-right-radius: var(--rounded-btn);
+      border-top-left-radius: var(--radius-selector);
+      border-top-right-radius: var(--radius-selector);
     }
 
     &:last-child {
-      border-bottom-left-radius: var(--rounded-btn);
-      border-bottom-right-radius: var(--rounded-btn);
+      border-bottom-left-radius: var(--radius-selector);
+      border-bottom-right-radius: var(--radius-selector);
       border-bottom: 0;
     }
 

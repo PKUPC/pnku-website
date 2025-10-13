@@ -1,7 +1,7 @@
 .fancierCard {
   position: relative;
   width: 100%;
-  background: oklch(var(--b1));
+  background: var(--color-base-100);
   box-sizing: border-box;
   font-family: 'Noto Serif SC', serif !important;
   --icon-scale: 24px;

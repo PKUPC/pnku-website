@@ -1,5 +1,5 @@
 import { TicketTable } from '@/app/(general)/staff/(menu)/tickets/TicketTable';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useWishData } from '@/logic/swrWrappers';
 

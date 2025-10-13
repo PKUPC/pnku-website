@@ -2,7 +2,7 @@ import { ClockCircleOutlined } from '@ant-design/icons';
 import { Empty, Timeline } from 'antd';
 import React from 'react';
 
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useTheme } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';

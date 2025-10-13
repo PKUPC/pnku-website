@@ -1,8 +1,8 @@
 import { useContext, useEffect } from 'react';
 
 import NotFound from '@/app/NotFound.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import { Footer } from '@/components/Footer.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { ARCHIVE_MODE } from '@/constants.tsx';
 import { GameStatusContext, useSuccessGameInfo } from '@/logic/contexts.ts';

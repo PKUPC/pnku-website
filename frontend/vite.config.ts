@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import Md5 from 'crypto-js/md5';
 import { resolve } from 'path';
@@ -137,6 +138,7 @@ export default defineConfig(({ mode }) => {
         plugins: [
             react(),
             svgr(),
+            tailwindcss(),
             obfuscator({
                 include: 'src/setup.ts',
                 options: {

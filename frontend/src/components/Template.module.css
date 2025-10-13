@@ -1,29 +1,31 @@
+@import '@/globals.css';
+
 .template {
   overflow-wrap: break-word;
   font-size: 16px;
 
   h1 {
-    @apply mb-2 mt-2 text-[2rem] font-bold;
+    @apply mt-2 mb-2 text-[2rem] font-bold;
   }
 
   h2 {
-    @apply mb-2 mt-2 text-2xl font-bold;
+    @apply mt-2 mb-2 text-2xl font-bold;
   }
 
   h3 {
-    @apply mb-2 mt-2 text-xl font-bold;
+    @apply mt-2 mb-2 text-xl font-bold;
   }
 
   h4 {
-    @apply mb-2 mt-2 text-base font-bold;
+    @apply mt-2 mb-2 text-base font-bold;
   }
 
   h5 {
-    @apply mb-2 mt-2 text-base font-bold;
+    @apply mt-2 mb-2 text-base font-bold;
   }
 
   h6 {
-    @apply mb-2 mt-2 text-base font-bold;
+    @apply mt-2 mb-2 text-base font-bold;
   }
 
   ul {
@@ -31,14 +33,14 @@
   }
 
   p {
-    @apply mb-2 mt-2 text-base leading-normal;
+    @apply mt-2 mb-2 text-base leading-normal;
   }
 
   blockquote {
     padding: 0.125em 1em;
     margin: 0.5em 0;
-    border-left: 5px solid oklch(var(--b3));
-    color: oklch(var(--bc) / 0.65);
+    border-left: 5px solid var(--color-base-300);
+    color: var(--color-base-content) / 0.65;
   }
 
   del {
@@ -79,16 +81,16 @@
 
   th,
   td {
-    border: 1px solid oklch(var(--b3));
+    border: 1px solid var(--color-base-300);
     padding: 8px;
   }
 
   thead {
-    background-color: oklch(var(--b3));
+    background-color: var(--color-base-300);
   }
 
   tr:nth-child(even) {
-    background-color: oklch(var(--b2));
+    background-color: var(--color-base-200);
   }
 
   :global(.well) {

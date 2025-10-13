@@ -22,7 +22,7 @@ function PassedStatus({ team }: { team: Wish.Game.FullBoardItem }) {
     else
         return (
             <div className="inline">
-                <div className="inline text-base-content text-opacity-70">未过序章</div>
+                <div className="inline text-base-content/70">未过序章</div>
             </div>
         );
 }
@@ -123,8 +123,8 @@ const RowHeader = memo(({ wide }: { wide: boolean }) => {
     const common = 'p-2 items-center border-neutral-content';
     if (wide)
         return (
-            <div className="flex text-[0.875rem] rounded-t-box bg-base-200/30 font-bold h-10 border-b-[1px] border-neutral-content">
-                <div className={`${common} hidden w640:w-[3.75rem] w640:flex`}>排名</div>
+            <div className="flex text-[0.875rem] rounded-t-box bg-base-200/30 font-bold h-10 border-b border-neutral-content">
+                <div className={`${common} hidden w640:w-15 w640:flex`}>排名</div>
                 <div
                     className={`${common} hidden w640:flex`}
                     style={{
@@ -138,8 +138,8 @@ const RowHeader = memo(({ wide }: { wide: boolean }) => {
             </div>
         );
     return (
-        <div className="flex text-[0.875rem] rounded-t-box bg-base-200/30 font-bold h-10 border-b-[1px] border-neutral-content">
-            <div className={`${common} flex w-[2.25rem] w640:hidden`}>#</div>
+        <div className="flex text-[0.875rem] rounded-t-box bg-base-200/30 font-bold h-10 border-b border-neutral-content">
+            <div className={`${common} flex w-9 w640:hidden`}>#</div>
             <div
                 className={`${common} flex w640:hidden`}
                 style={{
@@ -148,7 +148,7 @@ const RowHeader = memo(({ wide }: { wide: boolean }) => {
             >
                 队伍
             </div>
-            <div className="p-2 items-center w-[6.75rem] flex w640:hidden">状态</div>
+            <div className="p-2 items-center w-27 flex w640:hidden">状态</div>
         </div>
     );
 });
@@ -156,11 +156,11 @@ const RowHeader = memo(({ wide }: { wide: boolean }) => {
 // eslint-disable-next-line react/display-name
 const RowContent = memo(
     ({ team, gameStartTime, wide }: { team: Wish.Game.FullBoardItem; gameStartTime: number; wide: boolean }) => {
-        const common = 'p-2 items-center text-base-content text-opacity-80';
+        const common = 'p-2 items-center text-base-content/80';
         if (wide)
             return (
-                <div className="flex text-[0.875rem] border-b-[1px] hover:bg-base-200/30 border-neutral-content">
-                    <div className={`${common} hidden w640:w-[3.75rem] w640:flex`}>{team.g ? team.r : '--'}</div>
+                <div className="flex text-[0.875rem] border-b hover:bg-base-200/30 border-neutral-content">
+                    <div className={`${common} hidden w640:w-15 w640:flex`}>{team.g ? team.r : '--'}</div>
                     <div
                         className={`${common} hidden w640:flex`}
                         style={{
@@ -178,8 +178,8 @@ const RowContent = memo(
                 </div>
             );
         return (
-            <div className="flex text-[0.875rem] border-b-[1px] hover:bg-base-200/30 border-neutral-content">
-                <div className={`${common} flex w-[2.25rem] w640:hidden`}>{team.g ? team.r : '--'}</div>
+            <div className="flex text-[0.875rem] border-b hover:bg-base-200/30 border-neutral-content">
+                <div className={`${common} flex w-9 w640:hidden`}>{team.g ? team.r : '--'}</div>
                 <div
                     className={`${common} flex w640:hidden`}
                     style={{
@@ -188,7 +188,7 @@ const RowContent = memo(
                 >
                     <TeamInfo team={team} maxLength={25} />
                 </div>
-                <div className={`${common} w-[6.75rem] flex w640:hidden`}>
+                <div className={`${common} w-27 flex w640:hidden`}>
                     <StatusSmall team={team} gameStartTime={gameStartTime} />
                 </div>
             </div>

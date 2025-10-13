@@ -3,7 +3,7 @@ import { Button } from 'antd';
 
 import PassedPlot from '@/app/(general)/team/submission-history/PassedPlot.tsx';
 import { TeamSubmissionList } from '@/app/(general)/team/submission-history/TeamSubmissionList';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useWishData } from '@/logic/swrWrappers';
 import { Wish } from '@/types/wish.ts';

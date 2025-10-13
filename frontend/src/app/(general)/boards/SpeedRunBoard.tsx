@@ -34,7 +34,7 @@ export function SpeedRunBoard({ data }: { data: Wish.Game.SpeedRunBoard }) {
         {
             title: '区域',
             dataIndex: 'areaName',
-            className: 'w-[6.4rem] xl:w-[10rem] align-top',
+            className: 'w-[6.4rem] xl:w-40 align-top',
             render: (text) => (
                 <div className="text-[1rem] inline">
                     <b>{text}</b>

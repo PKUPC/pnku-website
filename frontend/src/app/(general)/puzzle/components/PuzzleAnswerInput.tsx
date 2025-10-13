@@ -87,7 +87,7 @@ export function PuzzleAnswerInput({ puzzle, reload }: { puzzle: Wish.Puzzle.Puzz
             {contextHolder}
             <Input.Search
                 size="large"
-                addonBefore={'提交答案：'}
+                addonBefore={'答案：'}
                 placeholder={cooling ? '冷却时间：' + format_ts_to_HMS(countdown) : '... ...'}
                 enterButton={
                     <>

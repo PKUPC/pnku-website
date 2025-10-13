@@ -1,7 +1,7 @@
 import NotFound from '@/app/NotFound.tsx';
 import { StoryList } from '@/app/story-list/StoryList';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
 import { Footer } from '@/components/Footer.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError';
 import { ARCHIVE_MODE } from '@/constants.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';

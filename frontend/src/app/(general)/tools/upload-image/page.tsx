@@ -3,7 +3,7 @@ import { Alert } from 'antd';
 import { ImageList } from '@/app/(general)/tools/upload-image/ImageList';
 import { UploadBox } from '@/app/(general)/tools/upload-image/UploadBox';
 import NotFound from '@/app/NotFound.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';

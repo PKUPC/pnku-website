@@ -2,7 +2,7 @@ import { Alert } from 'antd';
 
 import { ManualHintList } from '@/app/(general)/puzzle/components/ManualHintList.tsx';
 import { RequestManualHintPanel } from '@/app/(general)/puzzle/components/RequestManualHintPanel.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useCooldown } from '@/hooks/useCooldown';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';

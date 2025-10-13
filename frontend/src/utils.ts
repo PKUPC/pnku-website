@@ -1,6 +1,8 @@
+import { type ClassValue, clsx } from 'clsx';
 import { default as Color } from 'colorjs.io';
 import Md5 from 'crypto-js/md5';
 import seedrandom from 'seedrandom';
+import { twMerge } from 'tailwind-merge';
 
 import { AUTH_ROOT } from '@/constants';
 
@@ -254,4 +256,8 @@ export function mixColor(color1: string, color2: string, ratio: number) {
     return Color.mix(color1, color2, ratio, { space: 'srgb', outputSpace: 'srgb' })
         .to('srgb')
         .toString({ format: 'hex' });
+}
+
+export function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
 }

@@ -4,7 +4,7 @@ import { FirstBloodBoard } from '@/app/(general)/boards/FirstBloodBoard.tsx';
 import { FullScoreBoard } from '@/app/(general)/boards/FullScoreBoard.tsx';
 import { SimpleScoreBoard } from '@/app/(general)/boards/SimpleScoreBoard.tsx';
 import { SpeedRunBoard } from '@/app/(general)/boards/SpeedRunBoard.tsx';
-import { Loading } from '@/components/DaisyUI/Loading.tsx';
+import { Loading } from '@/components/Loading.tsx';
 import { WishError } from '@/components/WishError.tsx';
 import { useWishData } from '@/logic/swrWrappers';
 

@@ -57,9 +57,7 @@ export function DevLogin() {
                 </Col>
                 <Col xs={24} sm={10}>
                     <Input size="middle" onChange={(e) => setIdentity(e.target.value)} />
-                    <div className="text-left text-opacity-70 text-base-content mt-1">
-                        测试用账号的 ID，只要用同一个 ID 登录就是同一个账号。
-                    </div>
+                    <div className="text-left text-base-content/70 mt-1"></div>
                 </Col>
             </Row>
             <br />
