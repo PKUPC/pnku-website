@@ -11,7 +11,7 @@ from sanic_ext import validate
 
 from src import adhoc, secret, utils
 from src.adhoc.constants.enums import CurrencyType
-from src.adhoc.constants.misc import PUZZLE_AREA_NAMES, VALID_AREA_NAMES
+from src.adhoc.constants.misc import PUZZLE_AREA_NAMES, VALID_AREA_BEFORE_GAME_START, VALID_AREA_NAMES
 from src.adhoc.state.currency import CurrencyTypeToClass
 from src.custom import store_user_log
 from src.logic import Worker, glitter
@@ -48,26 +48,29 @@ async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker
 
     if user.is_staff:
         return {'status': 'success', 'data': adhoc.get_area_info(body.area_name, user, worker)}
+
     assert user.team is not None
+
     # 检查是否开始游戏
-    if body.area_name != 'intro' and not worker.game_nocheck.is_game_begin():
+    if body.area_name not in VALID_AREA_BEFORE_GAME_START and not worker.game_nocheck.is_game_begin():
         store_user_log(
             req, 'api.game.get_area_detail', 'abnormal', '游戏未开始时调用了 API。', {'area_name': body.area_name}
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '游戏未开始！'}
 
     # 检查是否未解锁
-    if body.area_name in VALID_AREA_NAMES:
-        if body.area_name == 'intro' and not worker.game_nocheck.is_intro_unlock():
-            return not_found
-        if body.area_name not in user.team.game_state.unlock_areas:
-            worker.log(
-                'debug',
-                'get_area_detail',
-                f'area {body.area_name} not in T#{user.team.model.id}'
-                + f'unlock areas {user.team.game_state.unlock_areas}]',
-            )
-            return not_found
+    if body.area_name in VALID_AREA_BEFORE_GAME_START and not worker.game_nocheck.is_intro_unlock():
+        return not_found
+
+    # 检查是否解锁
+    if body.area_name not in user.team.game_state.unlock_areas:
+        worker.log(
+            'debug',
+            'get_area_detail',
+            f'area {body.area_name} not in T#{user.team.model.id}'
+            + f'unlock areas {user.team.game_state.unlock_areas}]',
+        )
+        return not_found
 
     return {'status': 'success', 'data': adhoc.get_area_info(body.area_name, user, worker)}
 

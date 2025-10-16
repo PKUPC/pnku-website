@@ -14,6 +14,7 @@ from src.store import (
     SubmissionEvent,
     TeamStore,
 )
+from src.store.puzzle_store import PuzzleType
 
 from .. import utils
 from .base import WithGameLifecycle
@@ -51,16 +52,27 @@ class Teams(WithGameLifecycle):
     def _add_team_name_and_key_hash(self, team: Team) -> None:
         self.team_name_set.add(team.model.team_name)
         for puzzle_key in self.game.puzzles.puzzle_by_key:
+            puzzle = self.game.puzzles.puzzle_by_key[puzzle_key]
+            # 对于 PUBLIC 类型的题目，没有必要进行 key hash
+
             if secret.HASH_PUZZLE_KEY == 'key_and_team':
-                key_hash = utils.calc_sha1(secret.PUZZLE_KEY_HASH_SALT + str((team.model.id, puzzle_key)))
-                while key_hash in self.game.hash_to_team_and_key:
-                    key_hash = utils.calc_sha1(key_hash)
+                if puzzle.model.puzzle_metadata.type == PuzzleType.PUBLIC:
+                    key_hash = puzzle_key
+                else:
+                    key_hash = utils.calc_sha1(secret.PUZZLE_KEY_HASH_SALT + str((team.model.id, puzzle_key)))
+                    while key_hash in self.game.hash_to_team_and_key:
+                        key_hash = utils.calc_sha1(key_hash)
+
                 self.game.team_and_key_to_hash[(team.model.id, puzzle_key)] = key_hash
                 self.game.hash_to_team_and_key[key_hash] = (team.model.id, puzzle_key)
             elif secret.HASH_PUZZLE_KEY == 'key_only':
-                key_hash = utils.calc_sha1(secret.PUZZLE_KEY_HASH_SALT + puzzle_key)
-                while key_hash in self.game.hash_to_puzzle_key:
-                    key_hash = utils.calc_sha1(key_hash)
+                if puzzle.model.puzzle_metadata.type == PuzzleType.PUBLIC:
+                    key_hash = puzzle_key
+                else:
+                    key_hash = utils.calc_sha1(secret.PUZZLE_KEY_HASH_SALT + puzzle_key)
+                    while key_hash in self.game.hash_to_puzzle_key:
+                        key_hash = utils.calc_sha1(key_hash)
+
                 self.game.puzzle_key_to_hash[puzzle_key] = key_hash
                 self.game.hash_to_puzzle_key[key_hash] = puzzle_key
 

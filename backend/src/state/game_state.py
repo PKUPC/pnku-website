@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from src import secret
 from src.adhoc.boards import get_boards
 from src.store import GameStartEvent, PuzzleActionEvent, SubmissionEvent
+from src.store.puzzle_store import PuzzleType
 
 from .announcement_state import Announcements
 from .base import WithGameLifecycle
@@ -247,4 +248,9 @@ class Game(WithGameLifecycle):
             rst = self.hash_to_team_and_key.get(hashed_key, None)
             if rst is None:
                 return -1, None
+            _, puzzle_key = rst
+            puzzle = self.puzzles.puzzle_by_key[puzzle_key]
+            # 如果是 public 题目，返回自己的队伍 id
+            if puzzle.model.puzzle_metadata.type == PuzzleType.PUBLIC:
+                return team_id, puzzle_key
             return rst

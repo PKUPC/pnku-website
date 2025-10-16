@@ -1,3 +1,4 @@
+from enum import auto
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -9,8 +10,14 @@ from src import utils
 from . import Table
 
 
+class PuzzleType(utils.EnhancedEnum):
+    NORMAL = auto()
+    # PUBLIC 类型题目允许未组队玩家验证答案，只能做简单验证
+    PUBLIC = auto()
+
+
 class PuzzleMetadataModel(BaseModel):
-    type: str = Field(default='normal')
+    type: PuzzleType = Field(default=PuzzleType.NORMAL)
     author: str = Field(default='Anonymous')
 
 

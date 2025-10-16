@@ -12,7 +12,7 @@ from .hint_store import HintStore, HintStoreModel, PriceModel
 from .log_store import LogStore
 from .log_user_store import LogUserStore
 from .message_store import MessageModel, MessageStore
-from .puzzle_store import PuzzleStore, PuzzleStoreModel
+from .puzzle_store import PuzzleStore, PuzzleStoreModel, PuzzleType
 from .team_event_store import (
     BuyNormalHintEvent,
     GameStartEvent,
@@ -45,6 +45,7 @@ __all__ = [
     'MessageStore',
     'PuzzleStore',
     'PuzzleStoreModel',
+    'PuzzleType',
     'TeamEventStore',
     'TeamEventStoreModel',
     'TeamEventType',

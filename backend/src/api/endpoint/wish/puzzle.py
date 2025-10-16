@@ -6,12 +6,13 @@ from pydantic import BaseModel, Field
 from sanic import Blueprint, Request
 from sanic_ext import validate
 
-from src import adhoc
+from src import adhoc, utils
 from src.adhoc.hint import hint_cd_after_puzzle_unlock
 from src.custom import store_user_log
 from src.logic import Worker, glitter
 from src.state import User
 from src.store import HintStore
+from src.store.puzzle_store import PuzzleType
 
 from . import wish_checker, wish_response
 
@@ -106,6 +107,69 @@ async def submit_answer(req: Request, body: SubmitParam, worker: Worker, user: U
         return res_dict
     # 这个 reducer 一定不会返回 None
     assert False
+
+
+@bp.route('/submit_public_answer', ['POST'])
+@validate(json=SubmitParam)
+@wish_response
+@wish_checker(['player_in_team', 'intro_unlock'])
+async def submit_public_answer(req: Request, body: SubmitParam, worker: Worker, user: User | None) -> dict[str, Any]:
+    assert user is not None
+    assert user.team is not None
+
+    if not (0 < len(body.content) <= 100):
+        store_user_log(req, 'api.puzzle.submit_answer', 'abnormal', f'答案长度不合法，长度为{len(body.content)}。', {})
+        return {'status': 'error', 'title': '答案过长', 'message': '答案长度应在1到100之间。'}
+
+    puzzle = worker.game_nocheck.puzzles.puzzle_by_key.get(body.puzzle_key, None)
+    if puzzle is None:
+        store_user_log(
+            req,
+            'api.puzzle.submit_public_answer',
+            'abnormal',
+            '谜题不存在。',
+            {'body_puzzle_key': body.puzzle_key},
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+    if puzzle.model.puzzle_metadata.type != PuzzleType.PUBLIC:
+        store_user_log(
+            req,
+            'api.puzzle.submit_public_answer',
+            'abnormal',
+            '谜题不是 public 类型！',
+            {'body_puzzle_key': body.puzzle_key},
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不是 public 类型！'}
+
+    store_user_log(
+        req,
+        'api.puzzle.submit_public_answer',
+        'submit_public_answer',
+        '',
+        {'puzzle_key': puzzle.model.key, 'content': body.content},
+    )
+
+    result = {'status': 'error', 'title': '答案错误！', 'message': '答案错误！你没有得到任何信息！'}
+    cleaned_submission = utils.clean_submission(body.content)
+    for trigger in puzzle.model.triggers:
+        if cleaned_submission == utils.clean_submission(trigger.value):
+            result_type, result_info = trigger.type, trigger.info
+            if result_type == 'answer':
+                if result_info in ['答案正确', '']:
+                    result_info = '答案正确！'
+                result['status'] = 'success'
+                result['title'] = '答案正确！'
+                result['message'] = result_info
+            elif result_type == 'milestone':
+                result['status'] = 'info'
+                result['title'] = '里程碑！'
+                result['message'] = f'你收到了一条信息：\n{result_info}'
+            elif result_type == 'surprise':
+                result['status'] = 'info'
+                result['title'] = '发现彩蛋！'
+                result['message'] = f'你发现了一个彩蛋：\n{result_info}'
+
+    return result
 
 
 class GetSubmissionsParam(BaseModel):
@@ -272,6 +336,48 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
             if puzzle.model.key in user.team.game_state.passed_puzzle_keys:
                 return_value['pass_ts'] = user.team.game_state.passed_puzzle_keys[puzzle.model.key]
         return_value['key'] = worker.game_nocheck.hash_puzzle_key(user.team.model.id, puzzle_key)
+
+    if len(puzzle.model.clipboard) > 0:
+        return_value['clipboard'] = [x.model_dump() for x in puzzle.model.clipboard]
+
+    return {'data': return_value}
+
+
+@bp.route('/get_public_detail', ['POST'])
+@validate(json=GetDetailParam)
+@wish_response
+@wish_checker(['player_in_team', 'intro_unlock'])
+async def get_public_detail(req: Request, body: GetDetailParam, worker: Worker, user: User | None) -> dict[str, Any]:
+    assert user is not None
+    assert user.team is not None
+
+    puzzle_key = body.puzzle_key
+    puzzle = worker.game_nocheck.puzzles.puzzle_by_key.get(puzzle_key, None)
+    if puzzle is None:
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+    if puzzle.model.puzzle_metadata.type != PuzzleType.PUBLIC:
+        store_user_log(
+            req,
+            'api.puzzle.get_public_detail',
+            'abnormal',
+            '谜题不是 public 类型！',
+            {'body_puzzle_key': body.puzzle_key},
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不是 public 类型！'}
+
+    store_user_log(req, 'api.puzzle.get_puzzle_details', 'get_puzzle_details', '', {'puzzle_key': puzzle_key})
+
+    puzzle_list: list[Any] = adhoc.gen_puzzle_structure_by_puzzle(puzzle, user, worker)
+
+    return_value = {
+        'key': puzzle.model.key,
+        'title': puzzle.model.title,
+        'desc': puzzle.render_desc(user),
+        'actions': puzzle.model.describe_actions(),
+        'status': 'public',
+        'puzzle_list': puzzle_list,
+        **adhoc.get_extra_puzzle_detail(puzzle, user),
+    }
 
     if len(puzzle.model.clipboard) > 0:
         return_value['clipboard'] = [x.model_dump() for x in puzzle.model.clipboard]

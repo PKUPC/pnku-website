@@ -131,7 +131,7 @@ def wish_checker(
                             req,
                             'api.wish_checker.intro_unlock',
                             'abnormal',
-                            '在游戏开始前调用了禁止的 API。',
+                            '在 intro 开始前调用了禁止的 API。',
                             {'req_url': req.url},
                         )
                         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '游戏未开始！'}
