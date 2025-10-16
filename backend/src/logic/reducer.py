@@ -746,7 +746,6 @@ class Reducer(StateContainerBase):
                 team_id=req.team_id,
                 subject=req.subject,
                 status=TicketStore.TicketStatus.OPEN.name,
-                type=req.ticket_type,
                 extra=req.extra,
             )
             session.add(ticket_store)

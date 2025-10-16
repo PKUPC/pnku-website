@@ -4,8 +4,11 @@ import time
 
 from typing import TYPE_CHECKING, Any, Literal
 
+import sqlalchemy
+
 from pydantic import BaseModel, ConfigDict, ValidationError
 from sqlalchemy import JSON, BigInteger, Integer, String
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.utils import EnhancedEnum
@@ -32,9 +35,12 @@ class TicketStoreModel(BaseModel):
 
     subject: str
     status: str
-    type: Literal['MANUAL_HINT']
 
     extra: ManualHintModel
+
+    @property
+    def type(self) -> Literal['MANUAL_HINT']:
+        return self.extra.type
 
 
 class TicketStore(Table):
@@ -54,9 +60,22 @@ class TicketStore(Table):
 
     subject: Mapped[str] = mapped_column(String(128), nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False)
-    type: Mapped[str] = mapped_column(String(32), nullable=False)
 
     extra: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+
+    @hybrid_property
+    def type(self):
+        return self.extra.get('type', None)
+
+    @type.expression  # type: ignore[no-redef]
+    def type(cls):
+        return sqlalchemy.case(
+            (
+                sqlalchemy.func.json_extract(cls.extra, '$.type').isnot(None),
+                sqlalchemy.cast(sqlalchemy.func.json_extract(cls.extra, '$.type'), String(128)),
+            ),
+            else_=sqlalchemy.null(),
+        )
 
     def validated_model(self) -> TicketStoreModel:
         """

@@ -12,6 +12,8 @@ class ExtraField(flask_admin.form.JSONField):  # type: ignore[misc]
 
 class TicketView(BaseView):
     can_delete = False
+    can_edit = False
+    can_create = False
 
     column_list = ['id', 'created_at', 'team_id', 'user_id', 'subject', 'status', 'type', 'extra']
     column_searchable_list = ['user_id', 'team_id', 'subject']
@@ -23,14 +25,8 @@ class TicketView(BaseView):
         'created_at': fields.timestamp_ms_formatter,
     }
 
-    form_choices = {
-        # 第一项是实际的 value，第二项是显示的名称
-        'type': [(x.name, x.value) for x in store.TicketStore.TicketType],
-    }
-
     form_overrides = {'created_at': fields.TimestampMsField, 'extra': ExtraField}
 
-    def after_model_touched(self, model: store.TriggerStore) -> None:
-        # TODO: 还没做
+    def after_model_touched(self, model: store.TicketStore) -> None:
+        # TODO: TicketStore 的 after model touched 还没做
         return
-        # self.emit_event(glitter.EventType.RELOAD_TRIGGER)
