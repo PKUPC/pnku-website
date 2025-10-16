@@ -3,10 +3,10 @@ import { BorderOutlined, CheckSquareTwoTone, LockOutlined, MinusSquareOutlined }
 import { PnKU3Day3Icon } from '@/SvgIcons';
 import { useTheme } from '@/logic/contexts.ts';
 
-export function PuzzleIcon({ status }: { status: 'untouched' | 'partial' | 'passed' | 'found' }) {
+export function PuzzleIcon({ status }: { status: 'untouched' | 'partial' | 'passed' | 'found' | 'public' }) {
     const { color } = useTheme();
 
-    if (status === 'untouched') return <BorderOutlined style={{ opacity: 0.3 }} />;
+    if (status === 'untouched' || status === 'public') return <BorderOutlined style={{ opacity: 0.3 }} />;
     else if (status === 'partial') return <MinusSquareOutlined style={{ opacity: 0.3 }} />;
     else if (status === 'passed') {
         return <CheckSquareTwoTone twoToneColor={[color.success, color.base100]} />;

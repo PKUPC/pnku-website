@@ -115,7 +115,7 @@ export namespace Wish {
 
         export type PuzzleInfo = {
             puzzle_key: string;
-            status: 'untouched' | 'partial' | 'passed' | 'found';
+            status: 'untouched' | 'partial' | 'passed' | 'found' | 'public';
             title: string;
             location?: [number, number, number, number];
             found_msg?: string;
@@ -394,6 +394,14 @@ export namespace Wish {
             response: NormalRes & { need_reload?: boolean };
         };
 
+        export type SubmitPublicAnswerApi = {
+            request: {
+                endpoint: 'puzzle/submit_public_answer';
+                payload: { puzzle_key: string; content: string };
+            };
+            response: NormalRes & { need_reload?: boolean };
+        };
+
         export type SubmissionRecordData = {
             idx: number;
             team_name: string;
@@ -447,6 +455,14 @@ export namespace Wish {
             response: ErrorRes | (SuccessRes & { data: PuzzleDetailData });
         };
 
+        export type GetPublicDetailApi = {
+            request: {
+                endpoint: 'puzzle/get_public_detail';
+                payload: { puzzle_key: string };
+            };
+            response: ErrorRes | (SuccessRes & { data: PuzzleDetailData });
+        };
+
         export type HintPrice = { type: Adhoc.CurrencyType; price: number };
 
         export type HintItem = {
@@ -477,7 +493,14 @@ export namespace Wish {
             response: NormalRes;
         };
 
-        export type PuzzleApis = SubmitAnswerApi | GetSubmissionsApi | GetDetailApi | GetHintsApi | BuyHintApi;
+        export type PuzzleApis =
+            | SubmitAnswerApi
+            | SubmitPublicAnswerApi
+            | GetSubmissionsApi
+            | GetDetailApi
+            | GetPublicDetailApi
+            | GetHintsApi
+            | BuyHintApi;
     }
 
     export namespace Staff {
@@ -922,6 +945,7 @@ export namespace Wish {
         | Team.ChangeLeaderApi
         | Team.LeaveTeamApi
         | Puzzle.SubmitAnswerApi
+        | Puzzle.SubmitPublicAnswerApi
         | Puzzle.BuyHintApi
         | Game.GameStartApi
         | Staff.VMe50Api

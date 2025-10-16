@@ -106,7 +106,7 @@ export function PuzzleAnswerInput({ puzzle, reload }: { puzzle: Wish.Puzzle.Puzz
             />
             <WishConfirmModal
                 wishParam={{
-                    endpoint: 'puzzle/submit_answer',
+                    endpoint: puzzle.status === 'public' ? 'puzzle/submit_public_answer' : 'puzzle/submit_answer',
                     payload: wishArgs,
                 }}
                 open={open}

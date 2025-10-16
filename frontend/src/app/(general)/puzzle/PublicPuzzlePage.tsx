@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { LeftCircleIcon } from '@/SvgIcons';
-import { TabContainer } from '@/app/(general)/puzzle/TabContainer.tsx';
+import { PublicTabContainer } from '@/app/(general)/puzzle/TabContainer.tsx';
 import PuzzleListDrawer from '@/app/(general)/puzzle/components/PuzzleListDrawer.tsx';
 import { PuzzleListSider } from '@/app/(general)/puzzle/components/PuzzleListSider.tsx';
 import NotFound from '@/app/NotFound.tsx';
@@ -14,9 +14,7 @@ import { ARCHIVE_MODE } from '@/constants.tsx';
 import { SiteSettingContext, useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';
 
-import styles from './page.module.css';
-
-export function PuzzlePage() {
+export function PublicPage() {
     const params = useParams();
     const info = useSuccessGameInfo();
     const { usePuzzleList } = useContext(SiteSettingContext);
@@ -29,7 +27,7 @@ export function PuzzlePage() {
     const curKey = params.puzzleKey ?? 'none';
 
     const { data } = useWishData({
-        endpoint: 'puzzle/get_detail',
+        endpoint: 'puzzle/get_public_detail',
         payload: { puzzle_key: curKey },
     });
 
@@ -41,12 +39,11 @@ export function PuzzlePage() {
     if (ARCHIVE_MODE) {
         /* empty */
     } else if (!info.user) return <NotFound />;
-    else if (info.user.group !== 'staff' && (!info.game.isGameBegin || !info.team?.gaming)) return <NotFound />;
 
     if (usePuzzleList == 'show')
         return (
-            <div className={styles.puzzleWithListContainer}>
-                <div className="puzzle-sidebar">
+            <div className="flex flex-row gap-4.5 max-md:block">
+                <div className="min-w-0 grow-0 shrink-0 basis-[320px] max-md:w-full max-md:mb-6">
                     {/*<LinkTitle icon={<LeftCircleIcon/>} title={"区域页"} url={data.data.return}/>*/}
                     <ClickTitle icon={<LeftCircleIcon />} title={'返回'} onClick={() => navigate(-1)} />
                     <br />
@@ -60,14 +57,14 @@ export function PuzzlePage() {
                         )}
                     </div>
                 </div>
-                <div className="puzzle-content-container">
+                <div className="grow shrink min-w-0">
                     {hideInfo && (
                         <div>
                             {hideInfo}
                             <br />
                         </div>
                     )}
-                    <TabContainer puzzleData={data.data} />
+                    <PublicTabContainer puzzleData={data.data} />
                 </div>
                 <FloatButton.BackTop />
             </div>
@@ -85,7 +82,7 @@ export function PuzzlePage() {
                             <br />
                         </>
                     )}
-                    <TabContainer puzzleData={data.data} />
+                    <PublicTabContainer puzzleData={data.data} />
                     <FloatButton.BackTop />
                 </div>
                 {usePuzzleList == 'drawer' && <PuzzleListDrawer data={data} />}
