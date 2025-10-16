@@ -22,19 +22,25 @@ def gen_puzzle_data_basic(puzzle: Puzzle) -> dict[str, Any]:
 
 def gen_puzzle_data(user: User, worker: Worker, puzzle: Puzzle) -> dict[str, Any] | None:
     assert user.team is not None
-    if not user.is_staff:
-        if user.team.game_state.puzzle_visible_status(puzzle.model.key) == 'lock':
-            return None
+    from src.store import PuzzleType
 
     puzzle_status = 'untouched'
 
     if not user.is_staff:
-        assert user.team is not None
-        # 这里是解题状态
-        puzzle_status = puzzle.status_by_team(user.team)
-        # 这里是是否发现该 puzzle
-        if user.team.game_state.puzzle_visible_status(puzzle.model.key) == 'found':
-            puzzle_status = 'found'
+        if user.team.game_state.puzzle_visible_status(puzzle.model.key) == 'lock':
+            # PUBLIC 类型的题目允许在未解锁时查看，此时用特殊状态 public 表示
+            if puzzle.model.puzzle_metadata.type == PuzzleType.PUBLIC:
+                puzzle_status = 'public'
+            else:
+                return None
+
+        if puzzle_status != 'public':
+            assert user.team is not None
+            # 这里是解题状态
+            puzzle_status = puzzle.status_by_team(user.team)
+            # 这里是是否发现该 puzzle
+            if user.team.game_state.puzzle_visible_status(puzzle.model.key) == 'found':
+                puzzle_status = 'found'
 
     # ADHOC day3_premeta
     if puzzle.model.key == 'day3_premeta' and (
