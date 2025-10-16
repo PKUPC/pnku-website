@@ -86,3 +86,35 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
         </div>
     );
 }
+
+export function PublicTabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetailData }) {
+    const { pathname } = useLocation();
+    const params = useParams();
+    const puzzleKey = params.puzzleKey;
+
+    const items = useMemo(() => {
+        let items = [
+            {
+                label: '题目',
+                icon: <TextIcon />,
+                key: '/puzzle/public/' + puzzleKey,
+            },
+        ];
+        return items;
+    }, [puzzleKey]);
+
+    return (
+        <div className={styles.tabContainer}>
+            <div className={styles.puzzleTitle}>
+                <div className={styles.titleContent}>{puzzleData.title}</div>
+                {puzzleData.unlock_ts && (
+                    <div className={styles.unlockTime}>解锁于 {format_ts(puzzleData.unlock_ts)}</div>
+                )}
+            </div>
+
+            <TabsNavbar items={items} selectedKeys={[pathname]} />
+            <br />
+            <PuzzleTab puzzleData={puzzleData} />
+        </div>
+    );
+}
