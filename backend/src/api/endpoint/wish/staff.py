@@ -115,16 +115,16 @@ async def get_team_detail(req: Request, body: GetTeamDetailParam, worker: Worker
                 'idx': idx,
                 'puzzle': sub.puzzle.model.title,
                 'user_name': sub.user.model.user_info.nickname,
-                'origin': sub.store.content,
+                'origin': sub.info.content,
                 'cleaned': sub.cleaned_content,
                 'status': sub.status,
                 'info': sub.result.info,
-                'timestamp_s': int(sub.store.created_at / 1000),
+                'timestamp_s': int(sub.model.created_at / 1000),
             }
             for idx, sub in enumerate(team.game_state.submissions)
         ][::-1],
         'passed_puzzles': [
-            {'title': p.model.title, 'timestamp_s': int(s.store.created_at / 1000)}
+            {'title': p.model.title, 'timestamp_s': int(s.model.created_at / 1000)}
             for p, s in team.game_state.passed_puzzles
         ],
         'ban_list': {
@@ -275,7 +275,7 @@ async def get_submission_list(
     if body.sort_field is not None and body.sort_order is not None:
         if body.sort_field == 'timestamp_s':
             sorted_submissions = sorted(
-                filtered_submissions, key=lambda x: x.store.created_at, reverse=(body.sort_order == 'descend')
+                filtered_submissions, key=lambda x: x.model.created_at, reverse=(body.sort_order == 'descend')
             )
     else:
         sorted_submissions.reverse()
@@ -284,17 +284,17 @@ async def get_submission_list(
             'total_num': len(sorted_submissions),
             'list': [
                 {
-                    'idx': sub.store.id,
+                    'idx': sub.model.id,
                     'puzzle': sub.puzzle.model.title,
                     'puzzle_key': sub.puzzle.model.key,
                     'team': sub.team.model.team_name,
                     'team_id': sub.team.model.id,
                     'user': sub.user.model.user_info.nickname,
-                    'origin': sub.store.content,
+                    'origin': sub.info.content,
                     'cleaned': sub.cleaned_content,
                     'status': sub.status,
                     'info': sub.result.info,
-                    'timestamp_s': int(sub.store.created_at / 1000),
+                    'timestamp_s': int(sub.model.created_at / 1000),
                 }
                 for idx, sub in enumerate(sorted_submissions[body.start_idx - 1 : body.start_idx + body.count - 1])
             ],

@@ -79,9 +79,8 @@ class Puzzles(WithGameLifecycle):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool) -> None:
         match event.model.info:
-            case SubmissionEvent(submission_id=submission_id):
-                assert submission_id in self.game.submissions_by_id
-                submission = self.game.submissions_by_id[submission_id]
+            case SubmissionEvent():
+                submission = self.game.submissions_by_id[event.model.id]
                 submission.puzzle.on_team_event(event, is_reloading)
             case _:
                 for puzzle in self.list:
@@ -115,16 +114,17 @@ class Puzzle(WithGameLifecycle):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool) -> None:
         match event.model.info:
-            case SubmissionEvent(submission_id=submission_id):
-                submission = self.game.submissions_by_id[submission_id]
+            case SubmissionEvent():
+                submission = self.game.submissions_by_id[event.model.id]
                 assert submission.puzzle is self
 
-                if submission.result.type == 'pass':
-                    self.passed_teams.add(submission.team)
-                    self.attempted_teams.add(submission.team)
-                    self.passed_submissions.add(submission)
-                else:
-                    self.attempted_teams.add(submission.team)
+                if not submission.team.is_staff_team:
+                    if submission.result.type == 'pass':
+                        self.passed_teams.add(submission.team)
+                        self.attempted_teams.add(submission.team)
+                        self.passed_submissions.add(submission)
+                    else:
+                        self.attempted_teams.add(submission.team)
 
     def on_store_reload(self, store: PuzzleStore) -> None:
         # 目前的设计中暂时不允许在线上修改 puzzle key（因为没必要），这里的检查暂时没用。

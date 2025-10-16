@@ -18,7 +18,6 @@ from src import secret, utils
 from src.state import Announcements, Trigger
 from src.store import (
     MessageStore,
-    SubmissionStore,
     TeamEventStore,
     TeamEventType,
     TeamStore,
@@ -460,22 +459,13 @@ class Reducer(StateContainerBase):
         assert user.team is not None
 
         with self.SqlSession() as session:
-            submission = SubmissionStore(
-                user_id=int(req.user_id),
-                puzzle_key=req.puzzle_key,
-                content=req.content,
-            )
-            session.add(submission)
-            # 需要用事务保证提交记录和添加 team event 是同时更新的
-            session.flush()
-            assert submission.id is not None, 'created submission not in db'
-
             team_event = TeamEventStore(
                 user_id=req.user_id,
                 team_id=user.team.model.id,
                 info={
                     'type': TeamEventType.SUBMISSION.name,
-                    'submission_id': submission.id,
+                    'puzzle_key': req.puzzle_key,
+                    'content': req.content,
                 },
             )
             session.add(team_event)

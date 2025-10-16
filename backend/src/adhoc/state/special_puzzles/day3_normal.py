@@ -26,7 +26,7 @@ class Day3Normal(TeamPuzzleState):
                 cold_down_seconds = self.wrong_count * COOLDOWN_TIME
                 if self.wrong_count > 10:
                     cold_down_seconds = 10 * COOLDOWN_TIME
-                self.cold_down_ts = int(submission.store.created_at / 1000) + cold_down_seconds
+                self.cold_down_ts = int(submission.model.created_at / 1000) + cold_down_seconds
             case 'pass':
                 self.correct_answers.append(submission.result.trigger_value)
             case 'multipass':

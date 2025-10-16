@@ -5,7 +5,7 @@ import time
 from enum import auto
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import JSON, BigInteger, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -23,28 +23,48 @@ class TeamEventType(EnhancedEnum):
     PUZZLE_ACTION = auto()
 
 
-class GameStartEvent(BaseModel):
+class SingleCurrencyChange(BaseModel):
+    type: CurrencyType
+    delta: int
+
+
+class CurrencyChangeModel(BaseModel):
+    changed: bool = False
+    change_list: list[SingleCurrencyChange] = Field(default_factory=list)
+
+
+class TeamEventBase(BaseModel):
+    type: TeamEventType
+    currency_change: CurrencyChangeModel = Field(default_factory=CurrencyChangeModel)
+
+
+class GameStartEvent(TeamEventBase):
     type: Literal[TeamEventType.GAME_START]
 
 
-class SubmissionEvent(BaseModel):
+class SubmissionEvent(TeamEventBase):
+    """
+    提交答案事件，包含了提交的答案和当时的检查结果。
+    """
+
     type: Literal[TeamEventType.SUBMISSION]
-    submission_id: int
+    puzzle_key: str
+    content: str
 
 
-class BuyNormalHintEvent(BaseModel):
+class BuyNormalHintEvent(TeamEventBase):
     type: Literal[TeamEventType.BUY_NORMAL_HINT]
     hint_id: int
 
 
-class StaffModifyCurrencyEvent(BaseModel):
+class StaffModifyCurrencyEvent(TeamEventBase):
     type: Literal[TeamEventType.STAFF_MODIFY_CURRENCY]
     currency_type: CurrencyType
     delta: int
     reason: str
 
 
-class PuzzleActionEvent(BaseModel):
+class PuzzleActionEvent(TeamEventBase):
     type: Literal[TeamEventType.PUZZLE_ACTION]
     puzzle_key: str
     content: dict[str, str | int]

@@ -125,7 +125,7 @@ class Checker:
         # 限制提交频率
         if not secret.DEBUG_MODE:
             if user.team.last_submission is not None:
-                delta = time.time() - user.team.last_submission.store.created_at / 1000
+                delta = time.time() - user.team.last_submission.model.created_at / 1000
                 if delta < 3:
                     return {'status': 'error', 'title': '太快了！', 'message': f'提交太频繁，请等待 {3 - delta:.1f} 秒'}
 

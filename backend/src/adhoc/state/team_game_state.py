@@ -226,7 +226,7 @@ class TeamGameState:
                 # 这里需要考虑多解的题的处理
                 assert submission.puzzle.model.key not in self.passed_puzzle_keys
                 puzzle_key = submission.puzzle.model.key
-                self.passed_puzzle_keys[submission.puzzle.model.key] = int(submission.store.created_at / 1000)
+                self.passed_puzzle_keys[submission.puzzle.model.key] = int(submission.model.created_at / 1000)
                 self.passed_puzzles.add((submission.puzzle, submission))
                 self.success_submissions.append(submission)
 
@@ -235,41 +235,41 @@ class TeamGameState:
                         self.unlock_areas.add('day2')
                         self.unlock_templates.add('day1_meta')
                         self.unlock_templates.add('day2_intro')
-                        self.add_unlock_puzzle('day2_01', int(submission.store.created_at / 1000), is_reloading)
-                        self.add_unlock_puzzle('day2_02', int(submission.store.created_at / 1000), is_reloading)
-                        self.add_unlock_puzzle('day2_03', int(submission.store.created_at / 1000), is_reloading)
-                        self.add_unlock_puzzle('day2_04', int(submission.store.created_at / 1000), is_reloading)
-                        self.add_unlock_puzzle('day2_05', int(submission.store.created_at / 1000), is_reloading)
-                        self.add_unlock_puzzle('day2_06', int(submission.store.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day2_01', int(submission.model.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day2_02', int(submission.model.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day2_03', int(submission.model.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day2_04', int(submission.model.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day2_05', int(submission.model.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day2_06', int(submission.model.created_at / 1000), is_reloading)
                     else:
                         self.day1_count += 1
                         # 做出一道解锁一道，做出 5 道时应当解锁完毕
                         if self.day1_count <= 5:
                             self.add_unlock_puzzle(
-                                f'day1_{3 + self.day1_count:0>2}', int(submission.store.created_at / 1000), is_reloading
+                                f'day1_{3 + self.day1_count:0>2}', int(submission.model.created_at / 1000), is_reloading
                             )
                         # 做出 7 题时开放 meta
                         if self.day1_count == 7:
-                            self.add_unlock_puzzle('day1_meta', int(submission.store.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day1_meta', int(submission.model.created_at / 1000), is_reloading)
 
                 elif puzzle_key.startswith('day2'):
                     if puzzle_key == 'day2_meta':
                         self.unlock_areas.add('day3')
                         self.unlock_templates.add('day2_meta')
                         self.unlock_templates.add('day3_intro')
-                        self.add_unlock_puzzle('day3_01', int(submission.store.created_at / 1000), is_reloading)
-                        self.add_unlock_puzzle('day3_02', int(submission.store.created_at / 1000), is_reloading)
-                        self.add_unlock_puzzle('day3_03', int(submission.store.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day3_01', int(submission.model.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day3_02', int(submission.model.created_at / 1000), is_reloading)
+                        self.add_unlock_puzzle('day3_03', int(submission.model.created_at / 1000), is_reloading)
                     else:
                         self.day2_count += 1
                         # if self.day2_count <= 3:
                         #     self.add_unlock_puzzle(
                         #         f"day2_{3 + self.day2_count:0>2}",
-                        #         int(submission.store.created_at / 1000), is_reloading
+                        #         int(submission.model.created_at / 1000), is_reloading
                         #     )
                         # 六道题全都做出的时候开放 meta
                         if self.day2_count == 4:
-                            self.add_unlock_puzzle('day2_meta', int(submission.store.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day2_meta', int(submission.model.created_at / 1000), is_reloading)
 
                 elif puzzle_key.startswith('day3'):
                     if puzzle_key in ['day3_meta1', 'day3_meta2', 'day3_meta3']:
@@ -281,7 +281,7 @@ class TeamGameState:
                             and 'day3_meta3' in self.passed_puzzle_keys
                         ):
                             self.finished = True
-                            self.finished_timestamp_s = int(submission.store.created_at / 1000)
+                            self.finished_timestamp_s = int(submission.model.created_at / 1000)
                             self.unlock_boards.append('first_blood')
                             self.unlock_boards.append('speed_run')
                             self.unlock_templates.add('ending')
@@ -298,36 +298,36 @@ class TeamGameState:
                         self.day3_count += 1
                         if self.day3_count < 4:
                             self.add_unlock_puzzle(
-                                f'day3_{3 + self.day3_count:0>2}', int(submission.store.created_at / 1000), is_reloading
+                                f'day3_{3 + self.day3_count:0>2}', int(submission.model.created_at / 1000), is_reloading
                             )
                         elif self.day3_count == 4:
-                            self.add_unlock_puzzle('day3_07', int(submission.store.created_at / 1000), is_reloading)
-                            self.add_unlock_puzzle('day3_08', int(submission.store.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_07', int(submission.model.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_08', int(submission.model.created_at / 1000), is_reloading)
                         elif self.day3_count < 7:
                             self.add_unlock_puzzle(
-                                f'day3_{4 + self.day3_count:0>2}', int(submission.store.created_at / 1000), is_reloading
+                                f'day3_{4 + self.day3_count:0>2}', int(submission.model.created_at / 1000), is_reloading
                             )
                         elif self.day3_count == 7:
-                            self.add_unlock_puzzle('day3_11', int(submission.store.created_at / 1000), is_reloading)
-                            self.add_unlock_puzzle('day3_12', int(submission.store.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_11', int(submission.model.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_12', int(submission.model.created_at / 1000), is_reloading)
                         elif self.day3_count < 12:
                             self.add_unlock_puzzle(
-                                f'day3_{5 + self.day3_count:0>2}', int(submission.store.created_at / 1000), is_reloading
+                                f'day3_{5 + self.day3_count:0>2}', int(submission.model.created_at / 1000), is_reloading
                             )
                         elif self.day3_count == 12:
-                            self.add_unlock_puzzle('day3_17', int(submission.store.created_at / 1000), is_reloading)
-                            self.add_unlock_puzzle('day3_18', int(submission.store.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_17', int(submission.model.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_18', int(submission.model.created_at / 1000), is_reloading)
                         elif self.day3_count < 17:
                             self.add_unlock_puzzle(
-                                f'day3_{6 + self.day3_count:0>2}', int(submission.store.created_at / 1000), is_reloading
+                                f'day3_{6 + self.day3_count:0>2}', int(submission.model.created_at / 1000), is_reloading
                             )
                         elif self.day3_count == 17:
                             self.add_unlock_puzzle(
-                                'day3_premeta', int(submission.store.created_at / 1000), is_reloading
+                                'day3_premeta', int(submission.model.created_at / 1000), is_reloading
                             )
-                            self.add_unlock_puzzle('day3_meta1', int(submission.store.created_at / 1000), is_reloading)
-                            self.add_unlock_puzzle('day3_meta2', int(submission.store.created_at / 1000), is_reloading)
-                            self.add_unlock_puzzle('day3_meta3', int(submission.store.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_meta1', int(submission.model.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_meta2', int(submission.model.created_at / 1000), is_reloading)
+                            self.add_unlock_puzzle('day3_meta3', int(submission.model.created_at / 1000), is_reloading)
                             self.unlock_templates.add('day3_premeta')
                 else:
                     assert False

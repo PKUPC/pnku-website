@@ -127,8 +127,8 @@ class Game(WithGameLifecycle):
     def on_team_event(self, event: TeamEvent, is_reloading: bool = False) -> None:
         match event.model.info:
             case SubmissionEvent():
-                sub_id = event.model.info.submission_id
-                assert sub_id in self.worker.submission_stores
+                sub_id = event.model.id
+                puzzle_key = event.model.info.puzzle_key
                 # 这里不应该有重复的 submission id
                 if sub_id in self.submissions_by_id:
                     self.log('error', 'game.on_team_event', f'dropping processed submission #{sub_id}')
@@ -137,31 +137,21 @@ class Game(WithGameLifecycle):
                 if not is_reloading:
                     self.log('debug', 'game.on_team_event', f'received submission #{sub_id}')
 
-                submission = Submission(self, self.worker.submission_stores[sub_id])
-                # important!
-                # 过滤脏数据
-                if (
-                    submission.result.type == 'pass'
-                    and submission.store.puzzle_key in submission.team.game_state.passed_puzzle_keys
-                ):
-                    self.log('debug', 'game.on_team_event', f'dirty submission! passed! Sub#{sub_id}')
-                elif submission.cleaned_content in submission.team.game_state.get_submission_set(
-                    submission.puzzle.model.key
-                ):
-                    self.log('debug', 'game.on_team_event', f'dirty submission! in submission set! Sub#{sub_id}')
-                else:
-                    self.submission_list.append(submission)
-                    self.submissions_by_id[sub_id] = submission
-                    self.submissions_by_puzzle_key.setdefault(submission.store.puzzle_key, [])
-                    self.submissions_by_puzzle_key[submission.store.puzzle_key].append(submission)
+                submission = Submission(self, event.model)
 
-                    self.puzzles.on_team_event(event, is_reloading)
-                    self.teams.on_team_event(event, is_reloading)
-                    for b in self.boards.values():
-                        b.on_team_event(event, is_reloading)
+                self.submission_list.append(submission)
+                self.submissions_by_id[sub_id] = submission
+                self.submissions_by_puzzle_key.setdefault(puzzle_key, [])
+                self.submissions_by_puzzle_key[puzzle_key].append(submission)
 
-                    if submission.result.type == 'pass':
-                        self.n_corr_submission += 1
+                self.puzzles.on_team_event(event, is_reloading)
+                self.teams.on_team_event(event, is_reloading)
+                for b in self.boards.values():
+                    b.on_team_event(event, is_reloading)
+
+                if submission.result.type == 'pass':
+                    self.n_corr_submission += 1
+
             case GameStartEvent():
                 if event.team.gaming:
                     self.log('debug', 'game.on_team_event', f'dirty event! game start! Event#{event.model.id}')
