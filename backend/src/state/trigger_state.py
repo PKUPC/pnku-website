@@ -31,7 +31,6 @@ class Trigger:
     def on_store_reload(self, stores: list[TriggerStore]) -> None:
         self._stores = sorted(stores, key=lambda s: s.timestamp_s)
         self.trigger_by_tick = {s.tick: s for s in self._stores}
-
         self._game.need_reload_team_event = True
 
         if self.TICK_GAME_START in self.trigger_by_tick:

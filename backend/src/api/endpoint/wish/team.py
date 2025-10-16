@@ -493,17 +493,17 @@ async def get_submission_history(req: Request, worker: Worker, user: User | None
                     'idx': idx,
                     'puzzle': sub.puzzle.model.title,
                     'user_name': sub.user.model.user_info.nickname,
-                    'origin': sub.store.content,
+                    'origin': sub.info.content,
                     'cleaned': sub.cleaned_content,
                     'status': sub.status,
                     'info': sub.result.info,
-                    'timestamp_s': int(sub.store.created_at / 1000),
+                    'timestamp_s': int(sub.model.created_at / 1000),
                 }
                 for idx, sub in enumerate(user.team.game_state.submissions)
             ][::-1],
             'passed_submissions': [
                 {
-                    'timestamp_s': int(sub.store.created_at / 1000),
+                    'timestamp_s': int(sub.model.created_at / 1000),
                     'gained_score': sub.gained_score(),
                     # "finished": sub.finished,
                 }

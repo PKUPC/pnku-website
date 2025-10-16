@@ -8,7 +8,6 @@ from .log_view import LogView
 from .message_view import MessageView
 from .puzzle_view import PuzzleView
 from .status_view import StatusView
-from .submission_view import SubmissionView
 from .team_event_view import TeamEventView
 from .team_view import TeamView
 from .template_view import TemplateView
@@ -22,7 +21,6 @@ VIEWS = {
     'AnnouncementStore': AnnouncementView,
     'GamePolicyStore': GamePolicyView,
     'LogStore': LogView,
-    'SubmissionStore': SubmissionView,
     'TeamStore': TeamView,
     'TriggerStore': TriggerView,
     'UserStore': UserView,
@@ -46,7 +44,6 @@ __all__ = [
     'MessageView',
     'PuzzleView',
     'StatusView',
-    'SubmissionView',
     'TeamEventView',
     'TeamView',
     'TemplateView',

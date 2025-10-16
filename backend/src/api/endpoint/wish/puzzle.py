@@ -157,11 +157,11 @@ async def get_submissions(req: Request, body: GetSubmissionsParam, worker: Worke
                     # user in submission must be in a team
                     'team_name': sub.user.team.model.team_name,  # type: ignore[union-attr]
                     'user_name': sub.user.model.user_info.nickname,
-                    'origin': sub.store.content,
+                    'origin': sub.info.content,
                     'cleaned': sub.cleaned_content,
                     'status': sub.status,
                     'info': sub.result.info,
-                    'timestamp_s': int(sub.store.created_at / 1000),
+                    'timestamp_s': int(sub.model.created_at / 1000),
                 }
                 for idx, sub in enumerate(worker.game_nocheck.submissions_by_puzzle_key.get(puzzle_key, []))
             ][::-1]
@@ -177,11 +177,11 @@ async def get_submissions(req: Request, body: GetSubmissionsParam, worker: Worke
                     'idx': idx,
                     'team_name': None,
                     'user_name': sub.user.model.user_info.nickname,
-                    'origin': clean_sub(sub.store.content),
+                    'origin': clean_sub(sub.info.content),
                     'cleaned': clean_sub(sub.cleaned_content),
                     'status': sub.status,
                     'info': sub.result.info,
-                    'timestamp_s': int(sub.store.created_at / 1000),
+                    'timestamp_s': int(sub.model.created_at / 1000),
                 }
                 for idx, sub in enumerate(user.team.get_submissions_by_puzzle_key(puzzle_key))
             ][::-1]
