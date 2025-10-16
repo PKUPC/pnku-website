@@ -15,21 +15,18 @@ export default function UserLayout() {
     const items = [];
 
     items.push({
-        type: 'link',
         label: '个人资料',
         key: '/user/profile',
         icon: <IdCardIcon />,
     });
 
     items.push({
-        type: 'link',
         label: '队伍信息',
         key: '/user/team',
         icon: <EveryUserIcon />,
     });
 
     items.push({
-        type: 'link',
         label: '安全设置',
         key: '/user/security',
         icon: <LockOutlined />,

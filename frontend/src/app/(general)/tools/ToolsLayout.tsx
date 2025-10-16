@@ -19,7 +19,6 @@ export function ToolsLayout() {
 
     const items = [
         {
-            type: 'link',
             label: '图片上传',
             key: '/tools/upload-image',
             icon: <CloudUploadOutlined />,

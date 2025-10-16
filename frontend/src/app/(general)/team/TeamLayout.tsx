@@ -17,19 +17,16 @@ export function TeamLayout() {
 
     const items = [
         {
-            type: 'link',
             label: '队伍提交记录',
             key: '/team/submission-history',
             icon: <HistoryIcon />,
         },
         ...info.game.currencies.map((currency) => ({
-            type: 'link',
             label: `${currency.name}变动记录`,
             key: `/team/currency-history?type=${currency.type}`,
             icon: <NamedIcon iconName={currency.icon} />,
         })),
         {
-            type: 'link',
             label: '题目数据统计',
             key: '/team/puzzle-statistics',
             icon: <BarChartOutlined />,
