@@ -25,9 +25,8 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
     const puzzleKey = params.puzzleKey;
 
     const items = useMemo(() => {
-        const items = [
+        let items = [
             {
-                type: 'link',
                 label: '题目',
                 icon: <TextIcon />,
                 key: '/puzzle/body/' + puzzleKey,
@@ -36,14 +35,12 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
 
         if (!ARCHIVE_MODE)
             items.push({
-                type: 'link',
                 label: '提交记录',
                 icon: <HistoryIcon />,
                 key: '/puzzle/submissions/' + puzzleKey,
             });
 
         items.push({
-            type: 'link',
             label: '观测',
             icon: <SearchIcon />,
             key: '/puzzle/hints/' + puzzleKey,
@@ -51,7 +48,6 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
 
         if (!ARCHIVE_MODE && info.user?.group === 'player' && !info.feature.playground)
             items.push({
-                type: 'link',
                 label: '神谕',
                 icon: <HintIcon />,
                 key: '/puzzle/manual-hints/' + puzzleKey,
@@ -59,7 +55,6 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
 
         if (ARCHIVE_MODE || info.user?.group === 'staff')
             items.push({
-                type: 'link',
                 label: '解析',
                 icon: <FileDoneOutlined />,
                 key: '/puzzle/solution/' + puzzleKey,

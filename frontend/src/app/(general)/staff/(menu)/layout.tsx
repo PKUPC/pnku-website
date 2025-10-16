@@ -11,19 +11,16 @@ export function StaffMenuLayout() {
 
     const items = [
         {
-            type: 'link',
             label: '队伍列表',
             key: '/staff/teams',
             icon: <TeamOutlined />,
         },
         {
-            type: 'link',
             label: '提交列表',
             key: '/staff/submissions',
             icon: <HistoryIcon />,
         },
         {
-            type: 'link',
             label: '工单列表',
             key: '/staff/tickets',
             icon: <ExceptionOutlined />,

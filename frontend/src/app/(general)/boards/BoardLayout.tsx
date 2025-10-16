@@ -1,4 +1,4 @@
-import { Navigate, useOutlet, useParams } from 'react-router';
+import { Navigate, useLocation, useOutlet, useParams } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
 import NamedIcon from '@/components/NamedIcon';
@@ -11,24 +11,21 @@ function BoardLayoutBody() {
     const info = useSuccessGameInfo();
     const params = useParams();
     const curKey = params.boardName;
-
-    console.log(curKey);
+    const { pathname } = useLocation();
 
     if (!curKey || !info.game.boards.map((item) => item.key).includes(curKey))
         if (info.game.boards.length > 0) return <Navigate to={`/boards/${info.game.boards[0].key}`} replace={true} />;
         else return <NotFound />;
 
     const items = info.game.boards.map((item) => ({
-        type: 'link',
-        href: `/boards/${item.key}`,
         label: item.name,
-        key: item.key,
+        key: `/boards/${item.key}`,
         icon: <NamedIcon iconName={item.icon} />,
     }));
 
     return (
         <div>
-            <TabsNavbar items={items} selectedKeys={curKey ? [curKey] : undefined} />
+            <TabsNavbar items={items} selectedKeys={[pathname]} />
             <br />
             {outlet}
         </div>

@@ -1,151 +1,293 @@
-import { NavigationMenu } from 'radix-ui';
-import { forwardRef, useCallback, useState } from 'react';
-import { Link } from 'react-router';
+import {
+    AppstoreOutlined,
+    DisconnectOutlined,
+    FileTextOutlined,
+    LoginOutlined,
+    NotificationOutlined,
+    SettingOutlined,
+} from '@ant-design/icons';
+import { ConfigProvider, Menu } from 'antd';
+import type { MenuProps } from 'antd';
+import { useCallback, useMemo } from 'react';
+import { BiNavigation } from 'react-icons/bi';
+import { Link, useLocation, useNavigate } from 'react-router';
 
+import { EveryUserIcon, HomeIcon, IdCardIcon, PlazaIcon, RankingIcon } from '@/SvgIcons.tsx';
+import { ImageWithSkeleton } from '@/components/ImageWithSkeleton.tsx';
 import { GAME_LOGO, GAME_SHORT_TITLE, GAME_TITLE } from '@/constants.tsx';
-import { ButtonMenuItem, LinkMenuItem, SubMenuItem, useHeaderMenu } from '@/hooks/useHeaderMenu.tsx';
-import { cn } from '@/utils.ts';
+import { ARCHIVE_MODE } from '@/constants.tsx';
+import { useSuccessGameInfo, useTheme, useWindowInfo } from '@/logic/contexts.ts';
+import { make_auth_url } from '@/utils.ts';
 
-function HeaderMenuButton({ item, closeMenu }: { item: ButtonMenuItem; closeMenu?: () => void }) {
-    return (
-        <button
-            className={cn(
-                'flex h-10 w-full items-center gap-2 px-3 md:px-4 py-2 text-sm font-normal rounded-md bg-neutral hover:bg-neutral-hover transition-colors active:scale-97',
-                item.buttonType === 'danger' ? ' text-error' : '',
-            )}
-            onClick={() => {
-                item.onClick();
-                if (closeMenu) {
-                    closeMenu();
+function genHeaderMenu(info: ReturnType<typeof useSuccessGameInfo>, compact: boolean = false) {
+    const items: MenuProps['items'] = [];
+    const compactItems: MenuProps['items'] = [];
+
+    // 主页，在序章开放后并且组队之后就能看到区域列表
+    if (!ARCHIVE_MODE && (!info.user || (info.user.group !== 'staff' && (!info.team || !info.game.isPrologueUnlock)))) {
+        items.push({ label: '主页', key: '/home', icon: <HomeIcon /> });
+    } else {
+        const submenuItems: MenuProps['items'] = [{ label: '主页', key: '/home' }];
+        submenuItems.push({ type: 'divider' });
+        info.areas.forEach((area) => {
+            submenuItems.push({
+                label: area.title === 'P&KU 3' ? '序章' : area.title,
+                key: area.buttonLink,
+            });
+        });
+        // 对于普通玩家，只有在游戏开始后且队伍开始游戏后能看到谜题一览和情报一览
+        if (
+            (info.user?.group === 'player' && info.game.isGameBegin && info.team?.gaming) ||
+            info.user?.group == 'staff' ||
+            ARCHIVE_MODE
+        ) {
+            submenuItems.push({ type: 'divider' });
+            submenuItems.push({ label: '谜题一览', key: '/puzzle-list' });
+            submenuItems.push({ label: '情报一览', key: '/story-list' });
+        }
+        items.push({
+            type: 'submenu',
+            label: '区域',
+            key: '_/area',
+            icon: <AppstoreOutlined />,
+            children: submenuItems,
+        });
+    }
+    const aboutItem = {
+        label: '关于',
+        key: '_/about',
+        icon: <FileTextOutlined />,
+    };
+
+    if (compact) compactItems.push(aboutItem);
+    else items.push(aboutItem);
+
+    // 如果是存档模式可以看到排行榜、信息和浏览设置
+    if (ARCHIVE_MODE) {
+        if (info.game.boards.length > 0) {
+            const boardItem = {
+                label: '排行榜',
+                key: '_/boards',
+                icon: <RankingIcon />,
+            };
+            if (compact) compactItems.push(boardItem);
+            else items.push(boardItem);
+        }
+
+        const infoItem = {
+            label: '信息',
+            key: '/info/announcements',
+            icon: <NotificationOutlined />,
+        };
+        if (compact) compactItems.push(infoItem);
+        else items.push(infoItem);
+
+        const settingItem = {
+            icon: <SettingOutlined />,
+            label: '浏览设置',
+            key: '/setting',
+        };
+
+        if (compact) compactItems.push(settingItem);
+        else items.push(settingItem);
+
+        if (compact) {
+            items.push({
+                type: 'submenu',
+                key: '_/nav',
+                label: '导航',
+                icon: <BiNavigation />,
+                children: compactItems,
+            });
+        }
+    }
+    // 否则，如果未登录，只能看见登录按钮
+    else if (!info.user) {
+        // 如果未登录并且是 compact 模式，把关于页面也在这里加上
+        if (compact)
+            items.push({
+                label: '关于',
+                key: '_/about',
+                icon: <FileTextOutlined />,
+            });
+        items.push({
+            label: '登录',
+            key: '/login',
+            icon: <LoginOutlined />,
+        });
+    }
+    // 登陆后的按钮
+    else {
+        if (info.game.boards.length > 0) {
+            const boardItem = {
+                label: '排行榜',
+                key: '_/boards',
+                icon: <RankingIcon />,
+            };
+            if (compact) compactItems.push(boardItem);
+            else items.push(boardItem);
+        }
+
+        const infoItem = {
+            label: '信息',
+            key: '/info/announcements',
+            icon: <NotificationOutlined />,
+        };
+        if (compact) compactItems.push(infoItem);
+        else items.push(infoItem);
+
+        const plazaItem = {
+            label: '队伍广场',
+            key: '/plaza',
+            icon: <PlazaIcon />,
+        };
+
+        if (compact) compactItems.push(plazaItem);
+        else items.push(plazaItem);
+
+        if (compact) {
+            items.push({
+                type: 'submenu',
+                key: '_/nav',
+                label: '导航',
+                icon: <BiNavigation />,
+                children: compactItems,
+            });
+        }
+
+        const submenuItems: MenuProps['items'] = [];
+        submenuItems.push({
+            icon: <IdCardIcon />,
+            label: '个人中心',
+            key: '/user/profile',
+        });
+
+        if (info.user.group === 'staff') {
+            submenuItems.push({
+                icon: <EveryUserIcon />,
+                label: '比赛管理',
+                key: '/staff/teams',
+            });
+        }
+
+        // 正式开赛并且队伍开始游戏后才能看到队伍动态
+        if (info.team?.gaming && info.game.isGameBegin) {
+            submenuItems.push({
+                icon: <EveryUserIcon />,
+                label: '队伍动态',
+                key: '/team/submission-history',
+            });
+        }
+
+        submenuItems.push({
+            icon: <SettingOutlined />,
+            label: '网站设置',
+            key: '/setting',
+        });
+
+        submenuItems.push({
+            icon: <DisconnectOutlined />,
+            label: '注销',
+            key: '_/user/logout',
+            danger: true,
+            onClick: () => {
+                sessionStorage.clear();
+                try {
+                    if (window.logout) window.logout();
+                } catch {
+                    /* empty */
                 }
+                window.location.href = make_auth_url(`logout?rem=${window.rem}&ram=${window.ram}`);
+            },
+        });
+
+        items.push({
+            type: 'submenu',
+            label: (
+                <div className="avatar">
+                    <div className="rounded-xl">
+                        <ImageWithSkeleton
+                            src={info.user.profile.avatar_url}
+                            alt="avatar"
+                            width="1.75rem"
+                            height="1.75rem"
+                        />
+                    </div>
+                </div>
+            ),
+            key: '_/user',
+            children: submenuItems,
+        });
+    }
+
+    return items;
+}
+
+function NavigationMenu() {
+    const { windowWidth } = useWindowInfo();
+    const info = useSuccessGameInfo();
+    const navigate = useNavigate();
+    const headerItems = useMemo(() => genHeaderMenu(info, windowWidth < 640), [info, windowWidth]);
+    const { color } = useTheme();
+    const { pathname } = useLocation();
+
+    const onClick = useCallback<NonNullable<MenuProps['onClick']>>(
+        (e) => {
+            if (e.key.startsWith('/')) {
+                navigate(e.key);
+            } else if (e.key.startsWith('_/boards')) {
+                navigate(`/boards/${info.game.boards[0]}`);
+            } else if (e.key.startsWith('_/about')) {
+                navigate('/about/introduction');
+            }
+        },
+        [navigate, info],
+    );
+
+    const selectedKeys = useMemo<string[]>(() => {
+        let result: string[] = [pathname];
+        if (pathname.startsWith('/boards')) {
+            result.push('_/boards');
+        }
+        if (pathname.startsWith('/about')) {
+            result.push('_/about');
+        }
+        return result;
+    }, [pathname]);
+
+    return (
+        <ConfigProvider
+            theme={{
+                token: {
+                    colorText: color.neutralContent,
+                    colorSplit: color.neutralContent,
+                },
+                components: {
+                    Menu: {
+                        popupBg: color.neutral,
+                        darkItemBg: color.neutral,
+                        darkItemSelectedBg: color.neutral,
+                    },
+                },
             }}
         >
-            {item.icon}
-            {item.label}
-        </button>
-    );
-}
-
-const HeaderMenuLink = forwardRef<HTMLAnchorElement, { item: LinkMenuItem; closeMenu?: () => void }>(
-    ({ item, closeMenu }, ref) => {
-        return (
-            <Link
-                className={cn(
-                    'text-neutral-content bg-neutral hover:bg-neutral-hover',
-                    'flex h-10 items-center gap-2 px-3 md:px-4 py-2 text-sm font-normal rounded-md    transition-colors active:scale-97',
-                )}
-                to={item.href}
-                ref={ref}
-                onClick={() => {
-                    if (closeMenu) {
-                        closeMenu();
-                    }
+            <Menu
+                items={headerItems}
+                theme="dark"
+                mode="horizontal"
+                onClick={onClick}
+                style={{
+                    minWidth: 0,
+                    flex: 'auto',
+                    justifyContent: 'flex-end',
                 }}
-            >
-                {item.icon}
-                {item.label}
-            </Link>
-        );
-    },
-);
-HeaderMenuLink.displayName = 'HeaderMenuLink';
-
-function NavigationSubmenu({
-    submenuItem,
-    position,
-    closeMenu,
-}: {
-    submenuItem: SubMenuItem;
-    position?: 'start' | 'end';
-    closeMenu?: () => void;
-}) {
-    return (
-        <>
-            <NavigationMenu.Trigger className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm font-normal rounded-md bg-neutral text-neutral-content hover:bg-neutral-hover transition-colors cursor-pointer active:scale-97">
-                {submenuItem.icon}
-                {submenuItem.label}
-            </NavigationMenu.Trigger>
-            <NavigationMenu.Content
-                className={cn(
-                    'absolute top-full z-40 mt-2 rounded-lg bg-neutral shadow-lg p-2',
-                    position === 'end' ? 'right-0' : 'left-0',
-                )}
-                style={{ width: submenuItem.width + 'rem' }}
-            >
-                {submenuItem.children.map((child, index) => {
-                    if (child.type === 'link') {
-                        return (
-                            <NavigationMenu.Link asChild key={child.key}>
-                                <HeaderMenuLink item={child} closeMenu={closeMenu} />
-                            </NavigationMenu.Link>
-                        );
-                    } else if (child.type === 'button') {
-                        return <HeaderMenuButton item={child} key={child.key} closeMenu={closeMenu} />;
-                    } else if (child.type === 'divider') {
-                        return <div key={`divider-${index}`} className="my-1 border-t border-neutral-600"></div>;
-                    }
-                    return null;
-                })}
-            </NavigationMenu.Content>
-        </>
-    );
-}
-
-function RadixNavigationMenu({ compact }: { compact?: boolean }) {
-    const headerItems = useHeaderMenu(compact ?? false);
-    const [currentValue, setCurrentValue] = useState('');
-    const closeMenu = useCallback(() => {
-        setCurrentValue('');
-    }, []);
-
-    return (
-        <NavigationMenu.Root
-            className="relative"
-            delayDuration={50}
-            value={currentValue}
-            onValueChange={setCurrentValue}
-        >
-            <NavigationMenu.List className="flex items-center gap-2">
-                {headerItems.map((item, index, items) => {
-                    if (item.type === 'submenu') {
-                        return (
-                            <NavigationMenu.Item key={item.key}>
-                                <NavigationSubmenu
-                                    submenuItem={item}
-                                    position={index === items.length - 1 ? 'end' : 'start'}
-                                    closeMenu={closeMenu}
-                                />
-                            </NavigationMenu.Item>
-                        );
-                    } else if (item.type === 'link') {
-                        return (
-                            <NavigationMenu.Item key={item.key}>
-                                <NavigationMenu.Link asChild>
-                                    <HeaderMenuLink item={item} />
-                                </NavigationMenu.Link>
-                            </NavigationMenu.Item>
-                        );
-                    } else if (item.type === 'button') {
-                        return (
-                            <NavigationMenu.Item key={item.key}>
-                                <HeaderMenuButton item={item} />
-                            </NavigationMenu.Item>
-                        );
-                    }
-                    return null;
-                })}
-            </NavigationMenu.List>
-
-            {/* Viewport for positioning content */}
-            <NavigationMenu.Viewport className="absolute top-full left-0 w-full" />
-        </NavigationMenu.Root>
+                selectedKeys={selectedKeys}
+            />
+        </ConfigProvider>
     );
 }
 
 export function Header() {
-    const headerItems = useHeaderMenu();
-    console.log(headerItems);
-
     return (
         <div className="fixed top-0 left-0 w-full z-50 h-12 bg-neutral">
             <div className="flex items-center justify-between h-12 max-w-300 mx-auto px-2">
@@ -165,14 +307,7 @@ export function Header() {
                         <div className="flex lg:hidden">{GAME_SHORT_TITLE}</div>
                     </div>
                 </Link>
-                {/* </div> */}
-
-                <div className="flex-none hidden w640:flex">
-                    <RadixNavigationMenu compact={false} />
-                </div>
-                <div className="flex-none w640:hidden">
-                    <RadixNavigationMenu compact={true} />
-                </div>
+                <NavigationMenu />
             </div>
         </div>
     );
