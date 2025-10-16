@@ -290,8 +290,6 @@ class Team(WithGameLifecycle):
         # 需要更新排行榜
         if self.model.ban_status != store.ban_status:
             self.game.need_updating_scoreboard = True
-            # TODO: 新加的速通榜需要 reload，以后得优化一下更新排行榜的逻辑
-            self.game.need_reload_team_event = True
         self._store = store
         self.model = store.validated_model()
 
