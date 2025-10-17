@@ -433,7 +433,6 @@ export namespace Wish {
         export type PuzzleDetailData = {
             key: string;
             title: string;
-            return: string;
             desc: string;
             actions: PuzzleActionData[];
             clipboard?: ClipboardData[];
@@ -445,7 +444,9 @@ export namespace Wish {
             special_list?: object;
             correct_answers?: string[];
             answer_display?: string;
-            area_name: string;
+            return?: string;
+            area_name?: string;
+            stories?: string[];
         };
 
         export type GetDetailApi = {

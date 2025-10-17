@@ -1,5 +1,6 @@
 import { FileDoneOutlined } from '@ant-design/icons';
 import { useMemo } from 'react';
+import { LuBookHeart } from 'react-icons/lu';
 import { useLocation, useParams } from 'react-router';
 
 import { HintIcon, HistoryIcon, SearchIcon, TextIcon } from '@/SvgIcons';
@@ -15,6 +16,7 @@ import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
 
 import { PuzzleTab } from './PuzzleTab';
+import { StoryTab } from './StoryTab';
 import styles from './TabContainer.module.css';
 
 export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetailData }) {
@@ -25,13 +27,19 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
     const puzzleKey = params.puzzleKey;
 
     const items = useMemo(() => {
-        let items = [
-            {
-                label: '题目',
-                icon: <TextIcon />,
-                key: '/puzzle/body/' + puzzleKey,
-            },
-        ];
+        let items = [];
+        if (puzzleData.stories?.length ?? 0 > 0)
+            items.push({
+                label: '剧情',
+                icon: <LuBookHeart />,
+                key: '/puzzle/stories/' + puzzleKey,
+            });
+
+        items.push({
+            label: '题目',
+            icon: <TextIcon />,
+            key: '/puzzle/body/' + puzzleKey,
+        });
 
         if (!ARCHIVE_MODE)
             items.push({
@@ -59,8 +67,9 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
                 icon: <FileDoneOutlined />,
                 key: '/puzzle/solution/' + puzzleKey,
             });
+
         return items;
-    }, [info, puzzleKey]);
+    }, [info, puzzleKey, puzzleData]);
 
     console.log(pathname);
 
@@ -70,6 +79,7 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
     else if (component === 'hints') children = <HintTab puzzleData={puzzleData} />;
     else if (component === 'manual-hints') children = <ManualHintTab puzzleData={puzzleData} />;
     else if (component == 'solution') children = <SolutionTab puzzleData={puzzleData} />;
+    else if (component == 'stories') children = <StoryTab puzzleData={puzzleData} />;
 
     return (
         <div className={styles.tabContainer}>
