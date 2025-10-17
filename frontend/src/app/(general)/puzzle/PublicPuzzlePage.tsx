@@ -44,8 +44,14 @@ export function PublicPage() {
         return (
             <div className="flex flex-row gap-4.5 max-md:block">
                 <div className="min-w-0 grow-0 shrink-0 basis-[320px] max-md:w-full max-md:mb-6">
-                    {/*<LinkTitle icon={<LeftCircleIcon/>} title={"区域页"} url={data.data.return}/>*/}
-                    <ClickTitle icon={<LeftCircleIcon />} title={'返回'} onClick={() => navigate(-1)} />
+                    <ClickTitle
+                        icon={<LeftCircleIcon />}
+                        title={data.data.area_name ?? '返回'}
+                        onClick={() => {
+                            if (data.data.return) navigate(data.data.return);
+                            else navigate(-1);
+                        }}
+                    />
                     <br />
                     <div className="puzzle-lists">
                         {data.data.puzzle_list.length === 0 ? (
@@ -73,8 +79,14 @@ export function PublicPage() {
         return (
             <>
                 <div className={'slim-container'}>
-                    {/*<LinkTitle icon={<LeftCircleIcon/>} title={"区域页"} url={data.data.return}/>*/}
-                    <ClickTitle icon={<LeftCircleIcon />} title={'返回'} onClick={() => navigate(-1)} />
+                    <ClickTitle
+                        icon={<LeftCircleIcon />}
+                        title={data.data.area_name ?? '返回'}
+                        onClick={() => {
+                            if (data.data.return) navigate(data.data.return);
+                            else navigate(-1);
+                        }}
+                    />
                     <br />
                     {hideInfo && (
                         <>
