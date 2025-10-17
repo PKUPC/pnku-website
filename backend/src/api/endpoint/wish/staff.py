@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from sanic import Blueprint, Request
 from sanic_ext import validate
 
+from src import utils
 from src.adhoc.constants import CurrencyType
 from src.adhoc.state.currency import CurrencyTypeToClass
 from src.custom import store_user_log
@@ -178,7 +179,7 @@ async def v_me_50(req: Request, body: VMe50Param, worker: Worker, user: User | N
     if not (0 < len(body.reason) <= 100):
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '更改原因的长度应在1到100之间'}
 
-    currency_type = CurrencyType.__members__.get(body.type.upper(), None)
+    currency_type = CurrencyType.__members__.get(utils.kebab_to_enum(body.type), None)
     if currency_type is None:
         store_user_log(
             req,

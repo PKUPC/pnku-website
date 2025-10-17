@@ -13,7 +13,7 @@ PuzzleVisibleStatusLiteral = Literal['unlock', 'lock', 'found']
 
 
 class CurrencyType(EnhancedEnum):
-    ATTENTION = '注意力'
+    HINT_POINT = '注意力'
 
 
-CurrencyTypeLiteral = Literal['ATTENTION']
+CurrencyTypeLiteral = Literal['HINT_POINT']

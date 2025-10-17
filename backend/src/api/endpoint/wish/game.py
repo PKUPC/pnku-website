@@ -164,7 +164,7 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
         for currency_type in CurrencyType:
             currencies.append(
                 {
-                    'type': currency_type.lower_name,
+                    'type': utils.enum_to_kebab(currency_type.name),
                     'name': currency_type.value,
                     'icon': CurrencyTypeToClass[currency_type].icon,
                     'denominator': CurrencyTypeToClass[currency_type].denominator,
@@ -405,7 +405,7 @@ async def get_team_currency_detail(
 ) -> dict[str, Any]:
     assert user is not None
 
-    currency_type = CurrencyType.__members__.get(body.currency_type.upper(), None)
+    currency_type = CurrencyType.__members__.get(utils.kebab_to_enum(body.currency_type), None)
 
     if currency_type is None:
         store_user_log(

@@ -446,7 +446,7 @@ async def get_hints(req: Request, body: GetHintsParam, worker: Worker, user: Use
             hint_cd = hint_cd_after_puzzle_unlock(hint)
             effective_after_ts = unlock_puzzle_ts + hint_cd
 
-        price = [{'type': x.type.name.lower(), 'price': x.price} for x in hint.model.extra.price]
+        price = [{'type': utils.enum_to_kebab(x.type.name), 'price': x.price} for x in hint.model.extra.price]
         # 至少设置一个 price
         if len(price) == 0:
             worker.log(
