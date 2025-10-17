@@ -1,4 +1,4 @@
-import { Empty, Tooltip } from 'antd';
+import { Empty, Tag, Tooltip } from 'antd';
 import React, { Fragment } from 'react';
 import { Link } from 'react-router';
 
@@ -27,6 +27,11 @@ export function PuzzleListSider({
                     <div className={'puzzle-title'}>
                         <PuzzleIcon status={puzzle.status} />{' '}
                         <span className={'puzzle-title-text'}>{puzzle.title}</span>
+                        {puzzle.tags?.map((tag) => (
+                            <Tag className="translate-x-1 h-5.5" color={tag.color} key={tag.text}>
+                                {tag.text}
+                            </Tag>
+                        )) ?? <></>}
                     </div>
                 );
                 if (isDisabled) {

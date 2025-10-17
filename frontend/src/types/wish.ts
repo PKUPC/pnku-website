@@ -127,6 +127,7 @@ export namespace Wish {
             total_attempted: number;
             total_passed: number;
             image?: string;
+            tags?: { text: string; color: string }[];
         };
 
         export type PuzzleGroupInfo = { name: string; puzzles: PuzzleInfo[] };
