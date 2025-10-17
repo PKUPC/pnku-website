@@ -18,7 +18,10 @@ class PuzzleType(utils.EnhancedEnum):
 
 class PuzzleMetadataModel(BaseModel):
     type: PuzzleType = Field(default=PuzzleType.NORMAL)
-    author: str = Field(default='Anonymous')
+    authors: list[str] = Field(default_factory=list)
+    story_before: str | None = Field(default=None)
+    story_after: str | None = Field(default=None)
+    solution: str | None = Field(default=None)
 
 
 class MediaActionModel(BaseModel):
