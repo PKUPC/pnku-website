@@ -12,17 +12,18 @@ if TYPE_CHECKING:
     from src.adhoc.state.team_game_state import TeamGameState
 
 
-class AttentionCurrencyState(CurrencyState):
+class HintPointCurrencyState(CurrencyState):
     """
-    P&KU3 中的注意力，本质是一种标准的随时间增长的货币，理论上很多场景下可以复用。
+    用于购买提示的提示点，在 P&KU3 中称为注意力。
+    本质是一种标准的随时间增长的货币，理论上很多场景下可以复用，只需要修改一些参数配置。
     """
 
     base = 0
     denominator = 1
     precision = 0
-    name = CurrencyType.ATTENTION.name
+    name = CurrencyType.HINT_POINT.name
     icon = 'attention'
-    currency_type = CurrencyType.ATTENTION
+    currency_type = CurrencyType.HINT_POINT
 
     def __init__(self, team_game_state: TeamGameState):
         super().__init__(team_game_state)

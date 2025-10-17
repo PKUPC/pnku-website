@@ -12,7 +12,7 @@ from src.adhoc.constants import CurrencyType, PuzzleVisibleStatusLiteral
 from src.adhoc.constants.messages import make_buy_hint_message, make_modify_currency_message
 from src.store import PuzzleActionEvent
 
-from .currency import AttentionCurrencyState, CurrencyEvent, CurrencyState
+from .currency import CurrencyEvent, CurrencyState, HintPointCurrencyState
 from .special_puzzles import (
     Day2Meta,
     Day3Normal,
@@ -68,7 +68,7 @@ class TeamGameState:
         self.success_submissions: list[Submission] = []
 
         self.currency_state_by_type: dict[CurrencyType, CurrencyState] = {
-            CurrencyType.ATTENTION: AttentionCurrencyState(self),
+            CurrencyType.HINT_POINT: HintPointCurrencyState(self),
         }
 
         # 游戏状态

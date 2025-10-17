@@ -110,3 +110,17 @@ def count_blank_in_string(origin: str) -> int:
 
 def count_non_blank_in_string(origin: str) -> int:
     return len(origin) - count_blank_in_string(origin)
+
+
+def enum_to_kebab(enum_str: str) -> str:
+    """
+    HINT_POINT -> hint-point
+    """
+    return enum_str.lower().replace('_', '-')
+
+
+def kebab_to_enum(kebab_str: str) -> str:
+    """
+    hint-point -> HINT_POINT
+    """
+    return kebab_str.upper().replace('-', '_')

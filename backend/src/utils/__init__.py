@@ -12,9 +12,11 @@ from .string_tools import (
     clean_submission,
     count_blank_in_string,
     count_non_blank_in_string,
+    enum_to_kebab,
     format_timestamp,
     formatted_ts_to_timestamp,
     gen_random_str,
+    kebab_to_enum,
 )
 from .system import chdir, fix_zmq_asyncio_windows, get_traceback, sys_status
 from .template import pure_render_template, render_template
@@ -44,6 +46,8 @@ __all__ = [
     'format_timestamp',
     'formatted_ts_to_timestamp',
     'gen_random_str',
+    'kebab_to_enum',
+    'enum_to_kebab',
     'chdir',
     'fix_zmq_asyncio_windows',
     'get_traceback',
