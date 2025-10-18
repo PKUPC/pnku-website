@@ -78,7 +78,7 @@ const routes: RouteObject[] = [
                             { path: '/puzzle/:component/:puzzleKey', element: <PuzzlePage /> },
                         ],
                     },
-                    { path: '/story', element: <StoryPage /> },
+                    { path: '/story/:storyKey', element: <StoryPage /> },
                     { path: '/ticket-detail/:ticketId', element: <TicketDetailPage /> },
                     {
                         path: '/boards/:boardName',
@@ -128,7 +128,7 @@ const routes: RouteObject[] = [
                         element: <TeamLayout />,
                         children: [
                             { index: true, element: <Navigate to="/about/introduction" /> },
-                            { path: '/team/currency-history', element: <CurrencyHistoryPage /> },
+                            { path: '/team/currency-history/:currencyType', element: <CurrencyHistoryPage /> },
                             { path: '/team/puzzle-statistics', element: <PuzzleStatisticsPage /> },
                             { path: '/team/submission-history', element: <SubmissionHistoryPage /> },
                         ],

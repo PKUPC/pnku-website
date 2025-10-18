@@ -1,5 +1,5 @@
 import { BarChartOutlined } from '@ant-design/icons';
-import { useLocation, useOutlet, useSearchParams } from 'react-router';
+import { useLocation, useOutlet } from 'react-router';
 
 import { HistoryIcon } from '@/SvgIcons';
 import NotFound from '@/app/NotFound.tsx';
@@ -10,9 +10,7 @@ import { useSuccessGameInfo } from '@/logic/contexts.ts';
 export function TeamLayout() {
     const outlet = useOutlet();
     const info = useSuccessGameInfo();
-    const { pathname: loc } = useLocation();
-    const [params] = useSearchParams();
-
+    const { pathname } = useLocation();
     if (!info.user || !info.team || !info.team.gaming || !info.game.isGameBegin) return <NotFound />;
 
     const items = [
@@ -23,7 +21,7 @@ export function TeamLayout() {
         },
         ...info.game.currencies.map((currency) => ({
             label: `${currency.name}变动记录`,
-            key: `/team/currency-history?type=${currency.type}`,
+            key: `/team/currency-history/${currency.type}`,
             icon: <NamedIcon iconName={currency.icon} />,
         })),
         {
@@ -33,11 +31,9 @@ export function TeamLayout() {
         },
     ];
 
-    const selectedKey = loc !== '/team/currency-history' ? loc : loc + '?type=' + (params.get('type') ?? '');
-
     return (
         <div className={'slim-container'}>
-            <TabsNavbar items={items} selectedKeys={[selectedKey]} />
+            <TabsNavbar items={items} selectedKeys={[pathname]} />
             <br />
             {outlet}
         </div>
