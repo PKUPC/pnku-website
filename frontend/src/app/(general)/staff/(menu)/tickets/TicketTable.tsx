@@ -102,7 +102,7 @@ export function TicketTable({
                 title: '队伍',
                 dataIndex: 'team_name',
                 key: 'team_id',
-                render: (value, item) => <Link to={`/staff/team-detail?tid=${item.team_id}`}>{value}</Link>,
+                render: (value, item) => <Link to={`/staff/team-detail/${item.team_id}`}>{value}</Link>,
                 filters: team_filters,
                 filterSearch: true,
                 filteredValue: tableParams.filters?.team_id ? tableParams.filters.team_id : undefined,
