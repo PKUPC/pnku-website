@@ -51,13 +51,13 @@ class Teams(WithGameLifecycle):
     def _add_team_name_and_key_hash(self, team: Team) -> None:
         self.team_name_set.add(team.model.team_name)
         for puzzle_key in self.game.puzzles.puzzle_by_key:
-            if secret.HASH_PUZZLE_KEY == 'key_and_team':
+            if secret.HASH_PUZZLE_KEY == 'hash_key_and_team':
                 key_hash = utils.calc_sha1(secret.PUZZLE_KEY_HASH_SALT + str((team.model.id, puzzle_key)))
                 while key_hash in self.game.hash_to_team_and_key:
                     key_hash = utils.calc_sha1(key_hash)
                 self.game.team_and_key_to_hash[(team.model.id, puzzle_key)] = key_hash
                 self.game.hash_to_team_and_key[key_hash] = (team.model.id, puzzle_key)
-            elif secret.HASH_PUZZLE_KEY == 'key_only':
+            elif secret.HASH_PUZZLE_KEY == 'hash_key':
                 key_hash = utils.calc_sha1(secret.PUZZLE_KEY_HASH_SALT + puzzle_key)
                 while key_hash in self.game.hash_to_puzzle_key:
                     key_hash = utils.calc_sha1(key_hash)
@@ -205,8 +205,8 @@ class Team(WithGameLifecycle):
             self.game.log('info', 'team.on_team_event', f'team#{self.model.id} got {event.model.info.type} event.')
 
         match event.model.info:
-            case SubmissionEvent(submission_id=submission_id):
-                submission = self.game.submissions_by_id[submission_id]
+            case SubmissionEvent():
+                submission = self.game.submissions_by_id[event.model.id]
                 self.game_state.on_submission(submission, is_reloading)
                 if submission.result.type == 'pass':
                     for _, board in self.game.boards.items():
@@ -290,8 +290,6 @@ class Team(WithGameLifecycle):
         # 需要更新排行榜
         if self.model.ban_status != store.ban_status:
             self.game.need_updating_scoreboard = True
-            # TODO: 新加的速通榜需要 reload，以后得优化一下更新排行榜的逻辑
-            self.game.need_reload_team_event = True
         self._store = store
         self.model = store.validated_model()
 
@@ -319,7 +317,7 @@ class Team(WithGameLifecycle):
         self.total_score += score
 
     def get_submissions_by_puzzle_key(self, puzzle_key: str) -> list[Submission]:
-        return [x for x in self.game_state.submissions if x.store.puzzle_key == puzzle_key]
+        return [x for x in self.game_state.submissions if x.info.puzzle_key == puzzle_key]
 
     def get_currency_change_list_by_type(self, currency_type: CurrencyType) -> list[dict[str, str | int]]:
         return self.game_state.get_currency_history(currency_type)
@@ -437,8 +435,8 @@ class StaffTeam(Team):
             self.game.log('info', 'team.on_team_event', f'team#{self.model.id} got {event.model.info.type} event.')
 
         match event.model.info:
-            case SubmissionEvent(submission_id=submission_id):
-                submission = self.game.submissions_by_id[submission_id]
+            case SubmissionEvent():
+                submission = self.game.submissions_by_id[event.model.id]
                 self.game_state.on_submission(submission, is_reloading)
 
         self.team_events.append(event)

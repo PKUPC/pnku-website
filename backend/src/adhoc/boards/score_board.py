@@ -34,7 +34,7 @@ class ScoreBoard(Board):
             return (
                 team.game_state.finished_timestamp_s if team.game_state.finished else 90000000000,
                 -score,
-                -1 if team.last_success_submission is None else team.last_success_submission.store.id,
+                -1 if team.last_success_submission is None else team.last_success_submission.model.id,
                 team.model.created_at,
             )
 
@@ -59,7 +59,7 @@ class ScoreBoard(Board):
 
     @staticmethod
     def _admin_knowledge_item(team: Team) -> dict[str, str]:
-        return {'detail_url': f'/staff/team-detail?tid={team.model.id}'}
+        return {'detail_url': f'/staff/team-detail/{team.model.id}'}
 
     def _render(self, is_admin: bool) -> dict[str, Any]:
         self._game.worker.log('debug', 'board.render', f'rendering score board {self.name}')
@@ -84,7 +84,7 @@ class ScoreBoard(Board):
                     'f': team.game_state.finished,
                     'fts': team.game_state.finished_timestamp_s,
                     's': score,
-                    'lts': int(team.last_success_submission.store.created_at / 1000)
+                    'lts': int(team.last_success_submission.model.created_at / 1000)
                     if team.last_success_submission
                     else None,
                     'g': team.gaming,
@@ -98,11 +98,11 @@ class ScoreBoard(Board):
                     'n': team.model.team_name,
                     'ss': [
                         [
-                            sub.store.created_at,
+                            sub.model.created_at,
                             sub.gained_score(),
                         ]
                         for sub in team.game_state.success_submissions
-                        if sub.store.created_at <= board_end_ts * 1000
+                        if sub.model.created_at <= board_end_ts * 1000
                     ],
                 }
                 for team, score in self.board[:top_star_n]
@@ -122,8 +122,8 @@ class ScoreBoard(Board):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool) -> None:
         match event.model.info:
-            case SubmissionEvent(submission_id=sub_id):
-                submission = self._game.submissions_by_id[sub_id]
+            case SubmissionEvent():
+                submission = self._game.submissions_by_id[event.model.id]
                 if submission.result.type == 'pass' and not is_reloading:
                     self._update_board()
                     self.clear_render_cache()

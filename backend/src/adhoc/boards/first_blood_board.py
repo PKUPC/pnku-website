@@ -41,7 +41,7 @@ class FirstBloodBoard(Board):
                             'team_name': submission.user.team.model.team_name  # type: ignore[union-attr]
                             if submission is not None
                             else None,
-                            'timestamp': int(submission.store.created_at / 1000) if submission is not None else None,
+                            'timestamp': int(submission.model.created_at / 1000) if submission is not None else None,
                         }
                         for puzzle in self._game.puzzles.puzzle_by_area.get(area, [])
                         for submission in [self.puzzle_board.get(puzzle, None)]
@@ -59,8 +59,8 @@ class FirstBloodBoard(Board):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool) -> None:
         match event.model.info:
-            case SubmissionEvent(submission_id=sub_id):
-                submission = self._game.submissions_by_id[sub_id]
+            case SubmissionEvent():
+                submission = self._game.submissions_by_id[event.model.id]
                 if submission.result.type != 'pass':
                     return
 

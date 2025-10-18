@@ -24,7 +24,7 @@ export function PuzzleBody({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetai
                 </p>
             ))}
 
-            {puzzleData.clipboard && <CopyButton clipboardData={puzzleData.clipboard} />}
+            {puzzleData.clipboard && <CopyButton puzzleKey={puzzleData.key} clipboardData={puzzleData.clipboard} />}
 
             <br />
 

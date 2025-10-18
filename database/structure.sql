@@ -46,6 +46,7 @@ CREATE TABLE `hint`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `enable` tinyint(1) NOT NULL,
   `puzzle_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `sorting_index` int(11) NOT NULL,
   `question` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `answer` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -120,6 +121,7 @@ DROP TABLE IF EXISTS `puzzle`;
 CREATE TABLE `puzzle`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `slug` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `title` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `category` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `subcategory` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -131,23 +133,8 @@ CREATE TABLE `puzzle`  (
   `actions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `triggers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `key`(`key`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for submission
--- ----------------------------
-DROP TABLE IF EXISTS `submission`;
-CREATE TABLE `submission`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_at` bigint(20) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `puzzle_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `content` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `extra` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `user_id`(`user_id`) USING BTREE,
-  CONSTRAINT `submission_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  UNIQUE INDEX `key`(`key`) USING BTREE,
+  UNIQUE INDEX `slug`(`slug`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------

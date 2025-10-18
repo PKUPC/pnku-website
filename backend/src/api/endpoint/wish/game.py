@@ -11,7 +11,7 @@ from sanic_ext import validate
 
 from src import adhoc, secret, utils
 from src.adhoc.constants.enums import CurrencyType
-from src.adhoc.constants.misc import PUZZLE_AREA_NAMES, VALID_AREA_NAMES
+from src.adhoc.constants.misc import PUZZLE_AREA_NAMES, VALID_AREA_BEFORE_GAME_START, VALID_AREA_NAMES
 from src.adhoc.state.currency import CurrencyTypeToClass
 from src.custom import store_user_log
 from src.logic import Worker, glitter
@@ -48,26 +48,29 @@ async def get_area_detail(req: Request, body: GetAreaDetailParam, worker: Worker
 
     if user.is_staff:
         return {'status': 'success', 'data': adhoc.get_area_info(body.area_name, user, worker)}
+
     assert user.team is not None
+
     # 检查是否开始游戏
-    if body.area_name != 'intro' and not worker.game_nocheck.is_game_begin():
+    if body.area_name not in VALID_AREA_BEFORE_GAME_START and not worker.game_nocheck.is_game_begin():
         store_user_log(
             req, 'api.game.get_area_detail', 'abnormal', '游戏未开始时调用了 API。', {'area_name': body.area_name}
         )
         return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '游戏未开始！'}
 
     # 检查是否未解锁
-    if body.area_name in VALID_AREA_NAMES:
-        if body.area_name == 'intro' and not worker.game_nocheck.is_intro_unlock():
-            return not_found
-        if body.area_name not in user.team.game_state.unlock_areas:
-            worker.log(
-                'debug',
-                'get_area_detail',
-                f'area {body.area_name} not in T#{user.team.model.id}'
-                + f'unlock areas {user.team.game_state.unlock_areas}]',
-            )
-            return not_found
+    if body.area_name in VALID_AREA_BEFORE_GAME_START and not worker.game_nocheck.is_intro_unlock():
+        return not_found
+
+    # 检查是否解锁
+    if body.area_name not in user.team.game_state.unlock_areas:
+        worker.log(
+            'debug',
+            'get_area_detail',
+            f'area {body.area_name} not in T#{user.team.model.id}'
+            + f'unlock areas {user.team.game_state.unlock_areas}]',
+        )
+        return not_found
 
     return {'status': 'success', 'data': adhoc.get_area_info(body.area_name, user, worker)}
 
@@ -120,9 +123,9 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
     # TODO: 这里的一些设置要移到 adhoc 中去
     # 排行榜相关逻辑
     board_key_to_icon = {
-        'score_board': 'ranking',
-        'first_blood': 'first-blood',
-        'speed_run': 'thunder',
+        'score-board': 'ranking',
+        'first-blood': 'first-blood',
+        'speed-run': 'thunder',
     }
     unlock_boards: list[dict[str, str]] = []
     if not secret.PLAYGROUND_MODE and user is not None:
@@ -161,7 +164,7 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
         for currency_type in CurrencyType:
             currencies.append(
                 {
-                    'type': currency_type.lower_name,
+                    'type': utils.enum_to_kebab(currency_type.name),
                     'name': currency_type.value,
                     'icon': CurrencyTypeToClass[currency_type].icon,
                     'denominator': CurrencyTypeToClass[currency_type].denominator,
@@ -402,7 +405,7 @@ async def get_team_currency_detail(
 ) -> dict[str, Any]:
     assert user is not None
 
-    currency_type = CurrencyType.__members__.get(body.currency_type.upper(), None)
+    currency_type = CurrencyType.__members__.get(utils.kebab_to_enum(body.currency_type), None)
 
     if currency_type is None:
         store_user_log(

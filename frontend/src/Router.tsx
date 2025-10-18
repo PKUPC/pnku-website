@@ -16,7 +16,7 @@ import { LoginErrorPage } from '@/app/(general)/login/error/page.tsx';
 import { LoginPage } from '@/app/(general)/login/page.tsx';
 import { PlazaPage } from '@/app/(general)/plaza/page.tsx';
 import { PuzzleLayout } from '@/app/(general)/puzzle/PuzzleLayout.tsx';
-import { PuzzlePage } from '@/app/(general)/puzzle/page.tsx';
+import { PuzzlePage } from '@/app/(general)/puzzle/PuzzlePage';
 import { SettingPage } from '@/app/(general)/setting/page.tsx';
 import { StoryPage } from '@/app/(general)/story/page.tsx';
 import { TeamLayout } from '@/app/(general)/team/TeamLayout.tsx';
@@ -38,6 +38,8 @@ import { PuzzleListPage } from '@/app/puzzle-list/page.tsx';
 import { StoryListPage } from '@/app/story-list/page.tsx';
 import { Loading } from '@/components/Loading.tsx';
 import { Header } from '@/components/layout/Header.tsx';
+
+import { PublicPage } from './app/(general)/puzzle/PublicPuzzlePage';
 
 function AppLayout() {
     console.debug('Rendering AppLayout');
@@ -71,9 +73,12 @@ const routes: RouteObject[] = [
                     { path: '/setting', element: <SettingPage /> },
                     {
                         element: <PuzzleLayout />,
-                        children: [{ path: '/puzzle/:component/:puzzleKey', element: <PuzzlePage /> }],
+                        children: [
+                            { path: '/puzzle/public/:puzzleKey', element: <PublicPage /> },
+                            { path: '/puzzle/:component/:puzzleKey', element: <PuzzlePage /> },
+                        ],
                     },
-                    { path: '/story', element: <StoryPage /> },
+                    { path: '/story/*', element: <StoryPage /> },
                     { path: '/ticket-detail/:ticketId', element: <TicketDetailPage /> },
                     {
                         path: '/boards/:boardName',
@@ -123,7 +128,7 @@ const routes: RouteObject[] = [
                         element: <TeamLayout />,
                         children: [
                             { index: true, element: <Navigate to="/about/introduction" /> },
-                            { path: '/team/currency-history', element: <CurrencyHistoryPage /> },
+                            { path: '/team/currency-history/:currencyType', element: <CurrencyHistoryPage /> },
                             { path: '/team/puzzle-statistics', element: <PuzzleStatisticsPage /> },
                             { path: '/team/submission-history', element: <SubmissionHistoryPage /> },
                         ],

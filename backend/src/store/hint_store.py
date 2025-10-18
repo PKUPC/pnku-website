@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
-from sqlalchemy import JSON, BigInteger, Boolean, String, Text
+from sqlalchemy import JSON, BigInteger, Boolean, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.adhoc.constants.enums import CurrencyType
@@ -32,6 +32,7 @@ class HintStoreModel(BaseModel):
     id: int
     enable: bool
     puzzle_key: str
+    sorting_index: int
     question: str
     answer: str
     type: Literal['BASIC', 'NORMAL', 'ADVANCE']
@@ -45,6 +46,7 @@ class HintStore(Table):
     enable: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     puzzle_key: Mapped[str] = mapped_column(String(32), nullable=False)
+    sorting_index: Mapped[int] = mapped_column(Integer, nullable=False)
 
     question: Mapped[str] = mapped_column(Text, nullable=False)
     answer: Mapped[str] = mapped_column(Text, nullable=False)

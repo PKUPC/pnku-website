@@ -1,3 +1,4 @@
+from enum import auto
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -9,9 +10,18 @@ from src import utils
 from . import Table
 
 
+class PuzzleType(utils.EnhancedEnum):
+    NORMAL = auto()
+    # PUBLIC 类型题目允许未组队玩家验证答案，只能做简单验证
+    PUBLIC = auto()
+
+
 class PuzzleMetadataModel(BaseModel):
-    type: str = Field(default='normal')
-    author: str = Field(default='Anonymous')
+    type: PuzzleType = Field(default=PuzzleType.NORMAL)
+    authors: list[str] = Field(default_factory=list)
+    story_before: str | None = Field(default=None)
+    story_after: str | None = Field(default=None)
+    solution: str | None = Field(default=None)
 
 
 class MediaActionModel(BaseModel):
@@ -43,6 +53,7 @@ class PuzzleStoreModel(BaseModel):
 
     id: int
     key: str
+    slug: str
     title: str
     category: str
     subcategory: str
@@ -87,6 +98,7 @@ class PuzzleStore(Table):
     __tablename__ = 'puzzle'
 
     key: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
+    slug: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
     title: Mapped[str] = mapped_column(String(64), nullable=False)
     category: Mapped[str] = mapped_column(String(128), nullable=False)
     subcategory: Mapped[str] = mapped_column(String(128), nullable=False, default='normal')

@@ -37,18 +37,7 @@ class Hints(WithGameLifecycle):
         self.hint_by_id = {}
         self.hint_by_key = {}
 
-        def sorter(x: Hint) -> tuple[int, int, int]:
-            type_id = -1
-            if x.model.type == 'BASIC':
-                type_id = 1
-            elif x.model.type == 'NORMAL':
-                type_id = 2
-            elif x.model.type == 'ADVANCE':
-                type_id = 3
-
-            return type_id, x.model.id, x.model.effective_after_ts
-
-        self.list = sorted(self.list, key=sorter)
+        self.list = sorted(self.list, key=lambda x: x.model.sorting_index)
 
         for hint in self.list:
             if not hint.model.enable:

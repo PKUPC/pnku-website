@@ -27,7 +27,6 @@ class EventType(Enum):
     UPDATE_PUZZLE = b'\x22'
 
     UPDATE_USER = b'\x23'
-    UPDATE_SUBMISSION = b'\x24'
     NEW_MSG = b'\x26'
     STAFF_READ_MSG = b'\x27'
     PLAYER_READ_MSG = b'\x28'

@@ -127,8 +127,8 @@ class Game(WithGameLifecycle):
     def on_team_event(self, event: TeamEvent, is_reloading: bool = False) -> None:
         match event.model.info:
             case SubmissionEvent():
-                sub_id = event.model.info.submission_id
-                assert sub_id in self.worker.submission_stores
+                sub_id = event.model.id
+                puzzle_key = event.model.info.puzzle_key
                 # 这里不应该有重复的 submission id
                 if sub_id in self.submissions_by_id:
                     self.log('error', 'game.on_team_event', f'dropping processed submission #{sub_id}')
@@ -137,31 +137,21 @@ class Game(WithGameLifecycle):
                 if not is_reloading:
                     self.log('debug', 'game.on_team_event', f'received submission #{sub_id}')
 
-                submission = Submission(self, self.worker.submission_stores[sub_id])
-                # important!
-                # 过滤脏数据
-                if (
-                    submission.result.type == 'pass'
-                    and submission.store.puzzle_key in submission.team.game_state.passed_puzzle_keys
-                ):
-                    self.log('debug', 'game.on_team_event', f'dirty submission! passed! Sub#{sub_id}')
-                elif submission.cleaned_content in submission.team.game_state.get_submission_set(
-                    submission.puzzle.model.key
-                ):
-                    self.log('debug', 'game.on_team_event', f'dirty submission! in submission set! Sub#{sub_id}')
-                else:
-                    self.submission_list.append(submission)
-                    self.submissions_by_id[sub_id] = submission
-                    self.submissions_by_puzzle_key.setdefault(submission.store.puzzle_key, [])
-                    self.submissions_by_puzzle_key[submission.store.puzzle_key].append(submission)
+                submission = Submission(self, event.model)
 
-                    self.puzzles.on_team_event(event, is_reloading)
-                    self.teams.on_team_event(event, is_reloading)
-                    for b in self.boards.values():
-                        b.on_team_event(event, is_reloading)
+                self.submission_list.append(submission)
+                self.submissions_by_id[sub_id] = submission
+                self.submissions_by_puzzle_key.setdefault(puzzle_key, [])
+                self.submissions_by_puzzle_key[puzzle_key].append(submission)
 
-                    if submission.result.type == 'pass':
-                        self.n_corr_submission += 1
+                self.puzzles.on_team_event(event, is_reloading)
+                self.teams.on_team_event(event, is_reloading)
+                for b in self.boards.values():
+                    b.on_team_event(event, is_reloading)
+
+                if submission.result.type == 'pass':
+                    self.n_corr_submission += 1
+
             case GameStartEvent():
                 if event.team.gaming:
                     self.log('debug', 'game.on_team_event', f'dirty event! game start! Event#{event.model.id}')
@@ -226,16 +216,22 @@ class Game(WithGameLifecycle):
     def hash_puzzle_key(self, team_id: int, puzzle_key: str) -> str:
         assert puzzle_key in self.puzzles.puzzle_by_key
         assert team_id in self.teams.team_by_id
-        if team_id == 0:  # staff 队伍
+
+        # staff 队伍只使用原始的 key
+        if team_id == 0:
             return puzzle_key
-        if secret.HASH_PUZZLE_KEY == 'none':
-            return puzzle_key
-        elif secret.HASH_PUZZLE_KEY == 'key_only':
-            assert puzzle_key in self.puzzle_key_to_hash
-            return self.puzzle_key_to_hash[puzzle_key]
-        elif secret.HASH_PUZZLE_KEY == 'key_and_team':
-            assert (team_id, puzzle_key) in self.team_and_key_to_hash
-            return self.team_and_key_to_hash[(team_id, puzzle_key)]
+
+        match secret.HASH_PUZZLE_KEY:
+            case 'none':
+                return puzzle_key
+            case 'slug':
+                return self.puzzles.puzzle_by_key[puzzle_key].model.slug
+            case 'hash_key':
+                assert puzzle_key in self.puzzle_key_to_hash
+                return self.puzzle_key_to_hash[puzzle_key]
+            case 'hash_key_and_team':
+                assert (team_id, puzzle_key) in self.team_and_key_to_hash
+                return self.team_and_key_to_hash[(team_id, puzzle_key)]
 
     def unhash_puzzle_key(self, team_id: int, hashed_key: str) -> tuple[int, str] | tuple[int, None]:
         if team_id == 0:
@@ -243,18 +239,23 @@ class Game(WithGameLifecycle):
                 return team_id, hashed_key
             else:
                 return -1, None
-        # 这里顺带一起判断是否存在
-        if secret.HASH_PUZZLE_KEY == 'none':
-            if hashed_key not in self.puzzles.puzzle_by_key:
-                return -1, None
-            return team_id, hashed_key
-        elif secret.HASH_PUZZLE_KEY == 'key_only':
-            puzzle_key = self.hash_to_puzzle_key.get(hashed_key, None)
-            if puzzle_key is None:
-                return -1, None
-            return team_id, puzzle_key
-        elif secret.HASH_PUZZLE_KEY == 'key_and_team':
-            rst = self.hash_to_team_and_key.get(hashed_key, None)
-            if rst is None:
-                return -1, None
-            return rst
+
+        match secret.HASH_PUZZLE_KEY:
+            case 'none':
+                if hashed_key not in self.puzzles.puzzle_by_key:
+                    return -1, None
+                return team_id, hashed_key
+            case 'slug':
+                if hashed_key not in self.puzzles.puzzle_by_slug:
+                    return -1, None
+                return team_id, self.puzzles.puzzle_by_slug[hashed_key].model.key
+            case 'hash_key':
+                puzzle_key = self.hash_to_puzzle_key.get(hashed_key, None)
+                if puzzle_key is None:
+                    return -1, None
+                return team_id, puzzle_key
+            case 'hash_key_and_team':
+                rst = self.hash_to_team_and_key.get(hashed_key, None)
+                if rst is None:
+                    return -1, None
+                return rst

@@ -29,6 +29,7 @@ class Puzzles(WithGameLifecycle):
         self.list: list[Puzzle] = []
         self.puzzle_by_id: dict[int, Puzzle] = {}
         self.puzzle_by_key: dict[str, Puzzle] = {}
+        self.puzzle_by_slug: dict[str, Puzzle] = {}
         self.puzzle_by_area: dict[str, list[Puzzle]] = {}
         self.puzzles_by_structure: dict[str, dict[str, list[Puzzle]]] = {}
 
@@ -38,6 +39,7 @@ class Puzzles(WithGameLifecycle):
         self.list = sorted(self.list, key=lambda x: x.model.sorting_index)
         self.puzzle_by_id = {p.model.id: p for p in self.list}
         self.puzzle_by_key = {p.model.key: p for p in self.list}
+        self.puzzle_by_slug = {p.model.slug: p for p in self.list}
         self.puzzles_by_structure = gen_puzzles_by_structure(self.list)
         self.puzzle_by_area = {}
         for puzzle in self.list:
@@ -79,9 +81,8 @@ class Puzzles(WithGameLifecycle):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool) -> None:
         match event.model.info:
-            case SubmissionEvent(submission_id=submission_id):
-                assert submission_id in self.game.submissions_by_id
-                submission = self.game.submissions_by_id[submission_id]
+            case SubmissionEvent():
+                submission = self.game.submissions_by_id[event.model.id]
                 submission.puzzle.on_team_event(event, is_reloading)
             case _:
                 for puzzle in self.list:
@@ -115,16 +116,17 @@ class Puzzle(WithGameLifecycle):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool) -> None:
         match event.model.info:
-            case SubmissionEvent(submission_id=submission_id):
-                submission = self.game.submissions_by_id[submission_id]
+            case SubmissionEvent():
+                submission = self.game.submissions_by_id[event.model.id]
                 assert submission.puzzle is self
 
-                if submission.result.type == 'pass':
-                    self.passed_teams.add(submission.team)
-                    self.attempted_teams.add(submission.team)
-                    self.passed_submissions.add(submission)
-                else:
-                    self.attempted_teams.add(submission.team)
+                if not submission.team.is_staff_team:
+                    if submission.result.type == 'pass':
+                        self.passed_teams.add(submission.team)
+                        self.attempted_teams.add(submission.team)
+                        self.passed_submissions.add(submission)
+                    else:
+                        self.attempted_teams.add(submission.team)
 
     def on_store_reload(self, store: PuzzleStore) -> None:
         # 目前的设计中暂时不允许在线上修改 puzzle key（因为没必要），这里的检查暂时没用。

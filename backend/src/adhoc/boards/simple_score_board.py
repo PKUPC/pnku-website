@@ -64,7 +64,7 @@ class SimpleScoreBoard(Board):
 
     @staticmethod
     def _admin_knowledge_item(team: Team) -> dict[str, str]:
-        return {'detail_url': f'/staff/team-detail?tid={team.model.id}'}
+        return {'detail_url': f'/staff/team-detail/{team.model.id}'}
 
     def _render(self, is_admin: bool) -> dict[str, Any]:
         self._game.worker.log('debug', 'board.render', f'rendering simple score board {self.key}')
@@ -78,7 +78,7 @@ class SimpleScoreBoard(Board):
             sub = team.last_success_submission_by_board.get(self.key, None)
             if sub is None:
                 return None
-            return sub.store.created_at // 1000
+            return sub.model.created_at // 1000
 
         return {
             'list': [
@@ -104,8 +104,8 @@ class SimpleScoreBoard(Board):
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool) -> None:
         match event.model.info:
-            case SubmissionEvent(submission_id=sub_id):
-                submission = self._game.submissions_by_id[sub_id]
+            case SubmissionEvent():
+                submission = self._game.submissions_by_id[event.model.id]
                 if submission.result.type == 'pass' and not is_reloading:
                     if submission.puzzle.on_simple_board(self.key):
                         self._update_board()

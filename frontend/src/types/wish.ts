@@ -3,7 +3,7 @@ import React from 'react';
 // ADHOC: 在这里修改各种 adhoc 类型定义
 export namespace Adhoc {
     // api 交互时统一为小写，大写字母形式显示在 url 中很怪
-    export type CurrencyType = 'attention';
+    export type CurrencyType = 'hint_point';
 }
 
 export namespace Wish {
@@ -115,7 +115,7 @@ export namespace Wish {
 
         export type PuzzleInfo = {
             puzzle_key: string;
-            status: 'untouched' | 'partial' | 'passed' | 'found';
+            status: 'untouched' | 'partial' | 'passed' | 'found' | 'public';
             title: string;
             location?: [number, number, number, number];
             found_msg?: string;
@@ -127,6 +127,7 @@ export namespace Wish {
             total_attempted: number;
             total_passed: number;
             image?: string;
+            tags?: { text: string; color: string }[];
         };
 
         export type PuzzleGroupInfo = { name: string; puzzles: PuzzleInfo[] };
@@ -394,6 +395,14 @@ export namespace Wish {
             response: NormalRes & { need_reload?: boolean };
         };
 
+        export type SubmitPublicAnswerApi = {
+            request: {
+                endpoint: 'puzzle/submit_public_answer';
+                payload: { puzzle_key: string; content: string };
+            };
+            response: NormalRes & { need_reload?: boolean };
+        };
+
         export type SubmissionRecordData = {
             idx: number;
             team_name: string;
@@ -417,14 +426,13 @@ export namespace Wish {
             | { type: 'webpage'; name: string; url: string; noreferrer?: boolean }
             | { type: 'media'; name: string; media_url: string };
 
-        export type ClipboardData = { type: string; content: string };
+        export type ClipboardData = { type: string; idx: number };
 
         export type PuzzleGroupInfo = Game.PuzzleGroupInfo;
 
         export type PuzzleDetailData = {
             key: string;
             title: string;
-            return: string;
             desc: string;
             actions: PuzzleActionData[];
             clipboard?: ClipboardData[];
@@ -436,12 +444,30 @@ export namespace Wish {
             special_list?: object;
             correct_answers?: string[];
             answer_display?: string;
-            area_name: string;
+            return?: string;
+            area_name?: string;
+            stories?: string[];
         };
 
         export type GetDetailApi = {
             request: {
                 endpoint: 'puzzle/get_detail';
+                payload: { puzzle_key: string };
+            };
+            response: ErrorRes | (SuccessRes & { data: PuzzleDetailData });
+        };
+
+        export type GetClipboardApi = {
+            request: {
+                endpoint: 'puzzle/get_clipboard';
+                payload: { puzzle_key: string; clipboard_idx: number; clipboard_type: string };
+            };
+            response: ErrorRes | (SuccessRes & { data: string });
+        };
+
+        export type GetPublicDetailApi = {
+            request: {
+                endpoint: 'puzzle/get_public_detail';
                 payload: { puzzle_key: string };
             };
             response: ErrorRes | (SuccessRes & { data: PuzzleDetailData });
@@ -477,7 +503,15 @@ export namespace Wish {
             response: NormalRes;
         };
 
-        export type PuzzleApis = SubmitAnswerApi | GetSubmissionsApi | GetDetailApi | GetHintsApi | BuyHintApi;
+        export type PuzzleApis =
+            | SubmitAnswerApi
+            | SubmitPublicAnswerApi
+            | GetSubmissionsApi
+            | GetDetailApi
+            | GetClipboardApi
+            | GetPublicDetailApi
+            | GetHintsApi
+            | BuyHintApi;
     }
 
     export namespace Staff {
@@ -922,6 +956,7 @@ export namespace Wish {
         | Team.ChangeLeaderApi
         | Team.LeaveTeamApi
         | Puzzle.SubmitAnswerApi
+        | Puzzle.SubmitPublicAnswerApi
         | Puzzle.BuyHintApi
         | Game.GameStartApi
         | Staff.VMe50Api

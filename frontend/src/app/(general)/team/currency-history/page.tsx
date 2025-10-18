@@ -1,5 +1,5 @@
 import { Alert } from 'antd';
-import { useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
 import { Loading } from '@/components/Loading.tsx';
@@ -58,8 +58,8 @@ function CurrencyChangeHistory({ currencyType }: { currencyType: Adhoc.CurrencyT
 
 export function CurrencyHistoryPage() {
     const info = useSuccessGameInfo();
-    const [params] = useSearchParams();
-    const currencyType = params.get('type');
+    const params = useParams();
+    const currencyType = params.currencyType;
 
     if (info.status !== 'success' || !info.user) throw new NeverError();
 

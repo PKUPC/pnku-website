@@ -37,8 +37,6 @@ from src.store import (
     LogStore,
     MessageStore,
     PuzzleStore,
-    SubmissionEvent,
-    SubmissionStore,
     Table,
     TeamEventStore,
     TeamStore,
@@ -86,8 +84,6 @@ class StateContainerBase(ABC):
         self.game_dirty: bool = True
         self.debug_reinit = False
 
-        self._submission_stores: dict[int, SubmissionStore] = {}
-
         self.ws_messages: dict[int, dict[str, Any]] = {}
         self.next_message_id: int = 1
         self.message_cond: asyncio.Condition = None  # type: ignore[assignment]
@@ -104,10 +100,6 @@ class StateContainerBase(ABC):
     @property
     def game_nocheck(self) -> Game:
         return self._game
-
-    @property
-    def submission_stores(self) -> dict[int, SubmissionStore]:
-        return self._submission_stores
 
     async def init_game(self, tick: int) -> None:
         failed_cnt = 0
@@ -145,7 +137,6 @@ class StateContainerBase(ABC):
                 self._game.on_tick_change()
                 self.checker = Checker(self._game)
 
-                self._submission_stores = {sub.id: sub for sub in self.load_all_data(SubmissionStore)}
                 self.reload_or_update_if_needed()
                 failed_cnt = 0
             except Exception as e:
@@ -272,14 +263,8 @@ class StateContainerBase(ABC):
         event_store = self.load_one_data(TeamEventStore, event_id)
         assert event_store is not None, 'event store is None'
         team_event = TeamEvent(self._game, event_store)
-        assert isinstance(team_event.model.info, SubmissionEvent), f'submission_id error: {event_store.info}'
-        # 添加 submission store
-        sub_store = self.load_one_data(SubmissionStore, team_event.model.info.submission_id)
-        assert sub_store is not None, 'submission not found'
-        self._submission_stores[sub_store.id] = sub_store
         self._game.team_events.append(team_event)
         self._game.on_team_event(team_event)
-        assert sub_store.id in self._game.submissions_by_id
 
     def internal_on_new_message(self, msg_id: int) -> None:
         msg_store = self.load_one_data(MessageStore, msg_id)
@@ -334,17 +319,6 @@ class StateContainerBase(ABC):
         msg_store = self.load_one_data(MessageStore, event.data)
         assert msg_store is not None, 'message not found'
         self._game.messages.on_player_read_message(msg_store.team_id, msg_store.id)
-
-    # TODO: 这个之后要清理了
-    @on_event(glitter.EventType.UPDATE_SUBMISSION)
-    def on_update_submission(self, event: glitter.Event) -> None:
-        sub_store = self.load_one_data(SubmissionStore, event.data)
-        if sub_store is None:  # remove sub, not likely, but possible
-            self._submission_stores.pop(event.data, None)
-        else:
-            self._submission_stores[event.data] = sub_store
-
-        self._game.need_reload_team_event = True
 
     @on_event(glitter.EventType.TEAM_CREATE_TICKET)
     def on_team_create_ticket(self, event: glitter.Event) -> None:

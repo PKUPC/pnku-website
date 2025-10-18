@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { LeftCircleIcon } from '@/SvgIcons';
 import NotFound from '@/app/NotFound.tsx';
@@ -9,7 +9,7 @@ import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
 export function StoryPage() {
     const info = useSuccessGameInfo();
-    const [params] = useSearchParams();
+    const { '*': storyKey } = useParams();
     const navigate = useNavigate();
 
     if (ARCHIVE_MODE) {
@@ -17,8 +17,7 @@ export function StoryPage() {
     } else if (!info.user) return <NotFound />;
     else if (info.user?.group !== 'staff' && (!info.team?.gaming || !info.game.isGameBegin)) return <NotFound />;
 
-    const storyKey = params.get('key');
-    if (!storyKey) return <NotFound />;
+    if (!storyKey || storyKey.length === 0) return <NotFound />;
 
     return (
         <div className={'slim-container'}>
