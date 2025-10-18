@@ -185,6 +185,7 @@ export function WishConfirmModal<T extends Wish.WishConfirmParams>({
                 destroyOnHidden={true}
                 closable={false}
                 wrapClassName={styles.wishConfirmModal}
+                getContainer={false}
             >
                 {content}
             </Modal>
