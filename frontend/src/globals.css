@@ -96,7 +96,7 @@
 }
 
 body {
-  overflow-y: scroll;
+  overflow-y: scroll !important;
 }
 
 a {
