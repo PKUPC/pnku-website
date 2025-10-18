@@ -123,9 +123,9 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
     # TODO: 这里的一些设置要移到 adhoc 中去
     # 排行榜相关逻辑
     board_key_to_icon = {
-        'score_board': 'ranking',
-        'first_blood': 'first-blood',
-        'speed_run': 'thunder',
+        'score-board': 'ranking',
+        'first-blood': 'first-blood',
+        'speed-run': 'thunder',
     }
     unlock_boards: list[dict[str, str]] = []
     if not secret.PLAYGROUND_MODE and user is not None:

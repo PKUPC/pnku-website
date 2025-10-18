@@ -14,9 +14,9 @@ if TYPE_CHECKING:
 
 def get_boards(game: Game) -> dict[str, Board]:
     return {
-        'score_board': ScoreBoard('score_board', '排名', None, game),
-        'first_blood': FirstBloodBoard('first_blood', '一血榜', None, game),
-        'speed_run': SpeedRunBoard(
-            'speed_run', '速通榜', '本榜仅供参考！注：由于开赛时服务器出现问题，前 5 题是直接公开的。', game
+        'score-board': ScoreBoard('score-board', '排名', None, game),
+        'first-blood': FirstBloodBoard('first-blood', '一血榜', None, game),
+        'speed-run': SpeedRunBoard(
+            'speed-run', '速通榜', '本榜仅供参考！注：由于开赛时服务器出现问题，前 5 题是直接公开的。', game
         ),
     }
