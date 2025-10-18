@@ -64,7 +64,7 @@ class SimpleScoreBoard(Board):
 
     @staticmethod
     def _admin_knowledge_item(team: Team) -> dict[str, str]:
-        return {'detail_url': f'/staff/team-detail?tid={team.model.id}'}
+        return {'detail_url': f'/staff/team-detail/{team.model.id}'}
 
     def _render(self, is_admin: bool) -> dict[str, Any]:
         self._game.worker.log('debug', 'board.render', f'rendering simple score board {self.key}')
