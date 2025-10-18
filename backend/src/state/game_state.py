@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 from src import secret
 from src.adhoc.boards import get_boards
 from src.store import GameStartEvent, PuzzleActionEvent, SubmissionEvent
-from src.store.puzzle_store import PuzzleType
 
 from .announcement_state import Announcements
 from .base import WithGameLifecycle
@@ -217,16 +216,22 @@ class Game(WithGameLifecycle):
     def hash_puzzle_key(self, team_id: int, puzzle_key: str) -> str:
         assert puzzle_key in self.puzzles.puzzle_by_key
         assert team_id in self.teams.team_by_id
-        if team_id == 0:  # staff 队伍
+
+        # staff 队伍只使用原始的 key
+        if team_id == 0:
             return puzzle_key
-        if secret.HASH_PUZZLE_KEY == 'none':
-            return puzzle_key
-        elif secret.HASH_PUZZLE_KEY == 'key_only':
-            assert puzzle_key in self.puzzle_key_to_hash
-            return self.puzzle_key_to_hash[puzzle_key]
-        elif secret.HASH_PUZZLE_KEY == 'key_and_team':
-            assert (team_id, puzzle_key) in self.team_and_key_to_hash
-            return self.team_and_key_to_hash[(team_id, puzzle_key)]
+
+        match secret.HASH_PUZZLE_KEY:
+            case 'none':
+                return puzzle_key
+            case 'slug':
+                return self.puzzles.puzzle_by_key[puzzle_key].model.slug
+            case 'hash_key':
+                assert puzzle_key in self.puzzle_key_to_hash
+                return self.puzzle_key_to_hash[puzzle_key]
+            case 'hash_key_and_team':
+                assert (team_id, puzzle_key) in self.team_and_key_to_hash
+                return self.team_and_key_to_hash[(team_id, puzzle_key)]
 
     def unhash_puzzle_key(self, team_id: int, hashed_key: str) -> tuple[int, str] | tuple[int, None]:
         if team_id == 0:
@@ -234,23 +239,23 @@ class Game(WithGameLifecycle):
                 return team_id, hashed_key
             else:
                 return -1, None
-        # 这里顺带一起判断是否存在
-        if secret.HASH_PUZZLE_KEY == 'none':
-            if hashed_key not in self.puzzles.puzzle_by_key:
-                return -1, None
-            return team_id, hashed_key
-        elif secret.HASH_PUZZLE_KEY == 'key_only':
-            puzzle_key = self.hash_to_puzzle_key.get(hashed_key, None)
-            if puzzle_key is None:
-                return -1, None
-            return team_id, puzzle_key
-        elif secret.HASH_PUZZLE_KEY == 'key_and_team':
-            rst = self.hash_to_team_and_key.get(hashed_key, None)
-            if rst is None:
-                return -1, None
-            _, puzzle_key = rst
-            puzzle = self.puzzles.puzzle_by_key[puzzle_key]
-            # 如果是 public 题目，返回自己的队伍 id
-            if puzzle.model.puzzle_metadata.type == PuzzleType.PUBLIC:
+
+        match secret.HASH_PUZZLE_KEY:
+            case 'none':
+                if hashed_key not in self.puzzles.puzzle_by_key:
+                    return -1, None
+                return team_id, hashed_key
+            case 'slug':
+                if hashed_key not in self.puzzles.puzzle_by_slug:
+                    return -1, None
+                return team_id, self.puzzles.puzzle_by_slug[hashed_key].model.key
+            case 'hash_key':
+                puzzle_key = self.hash_to_puzzle_key.get(hashed_key, None)
+                if puzzle_key is None:
+                    return -1, None
                 return team_id, puzzle_key
-            return rst
+            case 'hash_key_and_team':
+                rst = self.hash_to_team_and_key.get(hashed_key, None)
+                if rst is None:
+                    return -1, None
+                return rst

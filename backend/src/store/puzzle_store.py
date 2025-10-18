@@ -53,6 +53,7 @@ class PuzzleStoreModel(BaseModel):
 
     id: int
     key: str
+    slug: str
     title: str
     category: str
     subcategory: str
@@ -97,6 +98,7 @@ class PuzzleStore(Table):
     __tablename__ = 'puzzle'
 
     key: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
+    slug: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
     title: Mapped[str] = mapped_column(String(64), nullable=False)
     category: Mapped[str] = mapped_column(String(128), nullable=False)
     subcategory: Mapped[str] = mapped_column(String(128), nullable=False, default='normal')

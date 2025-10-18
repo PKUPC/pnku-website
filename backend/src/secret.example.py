@@ -16,26 +16,43 @@ if TYPE_CHECKING:
 
 # 开启后会启用手动自由登陆模式，以及一些其他的功能
 DEBUG_MODE = True
+
 # 只有在 DEBUG_MODE 开启时有效，开启此选项后可以自由访问后台，不会检查是否为 admin 用户
 DEBUG_WITH_FREE_ADMIN = True
+
 # playground 模式会关闭站内信、神谕等互动功能，用于赛后开放一个可以游玩的环境
 PLAYGROUND_MODE = False
+
 # 是否开启 RECAPTCHA
 USE_RECAPTCHA = False
+
 # 队伍人数限制
 TEAM_MAX_MEMBER = 5
+
 # 使用邮箱注册
 EMAIL_AUTH_ENABLE = True
-# 使用 sso 注册（目前一直没有使用过）
+
+# 使用 sso 注册（目前一直没有使用过，只是暂时保留了这个选项）
 SSO_AUTH_ENABLE = False
-# 使用 websocket 推送
+
+# 启用 websocket 功能，目前主要用于推送通知，以及自动刷新页面
 WS_PUSH_ENABLED = True
-# 启用存档 api，用于导出存档用的 json 数据
+
+# 启用存档 api，用于导出存档用的 json 数据，一般仅在赛后本地导出数据时启用
 USE_ARCHIVE_API = False
-# 是否重新 hash media 文件名
+
+# 是否启用文件名 hash 功能，开启此功能需要在各个返回 media 的部分中调用 media_wrapper
+# 开启此功能后在更新 media 时需要在后台手动点一下更新，不然不会产生 hash 文件名后的文件
 HASH_MEDIA_FILENAME = False
-# puzzle_key hash 方法 "none": 不 hash, "key_only": 只 hash puzzle_key, "key_and_team": hash team_id + puzzle_key
-HASH_PUZZLE_KEY: Literal['none', 'key_only', 'key_and_team'] = 'none'
+
+# puzzle_key hash 方法，控制所有 api 返回的 puzzle key 字段，避免暴露内部 key
+# 可选项：none, slug, key_only, key_and_team
+# none: 直接使用 puzzle 的 key 字段
+# slug: 使用 puzzle 的 slug 字段，人工命名一遍
+# hash_key: 使用 hash 后的 puzzle_key
+# hash_key_and_team: 使用 team_id + puzzle_key 进行 hash，每个队伍的 key 不同
+HASH_PUZZLE_KEY: Literal['none', 'slug', 'hash_key', 'hash_key_and_team'] = 'none'
+
 # 性能警报设置
 HEALTH_CHECK_THROTTLE = {
     'ram_throttle': 0.2,  # 剩余空间小于此比例报警
