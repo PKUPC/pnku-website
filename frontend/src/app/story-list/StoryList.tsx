@@ -17,7 +17,7 @@ function GroupList({ storyGroup }: { storyGroup: Wish.Game.StoryGroup }) {
                 ) : (
                     storyGroup.list.map((item) => (
                         <Link
-                            to={`/story?key=${item.template}`}
+                            to={`/story/${item.template}`}
                             style={{ display: 'flex' }}
                             key={item.template}
                             className={styles.storyItem}
