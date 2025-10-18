@@ -24,9 +24,7 @@ class HintView(BaseView):
     column_list = ['id', 'enable', 'effective_after_ts', 'puzzle_key', 'type', 'question', 'answer', 'extra']
     column_display_pk = True
     column_searchable_list = ['puzzle_key']
-    column_default_sort = ('id', True)
-
-    # form_excluded_columns = ["puzzle_key"]
+    column_default_sort = ('id', False)
 
     column_descriptions = {
         'extra': '额外的自定义信息',
@@ -55,11 +53,13 @@ class HintView(BaseView):
     def edit_form(self, **kwargs: Any) -> Form:
         form = super().create_form(**kwargs)
         if 'puzzle_key' in dir(form):
+            puzzle_key = form.puzzle_key.data
             choices = run_reducer_callback(
-                lambda reducer: [(k, p.model.title) for k, p in reducer.game_nocheck.puzzles.puzzle_by_key.items()]
+                lambda reducer: [
+                    (k, p.model.title) for k, p in reducer.game_nocheck.puzzles.puzzle_by_key.items() if k == puzzle_key
+                ]
             )
             form.puzzle_key.choices = choices
-        form.puzzle_key.render_kw = {'readonly': True, 'disabled': True}
         return form  # type: ignore  # create_form itself returns Any
 
     def on_model_change(self, form: Any, model: store.HintStore, is_created: bool) -> None:
@@ -93,7 +93,6 @@ class HintView(BaseView):
                 else:
                     assert model.id in reducer.game.hints.hint_by_id
 
-                assert False, '????'
                 reducer.log('debug', 'hint_view', f'admin modify hint {model}')
 
             run_reducer_callback(check)
