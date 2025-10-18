@@ -46,6 +46,7 @@ CREATE TABLE `hint`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `enable` tinyint(1) NOT NULL,
   `puzzle_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `sorting_index` int(11) NOT NULL,
   `question` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `answer` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
