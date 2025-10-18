@@ -426,7 +426,7 @@ export namespace Wish {
             | { type: 'webpage'; name: string; url: string; noreferrer?: boolean }
             | { type: 'media'; name: string; media_url: string };
 
-        export type ClipboardData = { type: string; content: string };
+        export type ClipboardData = { type: string; idx: number };
 
         export type PuzzleGroupInfo = Game.PuzzleGroupInfo;
 
@@ -455,6 +455,14 @@ export namespace Wish {
                 payload: { puzzle_key: string };
             };
             response: ErrorRes | (SuccessRes & { data: PuzzleDetailData });
+        };
+
+        export type GetClipboardApi = {
+            request: {
+                endpoint: 'puzzle/get_clipboard';
+                payload: { puzzle_key: string; clipboard_idx: number; clipboard_type: string };
+            };
+            response: ErrorRes | (SuccessRes & { data: string });
         };
 
         export type GetPublicDetailApi = {
@@ -500,6 +508,7 @@ export namespace Wish {
             | SubmitPublicAnswerApi
             | GetSubmissionsApi
             | GetDetailApi
+            | GetClipboardApi
             | GetPublicDetailApi
             | GetHintsApi
             | BuyHintApi;
