@@ -29,6 +29,7 @@ class Puzzles(WithGameLifecycle):
         self.list: list[Puzzle] = []
         self.puzzle_by_id: dict[int, Puzzle] = {}
         self.puzzle_by_key: dict[str, Puzzle] = {}
+        self.puzzle_by_slug: dict[str, Puzzle] = {}
         self.puzzle_by_area: dict[str, list[Puzzle]] = {}
         self.puzzles_by_structure: dict[str, dict[str, list[Puzzle]]] = {}
 
@@ -38,6 +39,7 @@ class Puzzles(WithGameLifecycle):
         self.list = sorted(self.list, key=lambda x: x.model.sorting_index)
         self.puzzle_by_id = {p.model.id: p for p in self.list}
         self.puzzle_by_key = {p.model.key: p for p in self.list}
+        self.puzzle_by_slug = {p.model.slug: p for p in self.list}
         self.puzzles_by_structure = gen_puzzles_by_structure(self.list)
         self.puzzle_by_area = {}
         for puzzle in self.list:
