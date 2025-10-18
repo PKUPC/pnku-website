@@ -155,7 +155,7 @@ class TeamGameState:
         if unlock_time < game_start_time:
             unlock_time = game_start_time
 
-        self.unlock_boards.append('score_board')
+        self.unlock_boards.append('score-board')
         self.unlock_templates.add('prologue')
         self.unlock_templates.add('day1_intro')
         self.unlock_areas.add('day1')

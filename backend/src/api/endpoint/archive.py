@@ -19,9 +19,9 @@ if secret.USE_ARCHIVE_API:
     @bp.route('/game_info.json')
     async def game_info_json(_req: Request, worker: Worker) -> HTTPResponse:
         board_key_to_icon = {
-            'score_board': 'ranking',
-            'first_blood': 'first-blood',
-            'speed_run': 'thunder',
+            'score-board': 'ranking',
+            'first-blood': 'first-blood',
+            'speed-run': 'thunder',
         }
 
         unlock_areas = [
