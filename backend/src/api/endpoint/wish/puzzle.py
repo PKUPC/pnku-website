@@ -316,9 +316,66 @@ async def get_detail(req: Request, body: GetDetailParam, worker: Worker, user: U
         return_value['key'] = worker.game_nocheck.hash_puzzle_key(user.team.model.id, puzzle_key)
 
     if len(puzzle.model.clipboard) > 0:
-        return_value['clipboard'] = [x.model_dump() for x in puzzle.model.clipboard]
+        return_value['clipboard'] = [{'idx': idx, 'type': x.type} for idx, x in enumerate(puzzle.model.clipboard)]
 
     return {'data': return_value}
+
+
+class GetClipboardParam(BaseModel):
+    puzzle_key: str = Field(description='Puzzle的key')
+    clipboard_idx: int
+    clipboard_type: str
+
+
+@bp.route('/get_clipboard', ['POST'])
+@validate(json=GetClipboardParam)
+@wish_response
+@wish_checker(['team_is_gaming', 'game_start'])
+async def get_clipboard(req: Request, body: GetClipboardParam, worker: Worker, user: User | None) -> dict[str, Any]:
+    assert user is not None
+    assert user.team is not None
+
+    valid, result = check_puzzle_key(req, worker, user, body.puzzle_key, 'api.puzzle.get_clipboard')
+    if not valid:
+        return result
+    puzzle_key = result['puzzle_key']
+
+    puzzle = worker.game_nocheck.puzzles.puzzle_by_key[puzzle_key]
+    if not user.is_staff:
+        # 如果不是 unlock，则视为没解锁，状态是 found 也不行
+        if user.team.game_state.puzzle_visible_status(puzzle_key) != 'unlock':
+            store_user_log(
+                req, 'api.puzzle.get_clipboard', 'abnormal', '试图访问没解锁的题目。', {'puzzle_key': puzzle_key}
+            )
+            return {'status': 'error', 'title': 'NOT_FOUND', 'message': '题目不存在'}
+
+    store_user_log(req, 'api.puzzle.get_clipboard', 'get_clipboard', '', {'puzzle_key': puzzle_key})
+
+    clipboard_type = body.clipboard_type
+
+    if body.clipboard_idx < 0 or body.clipboard_idx >= len(puzzle.model.clipboard):
+        store_user_log(
+            req,
+            'api.puzzle.get_clipboard',
+            'abnormal',
+            '使用了错误的剪切板索引',
+            {'puzzle_key': puzzle_key, 'clipboard_idx': body.clipboard_idx, 'clipboard_type': clipboard_type},
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '内容不存在！'}
+
+    clipboard = puzzle.model.clipboard[body.clipboard_idx]
+
+    if clipboard.type != clipboard_type:
+        store_user_log(
+            req,
+            'api.puzzle.get_clipboard',
+            'abnormal',
+            '使用了错误的剪切板类型',
+            {'puzzle_key': puzzle_key, 'clipboard_idx': body.clipboard_idx, 'clipboard_type': clipboard_type},
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '内容不存在！'}
+
+    return {'data': clipboard.content}
 
 
 @bp.route('/get_public_detail', ['POST'])
