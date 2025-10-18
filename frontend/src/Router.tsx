@@ -78,7 +78,7 @@ const routes: RouteObject[] = [
                             { path: '/puzzle/:component/:puzzleKey', element: <PuzzlePage /> },
                         ],
                     },
-                    { path: '/story/:storyKey', element: <StoryPage /> },
+                    { path: '/story/*', element: <StoryPage /> },
                     { path: '/ticket-detail/:ticketId', element: <TicketDetailPage /> },
                     {
                         path: '/boards/:boardName',
