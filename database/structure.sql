@@ -121,6 +121,7 @@ DROP TABLE IF EXISTS `puzzle`;
 CREATE TABLE `puzzle`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `slug` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `title` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `category` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `subcategory` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -132,7 +133,8 @@ CREATE TABLE `puzzle`  (
   `actions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `triggers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `key`(`key`) USING BTREE
+  UNIQUE INDEX `key`(`key`) USING BTREE,
+  UNIQUE INDEX `slug`(`slug`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
