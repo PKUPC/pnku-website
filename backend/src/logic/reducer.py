@@ -13,6 +13,7 @@ import zmq
 
 from sqlalchemy import and_, select
 from sqlalchemy.dialects.mysql import insert
+from sqlalchemy.orm.attributes import flag_modified
 from zmq.asyncio import Socket
 
 from src import secret, utils
@@ -744,6 +745,10 @@ class Reducer(StateContainerBase):
             new_state = team_puzzle_state.update_puzzle_state(puzzle_state_store.data, req.content)
             puzzle_state_store.data = new_state
             puzzle_state_store.updated_at = int(time.time() * 1000)
+
+            # 标记修改，避免浅拷贝导致误判，并且不强制要求更新时一定要深拷贝一份
+            flag_modified(puzzle_state_store, 'data')
+
             session.commit()
 
             self.state_counter += 1
