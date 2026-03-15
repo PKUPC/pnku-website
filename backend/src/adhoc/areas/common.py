@@ -59,10 +59,10 @@ def gen_puzzle_data(user: User, worker: Worker, puzzle: Puzzle) -> dict[str, Any
 
     if puzzle_status == 'found':
         puzzle_data['puzzle_key'] = ''
-
-    if user.model.group != 'staff' and puzzle_status != 'found':
+    else:
         assert user.team is not None
         puzzle_data['puzzle_key'] = worker.game_nocheck.hash_puzzle_key(user.team.model.id, puzzle.model.key)
+
     return puzzle_data
 
 
