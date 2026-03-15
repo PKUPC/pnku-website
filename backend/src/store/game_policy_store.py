@@ -35,12 +35,36 @@ class BoardSetting(BaseModel):
     top_star_n: int = Field(default=10)
 
 
+class FeatureEnableConfig(BaseModel):
+    """
+    控制某个 feature 启用的配置，三个条件均满足时才启用。
+    effective_after 表示需要当前 tick 大于等于这个值
+    effective_before 表示需要当前 tick 小于这个值
+    """
+
+    default: bool = Field(default=True)
+    effective_after: int | None = Field(default=None)
+    effective_before: int | None = Field(default=None)
+
+    def is_enabled(self, tick: int) -> bool:
+        if self.effective_after is not None and tick < self.effective_after:
+            return False
+        if self.effective_before is not None and tick >= self.effective_before:
+            return False
+        return self.default
+
+
+class FeatureModel(BaseModel):
+    user_register: FeatureEnableConfig = Field(default_factory=FeatureEnableConfig)
+
+
 class PolicyModel(BaseModel):
     model_config = ConfigDict(extra='ignore')
 
     puzzle_passed_display: list[int] = Field(default_factory=list)
     currency_increase_policy: list[CurrencyIncreaseModel] = Field(default_factory=list)
     board_setting: BoardSetting
+    feature: FeatureModel = Field(default_factory=FeatureModel)
 
 
 class GamePolicyStoreModel(BaseModel):
