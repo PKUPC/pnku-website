@@ -12,19 +12,20 @@ import { format_ts } from '@/utils.ts';
 export function UpdateRecruitmentInfoForm() {
     const { info, reloadInfo } = useContext(GameInfoContext);
     const [updateRecruitmentInfoForm] = Form.useForm();
-    const [changed, set_changed] = useState(false);
     if (info.status !== 'success' || !info.team) throw new NeverError();
-    const [checked, setChecked] = useState(info.team ? info.team.recruiting : false);
+    const [checked, setChecked] = useState(info.team.recruiting);
+    const [recruitingContact, setRecruitingContact] = useState(info.team.recruiting_contact);
     const [messageApi, contextHolder] = message.useMessage();
 
-    const onUpdateRecruitmentInfo = (values: { recruiting_contact: string }) => {
+    const onUpdateRecruitmentInfo = () => {
+        console.log(checked, recruitingContact);
         wish({
             endpoint: 'team/update_extra_team_info',
             payload: {
                 type: 'recruitment',
                 data: {
                     recruiting: checked,
-                    recruiting_contact: values.recruiting_contact,
+                    recruiting_contact: recruitingContact,
                 },
             },
         }).then((res) => {
@@ -39,13 +40,10 @@ export function UpdateRecruitmentInfoForm() {
         });
     };
 
-    const onInfoChange = () => {
-        // console.log(updateRecruitmentInfoForm.getFieldValue("switch"));
-        if (!changed) set_changed(true);
-    };
-
     const banned = info.team.ban_list.ban_recruiting_until > new Date().getTime() / 1000;
     const bannedText = `您的队伍的成员招募功能被禁用至 ${format_ts(info.team.ban_list.ban_recruiting_until)}。`;
+
+    const changed = recruitingContact !== info.team.recruiting_contact || checked !== info.team.recruiting;
 
     return (
         <FancyCard title="成员招募设置">
@@ -73,25 +71,23 @@ export function UpdateRecruitmentInfoForm() {
                     name="recruitment-info"
                     {...FORM_STYLE}
                     onFinish={onUpdateRecruitmentInfo}
-                    onValuesChange={onInfoChange}
                     form={updateRecruitmentInfoForm}
                 >
                     <Form.Item label="公开招募" extra={'启用此选项后会在队伍广场中发布招募启示'}>
                         <Switch
                             onChange={(e) => {
                                 setChecked(e);
-                                onInfoChange();
                             }}
                             checked={checked}
                         />
                     </Form.Item>
-                    <Form.Item
-                        name="recruiting_contact"
-                        label="招募信息"
-                        extra={'给想加入的玩家提供一个联系方式吧！'}
-                        initialValue={info.team.recruiting_contact}
-                    >
-                        <Input.TextArea maxLength={100} showCount />
+                    <Form.Item label="招募信息" extra={'给想加入的玩家提供一个联系方式吧！'}>
+                        <Input.TextArea
+                            maxLength={100}
+                            showCount
+                            value={recruitingContact}
+                            onChange={(e) => setRecruitingContact(e.target.value)}
+                        />
                     </Form.Item>
 
                     <Button type="primary" size="large" block htmlType="submit" disabled={!changed}>

@@ -12,23 +12,30 @@ import { random_str } from '@/utils.ts';
 
 export function UpdateTeamForm() {
     const { info, reloadInfo } = useContext(GameInfoContext);
-    const [updateTeamForm] = Form.useForm();
-    const [changed, set_changed] = useState(false);
+    const [updateTeamForm] = Form.useForm<{ teamId: number; teamName: string; teamInfo: string; teamSecret: string }>();
+    const [changed, setChanged] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
     if (info.status !== 'success') throw new NeverError();
 
-    const onTeamInfoChange = () => {
-        if (!changed) set_changed(true);
+    const onTeamInfoChange = (
+        _1: any,
+        values: { teamId: number; teamName: string; teamInfo: string; teamSecret: string },
+    ) => {
+        setChanged(
+            values.teamId !== info.team?.id ||
+                values.teamName !== info.team?.team_name ||
+                values.teamInfo !== info.team?.team_info ||
+                values.teamSecret !== info.team?.team_secret,
+        );
     };
 
-    const onUpdateTeamInfo = (values: { team_name: string; team_info: string; team_secret: string }) => {
-        // console.log(values);
+    const onUpdateTeamInfo = (values: { teamName: string; teamInfo: string; teamSecret: string }) => {
         wish({
             endpoint: 'team/update_team',
             payload: {
-                team_name: values.team_name ? values.team_name : '',
-                team_info: values.team_info ? values.team_info : '',
-                team_secret: values.team_secret ? values.team_secret : '',
+                team_name: values.teamName ? values.teamName : '',
+                team_info: values.teamInfo ? values.teamInfo : '',
+                team_secret: values.teamSecret ? values.teamSecret : '',
             },
         }).then((res) => {
             if (res.status === 'error') {
@@ -37,14 +44,20 @@ export function UpdateTeamForm() {
                 messageApi.info({ content: res.message, key: 'TeamInfo', duration: 3 }).then();
             } else {
                 messageApi.success({ content: '保存成功', key: 'TeamInfo', duration: 2 }).then();
-                reloadInfo().then();
+                reloadInfo().then(() => {
+                    setChanged(false);
+                });
             }
         });
     };
 
     const onFreshTeamSecretInUpdateTeam = () => {
-        onTeamInfoChange();
-        updateTeamForm.setFieldsValue({ team_secret: random_str(16) });
+        if (!changed) setChanged(true);
+        const newTeamSecret = random_str(16);
+        if (newTeamSecret !== info.team?.team_secret) {
+            setChanged(true);
+        }
+        updateTeamForm.setFieldsValue({ teamSecret: newTeamSecret });
     };
 
     if (!info.user || !info.team)
@@ -67,7 +80,7 @@ export function UpdateTeamForm() {
                         info.team.disp_list.map((v) => <TeamStatusTag key={v.text} data={v} />)}
                 </Form.Item>
                 <Form.Item
-                    name="team_id"
+                    name="teamId"
                     label="队伍 ID"
                     initialValue={info.team.id}
                     extra={'注意：加入队伍时需要填写的是这个 ID 而不是队名。'}
@@ -75,7 +88,7 @@ export function UpdateTeamForm() {
                     <Input maxLength={20} disabled={true} />
                 </Form.Item>
                 <Form.Item
-                    name="team_name"
+                    name="teamName"
                     label="队名"
                     extra={
                         isLeader
@@ -90,24 +103,22 @@ export function UpdateTeamForm() {
                         disabled={!isLeader || info.team.status !== 'preparing' || info.team.id === 0}
                     />
                 </Form.Item>
-                <Form.Item name="team_info" label="简介" initialValue={info.team.team_info}>
+                <Form.Item name="teamInfo" label="简介" initialValue={info.team.team_info}>
                     <Input.TextArea maxLength={200} showCount disabled={!isLeader || info.team.id === 0} />
                 </Form.Item>
-                {isLeader && (
-                    <Form.Item
-                        name="team_secret"
-                        label="队伍邀请码"
-                        initialValue={info.team.team_secret}
-                        extra="队伍邀请码长度应该在10到20之间，建议随机生成。"
-                    >
-                        <Input.Search
-                            style={{ width: '100%' }}
-                            onSearch={onFreshTeamSecretInUpdateTeam}
-                            enterButton="随机"
-                            disabled={info.team.id === 0}
-                        />
-                    </Form.Item>
-                )}
+                <Form.Item
+                    name="teamSecret"
+                    label="队伍邀请码"
+                    initialValue={info.team.team_secret}
+                    extra="队伍邀请码长度应该在10到20之间，建议随机生成。"
+                >
+                    <Input.Search
+                        style={{ width: '100%' }}
+                        onSearch={onFreshTeamSecretInUpdateTeam}
+                        enterButton="随机"
+                        disabled={!isLeader || info.team.id === 0}
+                    />
+                </Form.Item>
 
                 {isLeader && info.team.id !== 0 && (
                     <Button

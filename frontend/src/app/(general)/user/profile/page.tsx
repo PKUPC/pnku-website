@@ -24,8 +24,8 @@ function UserProfileForm() {
         labelCol: { span: 6 },
         labelWrap: true,
         wrapperCol: { span: 13 },
-        onValuesChange: () => {
-            set_changed(true);
+        onValuesChange: (_: any, values: { nickname: string }) => {
+            set_changed(info.user?.profile.nickname !== values.nickname);
         },
     };
 
