@@ -33,7 +33,7 @@ import { mixColor } from '@/utils.ts';
 
 import { Loading } from './components/Loading';
 import { SyncTextarea } from './components/SyncTextarea';
-import { useYArray, useYClient, useYMap, useYText } from './hooks/useYClient';
+import { useYArray, useYClient, useYKeyValue, useYMap, useYText } from './hooks/useYClient';
 import { YClient } from './logic/YClient';
 import { useWishData } from './logic/swrWrappers';
 
@@ -87,6 +87,7 @@ function App({ children }: { children: ReactNode }) {
             useYText,
             useYMap,
             useYArray,
+            useYKeyValue,
             useParams,
             useLocation,
             useWindowInfo,

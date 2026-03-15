@@ -95,6 +95,9 @@ importers:
       y-protocols:
         specifier: ^1.0.6
         version: 1.0.6(yjs@13.6.27)
+      y-utility:
+        specifier: ^0.1.4
+        version: 0.1.4(yjs@13.6.27)
       y-websocket:
         specifier: ^3.0.0
         version: 3.0.0(yjs@13.6.27)
@@ -4419,6 +4422,12 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     peerDependencies:
       yjs: ^13.0.0
+
+  y-utility@0.1.4:
+    resolution: {integrity: sha512-i8HSo2DGRB13PSm9B0hbljPBramKWK2Gi9R+ZCPrstyIx0VJAdcaurGdYTmcu2SBJI9HWcSCW0siSF2SyRa4lg==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      yjs: ^13.5.29
 
   y-websocket@3.0.0:
     resolution: {integrity: sha512-mUHy7AzkOZ834T/7piqtlA8Yk6AchqKqcrCXjKW8J1w2lPtRDjz8W5/CvXz9higKAHgKRKqpI3T33YkRFLkPtg==}
@@ -9093,6 +9102,11 @@ snapshots:
       strip-ansi: 7.1.2
 
   y-protocols@1.0.6(yjs@13.6.27):
+    dependencies:
+      lib0: 0.2.114
+      yjs: 13.6.27
+
+  y-utility@0.1.4(yjs@13.6.27):
     dependencies:
       lib0: 0.2.114
       yjs: 13.6.27

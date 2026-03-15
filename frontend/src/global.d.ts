@@ -21,7 +21,7 @@ import type { useLocation, useParams } from 'react-router';
 import type { Loading } from './components/Loading';
 import type { SyncTextarea } from './components/SyncTextarea';
 import type { WishError } from './components/WishError';
-import type { useYArray, useYClient, useYMap, useYText } from './hooks/useYClient';
+import type { useYArray, useYClient, useYKeyValue, useYMap, useYText } from './hooks/useYClient';
 import type { YClient } from './logic/YClient';
 import type { useSuccessGameInfo, useWindowInfo } from './logic/contexts';
 import type { useWishData } from './logic/swrWrappers';
@@ -52,6 +52,7 @@ declare global {
             useYText: typeof useYText;
             useYMap: typeof useYMap;
             useYArray: typeof useYArray;
+            useYKeyValue: typeof useYKeyValue;
             useParams: typeof useParams;
             useLocation: typeof useLocation;
             useSuccessGameInfo: typeof useSuccessGameInfo;

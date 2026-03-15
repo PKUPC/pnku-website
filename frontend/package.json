@@ -48,6 +48,7 @@
     "tailwind-merge": "^3.3.1",
     "textarea-caret": "^3.1.0",
     "y-protocols": "^1.0.6",
+    "y-utility": "^0.1.4",
     "y-websocket": "^3.0.0",
     "yjs": "^13.6.27"
   },
