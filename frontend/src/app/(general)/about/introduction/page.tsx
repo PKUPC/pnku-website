@@ -1,5 +1,5 @@
-import { SimpleTemplateFile } from '@/components/Template';
+import { TemplateFile } from '@/components/Template';
 
 export default function IntroductionPage() {
-    return <SimpleTemplateFile name={'introduction'} />;
+    return <TemplateFile name={'introduction'} />;
 }

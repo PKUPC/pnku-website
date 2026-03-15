@@ -1,5 +1,5 @@
-import { SimpleTemplateFile } from '@/components/Template';
+import { TemplateFile } from '@/components/Template';
 
 export function Page() {
-    return <SimpleTemplateFile name={'admin-doc'} />;
+    return <TemplateFile name={'admin-doc'} />;
 }
