@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 // ADHOC: 在这里修改各种 adhoc 类型定义
 export namespace Adhoc {
@@ -914,6 +914,7 @@ export namespace Wish {
             | SendMessageApi
             | SetTicketStatusApi;
     }
+
     export namespace Upload {
         export type UploadedImageItem = { url: string };
 
@@ -940,6 +941,9 @@ export namespace Wish {
 
         export type UserApis = UpdateProfileApi | ChangePasswordApi;
     }
+
+    // ADHOC: 特殊题目的接口，如果有需要就加在这里，开发远程组件时可能用得到
+    export namespace Special {}
 
     export type WishApis =
         | Game.GameApis

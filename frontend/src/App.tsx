@@ -1,4 +1,4 @@
-import { ConfigProvider, message } from 'antd';
+import { Button, ConfigProvider, Image, Input, InputNumber, Modal, Popconfirm, Slider, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import React, { ReactNode, useContext, useEffect } from 'react';
 import { SWRConfig } from 'swr';
@@ -13,6 +13,9 @@ import { GameInfoContext, useTheme } from '@/logic/contexts.ts';
 import { wish } from '@/logic/wish.ts';
 import { setup } from '@/setup.ts';
 import { mixColor } from '@/utils.ts';
+
+import { Loading } from './components/Loading';
+import { useWishData } from './logic/swrWrappers';
 
 setup();
 
@@ -31,11 +34,33 @@ function App({ children }: { children: ReactNode }) {
     console.log(style);
 
     useEffect(() => {
+        // TODO: 这两个之后需要删除，统一到 window.websiteUtils 中
+        window.wish = wish;
+        window.messageApi = messageApi;
+
         window.recaptchaOptions = {
             useRecaptchaNet: true,
         };
-        window.wish = wish;
-        window.messageApi = messageApi;
+        window.exports = {
+            React,
+        };
+        window.websiteUtils = {
+            wish,
+            messageApi,
+            useWishData,
+        };
+        window.components = {
+            Loading,
+            WishError,
+            Button,
+            Image,
+            Modal,
+            Popconfirm,
+            Input,
+            InputNumber,
+            Slider,
+        };
+
         console.log(window.rem);
         console.log(window.ram);
     }, [messageApi]);
