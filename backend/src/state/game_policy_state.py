@@ -6,12 +6,13 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from src.adhoc.constants.enums import CurrencyType
+from src.store.game_policy_store import GamePolicyStoreModel
 
 from .base import WithGameLifecycle
 
 
 if TYPE_CHECKING:
-    from ..store import GamePolicyStore, GamePolicyStoreModel, PolicyModel
+    from ..store import GamePolicyStore, PolicyModel
     from . import Game
 
 
@@ -30,6 +31,27 @@ class GamePolicy(WithGameLifecycle):
         self.models = [x.validated_model() for x in self.stores]
         self.update_current_policy_idx_at_time()
         self.game.need_reload_team_event = True
+
+    def on_store_update(self, policy_id: int, new_store: GamePolicyStore | None) -> None:
+        old_model: GamePolicyStoreModel | None = ([x for x in self.models if x.id == policy_id] + [None])[0]
+        other_stores = [x for x in self.stores if x.id != policy_id]
+
+        if new_store is None:  # remove
+            assert False, 'GamePolicyStore should not be removed'
+        elif old_model is None:  # add
+            self.stores = sorted(other_stores + [new_store], key=lambda x: x.effective_after)
+            self.models = [x.validated_model() for x in self.stores]
+            self.update_current_policy_idx_at_time()
+            # 如果真新加了 policy，保险起见需要重新计算状态
+            self.game.need_reload_team_event = True
+        else:  # modify
+            self.stores = sorted(other_stores + [new_store], key=lambda x: x.effective_after)
+            self.models = [x.validated_model() for x in self.stores]
+            self.update_current_policy_idx_at_time()
+            new_model = new_store.validated_model()
+            if GamePolicyStoreModel.need_reload_team_event(old_model, new_model):
+                print('need reload team event!')
+                self.game.need_reload_team_event = True
 
     def update_current_policy_idx_at_time(self) -> None:
         self.cur_policy_idx = -1

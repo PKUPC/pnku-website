@@ -29,10 +29,13 @@ class GamePolicyView(BaseView):
     }
 
     def on_form_prefill(self, *args: Any, **kwargs: Any) -> None:
-        flash('警告：修改赛程配置会重算排行榜', 'warning')
+        flash(
+            '警告：修改 currency_increase_policy 时，如果变动项的时间距离现在小于 3 分钟，需要重新计算状态，请注意性能影响。',
+            'warning',
+        )
 
     def after_model_touched(self, model: store.GamePolicyStore) -> None:
-        self.emit_event(glitter.EventType.RELOAD_GAME_POLICY)
+        self.emit_event(glitter.EventType.UPDATE_GAME_POLICY, model.id)
 
     def on_model_change(self, form: Any, model: store.GamePolicyStore, is_created: bool) -> None:
         if is_created:

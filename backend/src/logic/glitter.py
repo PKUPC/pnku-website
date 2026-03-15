@@ -20,7 +20,7 @@ PROTOCOL_VER = 'glitter.alpha.v2'
 class EventType(Enum):
     SYNC = b'\x01'
 
-    RELOAD_GAME_POLICY = b'\x11'
+    UPDATE_GAME_POLICY = b'\x11'
     RELOAD_TRIGGER = b'\x12'
 
     UPDATE_ANNOUNCEMENT = b'\x21'
