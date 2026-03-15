@@ -14,7 +14,7 @@ export function ErrorHandler({ children }: { children: React.ReactNode }) {
                     title={'游戏信息获取出错'}
                     subtitle={
                         <>
-                            请稍后重试或者联系网站管理员。
+                            和服务器的连接出现了问题，请稍后重试。如果您一直遇到此问题，请联系工作人员。
                             <br />
                         </>
                     }
