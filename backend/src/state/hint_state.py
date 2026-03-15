@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import time
 
-from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from src import secret, utils
@@ -84,6 +83,9 @@ class Hint(WithGameLifecycle):
         self.puzzle = self.game.puzzles.puzzle_by_key[self.model.puzzle_key]
         self.add_hint_id_hash()
 
+        self._rendered = False
+        self._rendered_desc = ''
+
     def add_hint_id_hash(self) -> None:
         hind_id_hash = utils.hash_int(secret.HINT_ID_HASH_SALT, self.model.id, 8)
         while hind_id_hash in self.game.hash_to_hint_id:
@@ -94,6 +96,7 @@ class Hint(WithGameLifecycle):
     def on_store_update(self, new_store: HintStore) -> None:
         self._store = new_store
         self.model = new_store.validated_model()
+        self._rendered = False
 
     @property
     def effective(self) -> bool:
@@ -114,11 +117,11 @@ class Hint(WithGameLifecycle):
         pass
 
     def render_desc(self) -> str:
-        return self._render_template()
+        if not self._rendered:
+            self._rendered_desc = utils.pure_render_template(self.model.answer)
+            self._rendered = True
 
-    @lru_cache(128)
-    def _render_template(self) -> str:
-        return utils.pure_render_template(self.model.answer)
+        return self._rendered_desc
 
     def __repr__(self) -> str:
         return self.model.__repr__()
