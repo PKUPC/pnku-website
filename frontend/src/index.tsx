@@ -8,16 +8,19 @@ import { ThemeContextProvider } from '@/logic/ThemeContext.tsx';
 
 import App from './App.tsx';
 import './globals.css';
+import { GameSettingContextProvider } from './logic/SiteSettingContext.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <AppErrorBoundary>
             <StyleProvider layer>
-                <ThemeContextProvider>
-                    <App>
-                        <AppRouter />
-                    </App>
-                </ThemeContextProvider>
+                <GameSettingContextProvider>
+                    <ThemeContextProvider>
+                        <App>
+                            <AppRouter />
+                        </App>
+                    </ThemeContextProvider>
+                </GameSettingContextProvider>
             </StyleProvider>
         </AppErrorBoundary>
     </React.StrictMode>,

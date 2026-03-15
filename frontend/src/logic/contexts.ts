@@ -8,6 +8,8 @@ import { Wish } from '@/types/wish.ts';
 type PuzzleListConfig = 'off' | 'show' | 'drawer';
 
 type SiteSettingContextType = {
+    theme: 'light' | 'dark' | 'system';
+    setTheme: (value: 'light' | 'dark' | 'system') => void;
     usePuzzleList: PuzzleListConfig;
     setUsePuzzleList: (value: PuzzleListConfig) => void;
 };
@@ -71,13 +73,7 @@ type WindowInfoContextType = {
 // @ts-ignore
 const WindowInfoContext = createContext<WindowInfoContextType>(undefined);
 
-type SiteThemeType = 'light' | 'cupcake' | 'dark' | 'dracula' | 'corporate' | 'luxury';
-
-export const enabledThemes: SiteThemeType[] = ['light', 'cupcake', 'corporate', 'dark', 'dracula', 'luxury'];
-
 type ThemeContextType = {
-    theme: SiteThemeType;
-    setTheme: (value: SiteThemeType) => void;
     color: {
         primary: string;
         primaryContent: string;
@@ -131,7 +127,6 @@ export function useTheme() {
 export { GameInfoContext, GameStatusContext, SiteSettingContext, WindowInfoContext, ThemeContext };
 export type {
     SiteSettingContextType,
-    SiteThemeType,
     PuzzleListConfig,
     GameInfoContextType,
     GameStatusContextType,

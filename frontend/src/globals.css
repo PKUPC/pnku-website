@@ -6,8 +6,9 @@
 
 @custom-variant not-last (&:not(:last-child));
 
+/* 使用 themes.css 种提供的 light 和 dark 主题，便于自行配置新颜色 */
 @plugin 'daisyui' {
-  themes: light, corporate, cupcake, dark, dracula, luxury;
+  themes: false;
 }
 
 @theme {
@@ -22,32 +23,6 @@
 /* 主题颜色相关配置，主题见 themes.css */
 @theme {
   --color-neutral-hover: color-mix(in oklch, var(--color-neutral), #000 20%);
-
-  /* --color-base-100: var(--color-base-100);
-  --color-base-200: var(--color-base-200);
-  --color-base-300: var(--color-base-300);
-  --color-base-content: var(--color-base-content);
-
-  --color-primary: var(--color-primary);
-  --color-primary-content: var(--color-primary-content);
-  --color-secondary: var(--color-secondary);
-  --color-secondary-content: var(--color-secondary-content);
-  --color-accent: var(--color-accent);
-  --color-accent-content: var(--color-accent-content);
-  --color-neutral: var(--color-neutral);
-
-  --color-neutral-lighten-1: color-mix(in oklch, var(--color-neutral), #fff 10%);
-  --color-neutral-darken-1: color-mix(in oklch, var(--color-neutral), #000 10%);
-  --color-neutral-content: var(--color-neutral-content);
-
-  --color-info: var(--color-info);
-  --color-info-content: var(--color-info-content);
-  --color-success: var(--color-success);
-  --color-success-content: var(--color-success-content);
-  --color-error: var(--color-error);
-  --color-error-content: var(--color-error-content);
-  --color-warning: var(--color-warning);
-  --color-warning-content: var(--color-warning-content); */
 }
 
 :root {
@@ -113,25 +88,6 @@ a.link-nostyle {
   text-decoration: none; /* 移除下划线 */
   color: inherit; /* 继承其父元素的颜色 */
   cursor: default; /* 使用默认的指针样式，而不是链接的手型指针 */
-}
-
-.router-menu {
-  .ant-menu-item {
-    padding: 0 10px !important;
-
-    &:after {
-      left: 10px !important;
-      right: 10px !important;
-    }
-
-    &:first-child {
-      padding-left: 0 !important;
-    }
-
-    &:first-child:after {
-      left: 0 !important;
-    }
-  }
 }
 
 .push-notification {
