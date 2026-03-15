@@ -23,6 +23,7 @@ class PuzzleMetadataModel(BaseModel):
     story_after: str | None = Field(default=None)
     solution: str | None = Field(default=None)
     use_sync: bool = Field(default=False)
+    manual_milestone_count: int | None = Field(default=None)
 
 
 class MediaActionModel(BaseModel):
