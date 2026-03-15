@@ -70,6 +70,7 @@ export default defineConfig(({ mode }) => {
                             'colorjs.io',
                             'tailwind-merge',
                             'react-h5-audio-player',
+                            'pako',
                         ],
                         antd: [
                             'antd/es/form',
