@@ -169,7 +169,7 @@ class Reducer(StateContainerBase):
             if user is None:
                 return make_datebase_error('user not found')
             new_user_info = copy.deepcopy(user.user_info)
-            new_user_info.update({'nickname': req.profile['nickname']})
+            new_user_info.update({'nickname': req.profile['nickname'], 'avatar_service': req.profile['avatar_service']})
             user.user_info = new_user_info
             user.updated_at = int(1000 * time.time())
 

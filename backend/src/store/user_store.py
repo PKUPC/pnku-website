@@ -52,6 +52,7 @@ class BanList(BaseModel):
 
 class UserInfoModel(BaseModel):
     nickname: str
+    avatar_service: Literal['cravatar', 'weavatar'] = Field(default='cravatar')
     email: str
     website_setting: WebsiteSettingModel = Field(default=WebsiteSettingModel())
     ban_list: BanList = Field(default=BanList())

@@ -38,22 +38,59 @@ async def update_profile(req: Request, body: UpdateProfileParam, worker: Worker,
         return {'status': 'error', 'title': 'RATE_LIMIT', 'message': f'提交太频繁，请等待 {3 - delta:.1f} 秒'}
 
     if 'nickname' not in body.profile:
-        return {'status': 'error', 'title': 'INVALID_PARAM', 'message': '缺少昵称信息'}
+        store_user_log(
+            req,
+            'api.user.update_profile',
+            'abnormal',
+            '缺少昵称信息',
+            body.profile,
+        )
+
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '非法操作！'}
     if body.profile['nickname'] == '':
-        return {'status': 'error', 'title': 'INVALID_PARAM', 'message': '昵称不能为空'}
+        store_user_log(
+            req,
+            'api.user.update_profile',
+            'abnormal',
+            '昵称不能为空',
+            body.profile,
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '非法操作！'}
+
+    if 'avatarService' not in body.profile:
+        store_user_log(
+            req,
+            'api.user.update_profile',
+            'abnormal',
+            '缺少头像服务信息',
+            body.profile,
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '非法操作！'}
+    if body.profile['avatarService'] not in ['cravatar', 'weavatar']:
+        store_user_log(
+            req,
+            'api.user.update_profile',
+            'abnormal',
+            '头像服务信息错误',
+            body.profile,
+        )
+        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '非法操作！'}
 
     rep = await worker.perform_action(
         glitter.UserUpdateProfileReq(
             client=worker.process_name,
             uid=user.model.id,
-            profile={'nickname': body.profile['nickname']},  # TODO: fix type
+            profile={
+                'nickname': body.profile['nickname'],
+                'avatar_service': body.profile['avatarService'],
+            },
         )
     )
 
     if rep.result is not None:
         return rep.result
 
-    store_user_log(req, 'api.user.update_profile', 'update_profile', '', {'profile': body.profile})  # type: ignore
+    store_user_log(req, 'api.user.update_profile', 'update_profile', '', body.profile)
 
     return {}
 

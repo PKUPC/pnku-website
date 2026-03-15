@@ -183,6 +183,7 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
             'profile': {
                 'nickname': user.model.user_info.nickname,
                 'avatar_url': user.avatar_url,
+                'avatarService': user.model.user_info.avatar_service,
                 'email': user.model.user_info.email,
             },
         },
