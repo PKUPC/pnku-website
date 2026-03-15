@@ -46,8 +46,15 @@ def check_puzzle_key(
         )
         return False, {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
 
-    # 此时 puzzle_key 一定是存在的
-    if not user.is_staff and real_puzzle_key not in user.team.game_state.unlock_puzzle_keys:
+    # 此时 puzzle_key 一定是存在的，检查解锁状态
+
+    puzzle = worker.game_nocheck.puzzles.puzzle_by_key[real_puzzle_key]
+
+    if (
+        not user.is_staff
+        and puzzle.model.puzzle_metadata.type != PuzzleType.PUBLIC
+        and real_puzzle_key not in user.team.game_state.unlock_puzzle_keys
+    ):
         store_user_log(
             req,
             module,
@@ -141,16 +148,13 @@ async def submit_public_answer(req: Request, body: SubmitParam, worker: Worker, 
         store_user_log(req, 'api.puzzle.submit_answer', 'abnormal', f'答案长度不合法，长度为{len(body.content)}。', {})
         return {'status': 'error', 'title': '答案过长', 'message': '答案长度应在1到100之间。'}
 
-    puzzle = worker.game_nocheck.puzzles.puzzle_by_key.get(body.puzzle_key, None)
-    if puzzle is None:
-        store_user_log(
-            req,
-            'api.puzzle.submit_public_answer',
-            'abnormal',
-            '谜题不存在。',
-            {'body_puzzle_key': body.puzzle_key},
-        )
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+    valid, result = check_puzzle_key(req, worker, user, body.puzzle_key, 'api.puzzle.submit_answer')
+    if not valid:
+        return result
+
+    puzzle_key = result['puzzle_key']
+    puzzle = worker.game_nocheck.puzzles.puzzle_by_key[puzzle_key]
+
     if puzzle.model.puzzle_metadata.type != PuzzleType.PUBLIC:
         store_user_log(
             req,
@@ -386,10 +390,13 @@ async def get_public_detail(req: Request, body: GetDetailParam, worker: Worker, 
     assert user is not None
     assert user.team is not None
 
-    puzzle_key = body.puzzle_key
-    puzzle = worker.game_nocheck.puzzles.puzzle_by_key.get(puzzle_key, None)
-    if puzzle is None:
-        return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '谜题不存在！'}
+    valid, result = check_puzzle_key(req, worker, user, body.puzzle_key, 'api.puzzle.submit_answer')
+    if not valid:
+        return result
+
+    puzzle_key = result['puzzle_key']
+    puzzle = worker.game_nocheck.puzzles.puzzle_by_key[puzzle_key]
+
     if puzzle.model.puzzle_metadata.type != PuzzleType.PUBLIC:
         store_user_log(
             req,
@@ -416,6 +423,9 @@ async def get_public_detail(req: Request, body: GetDetailParam, worker: Worker, 
 
     if len(puzzle.model.clipboard) > 0:
         return_value['clipboard'] = [x.model_dump() for x in puzzle.model.clipboard]
+
+    if not user.is_staff:
+        return_value['key'] = worker.game_nocheck.hash_puzzle_key(user.team.model.id, puzzle_key)
 
     return {'data': return_value}
 
