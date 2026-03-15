@@ -1,7 +1,7 @@
 import { default as Color } from 'colorjs.io';
-import { ReactNode, useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { ReactNode, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-import { SiteThemeType, ThemeContext, ThemeContextType, enabledThemes } from '@/logic/contexts.ts';
+import { SiteSettingContext, ThemeContext, ThemeContextType } from '@/logic/contexts.ts';
 
 function getColorFromCssVar(cssVar: string) {
     const color = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
@@ -10,7 +10,7 @@ function getColorFromCssVar(cssVar: string) {
     return colorObj.to('srgb').toString({ format: 'hex' });
 }
 
-function getCurrentColor() {
+function getCurrentColor(): ThemeContextType['color'] {
     return {
         primary: getColorFromCssVar('--color-primary'),
         primaryContent: getColorFromCssVar('--color-primary-content'),
@@ -35,15 +35,6 @@ function getCurrentColor() {
     };
 }
 
-function getCurrentTheme(): SiteThemeType {
-    const storedTheme = localStorage.getItem('themeName');
-    if (storedTheme && enabledThemes.includes(storedTheme as SiteThemeType)) {
-        return storedTheme as SiteThemeType;
-    }
-    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDarkMode ? 'dark' : 'light';
-}
-
 function getCssVariableAsPx(variableName: string): number {
     const cssValue = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
     if (cssValue.endsWith('rem')) {
@@ -58,7 +49,6 @@ function getCssVariableAsPx(variableName: string): number {
 }
 
 function getCurrentStyle(): ThemeContextType['style'] {
-    console.log(window.getComputedStyle(document.documentElement).fontSize);
     return {
         radiusSelector: getCssVariableAsPx('--radius-selector'),
         radiusField: getCssVariableAsPx('--radius-field'),
@@ -66,37 +56,106 @@ function getCurrentStyle(): ThemeContextType['style'] {
     };
 }
 
+function deepEqual<T>(a: T, b: T): boolean {
+    if (a === b) return true;
+    if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;
+    const keysA = Object.keys(a) as Array<keyof T>;
+    const keysB = Object.keys(b) as Array<keyof T>;
+    if (keysA.length !== keysB.length) return false;
+    for (const key of keysA) {
+        if (!keysB.includes(key) || !deepEqual(a[key], b[key])) return false;
+    }
+    return true;
+}
+
 export function ThemeContextProvider({ children }: { children: ReactNode }) {
-    const [theme, setTheme] = useState<ThemeContextType['theme']>(getCurrentTheme());
+    const { theme } = useContext(SiteSettingContext);
     const [color, setColor] = useState<ThemeContextType['color']>(getCurrentColor());
     const [style, setStyle] = useState<ThemeContextType['style']>(getCurrentStyle());
+    const observerRef = useRef<MutationObserver | null>(null);
 
-    const innerSetTheme = useCallback((theme: SiteThemeType) => {
-        localStorage.setItem('themeName', theme);
-        setTheme(theme);
+    const getActualTheme = useCallback((themeValue: 'light' | 'dark' | 'system'): 'light' | 'dark' => {
+        if (themeValue === 'system') {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return themeValue;
     }, []);
 
+    const updateThemeValues = useCallback(() => {
+        const newColor = getCurrentColor();
+        const newStyle = getCurrentStyle();
+
+        setColor((prevColor) => {
+            if (!deepEqual(prevColor, newColor)) {
+                console.log('color changed, updating color!');
+                return newColor;
+            }
+            return prevColor;
+        });
+
+        setStyle((prevStyle) => {
+            if (!deepEqual(prevStyle, newStyle)) {
+                console.log('style changed, updating style!');
+                return newStyle;
+            }
+            return prevStyle;
+        });
+    }, []);
+
+    // 监听主题变化并更新 data-theme 属性
     useLayoutEffect(() => {
-        const oldTheme = document.documentElement.getAttribute('data-theme');
-        document.documentElement.setAttribute('data-theme', theme);
-        return () => {
-            if (oldTheme) document.documentElement.setAttribute('data-theme', oldTheme);
+        const actualTheme = getActualTheme(theme);
+        document.documentElement.setAttribute('data-theme', actualTheme);
+    }, [theme, getActualTheme]);
+
+    // 监听系统主题变化（仅在 theme === 'system' 时）
+    useEffect(() => {
+        if (theme !== 'system') return;
+
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = () => {
+            const actualTheme = getActualTheme('system');
+            document.documentElement.setAttribute('data-theme', actualTheme);
         };
-    }, [theme]);
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => {
+            mediaQuery.removeEventListener('change', handleChange);
+        };
+    }, [theme, getActualTheme]);
 
     useEffect(() => {
-        const currentColor = getCurrentColor();
-        const currentStyle = getCurrentStyle();
-        if (JSON.stringify(currentColor) !== JSON.stringify(color)) setColor(currentColor);
-        if (JSON.stringify(currentStyle) !== JSON.stringify(style)) setStyle(currentStyle);
-    }, [color, style, theme]);
+        observerRef.current = new MutationObserver((mutations) => {
+            const hasRelevantChange = mutations.some((mutation) => {
+                if (mutation.type === 'attributes') {
+                    const attributeName = mutation.attributeName;
+                    return attributeName === 'data-theme' || attributeName === 'style';
+                }
+                return false;
+            });
 
-    console.log(color);
-    console.log(style);
+            if (hasRelevantChange) {
+                console.log('document observer got style change!');
+                updateThemeValues();
+            }
+        });
 
-    return (
-        <ThemeContext.Provider value={{ color, style, theme, setTheme: innerSetTheme }}>
-            {children}
-        </ThemeContext.Provider>
-    );
+        // 开始观察 document.documentElement 的属性变化
+        observerRef.current.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme', 'style'],
+        });
+
+        // 初始化时也更新一次
+        updateThemeValues();
+
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+                observerRef.current = null;
+            }
+        };
+    }, [updateThemeValues]);
+
+    return <ThemeContext.Provider value={{ color, style }}>{children}</ThemeContext.Provider>;
 }

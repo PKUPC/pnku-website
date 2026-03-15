@@ -23,7 +23,6 @@ import { SWRConfig } from 'swr';
 import { WishError } from '@/components/WishError.tsx';
 import { GameInfoContextProvider } from '@/logic/GameInfoContext';
 import { GameStatusContextProvider } from '@/logic/GameStatusContext';
-import { GameSettingContextProvider } from '@/logic/SiteSettingContext.tsx';
 import { WindowInfoContextProvider } from '@/logic/WindowInfoContext.tsx';
 import { PushDaemonWrapper } from '@/logic/WsDaemon';
 import { GameInfoContext, useSuccessGameInfo, useTheme, useWindowInfo } from '@/logic/contexts.ts';
@@ -143,20 +142,18 @@ function App({ children }: { children: ReactNode }) {
                 }}
             >
                 <GameInfoContextProvider>
-                    <GameSettingContextProvider>
-                        <GameStatusContextProvider>
-                            <WindowInfoContextProvider>
-                                <PushDaemonWrapper>
-                                    <InnerLayout>
-                                        <div className={'global-container'} id={'global-container'}>
-                                            {contextHolder}
-                                            {children}
-                                        </div>
-                                    </InnerLayout>
-                                </PushDaemonWrapper>
-                            </WindowInfoContextProvider>
-                        </GameStatusContextProvider>
-                    </GameSettingContextProvider>
+                    <GameStatusContextProvider>
+                        <WindowInfoContextProvider>
+                            <PushDaemonWrapper>
+                                <InnerLayout>
+                                    <div className={'global-container'} id={'global-container'}>
+                                        {contextHolder}
+                                        {children}
+                                    </div>
+                                </InnerLayout>
+                            </PushDaemonWrapper>
+                        </WindowInfoContextProvider>
+                    </GameStatusContextProvider>
                 </GameInfoContextProvider>
             </SWRConfig>
         </ConfigProvider>
