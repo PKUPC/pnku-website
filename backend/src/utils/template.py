@@ -1,3 +1,4 @@
+import base64
 import re
 
 from typing import Any
@@ -29,21 +30,6 @@ class LinkTargetExtension(Extension):
         md.postprocessors.register(self.LinkTargetProcessor(), 'link-target-processor', 100)
 
 
-# class AddLinkToImgExtension(Extension):
-#     IMG_PATTERN = r'<img\s+[^>]*src="([^"]+)"[^>]*>'
-#
-#     class AddLinkToImgProcessor(InlineProcessor):
-#         def handleMatch(self, m: Match[str], data: Any) -> tuple[Element, int, int] | tuple[None, None, None]:
-#             el = Element("a")
-#             el.attrib["href"] = m.groups()[0]
-#             el.text = m.group()
-#             return el, m.start(0), m.end(0)
-#
-#     def extendMarkdown(self, md: markdown.Markdown) -> None:
-#         md.inlinePatterns.register(self.AddLinkToImgProcessor(AddLinkToImgExtension.IMG_PATTERN, md),
-#                                    'add-link-to-img-processor', 100)
-
-
 markdown_processor = markdown.Markdown(
     extensions=[
         FencedCodeExtension(),
@@ -52,10 +38,20 @@ markdown_processor = markdown.Markdown(
         TableExtension(),
         SaneListExtension(),
         LinkTargetExtension(),
-        # AddLinkToImgExtension(),
     ],
     output_format='html',
 )
+
+
+def b64encode_filter(s: Any, encoding: str = 'utf-8') -> str:
+    data: bytes = b''
+    if isinstance(s, str):
+        data = s.encode(encoding)
+    elif isinstance(s, bytes):
+        data = s
+    else:
+        raise ValueError(f'Invalid type: {type(s)}')
+    return base64.b64encode(data).decode('ascii')
 
 
 def render_template(template_str: str, args: dict[str, Any]) -> str:
@@ -66,6 +62,7 @@ def render_template(template_str: str, args: dict[str, Any]) -> str:
         auto_reload=False,
     )
     env.globals['media_wrapper'] = media_wrapper
+    env.filters['b64encode'] = b64encode_filter
     md_str = env.get_template('index.md').render(**args)
 
     # md to str
