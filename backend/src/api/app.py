@@ -7,33 +7,23 @@ from typing import Any
 
 import httpx
 
-from sanic import Blueprint, HTTPResponse, Sanic, response
-from sanic.exceptions import SanicException
+from sanic import Blueprint, Sanic
 from sanic.request import Request
-from sanic_ext.exceptions import ValidationError
 
 from .. import secret, utils
 from ..logic import Worker
 from ..state import User
-from . import get_cur_user
+from .utils import get_cur_user, get_http_client, handle_error
 
 
 utils.fix_zmq_asyncio_windows()
 
-app = Sanic('pnku3-backend')
+app = Sanic('pnku-website-backend-worker')
 app.config.DEBUG = secret.SANIC_DEBUG
 app.config.OAS = False
 app.config.PROXIES_COUNT = 1
 app.config.KEEP_ALIVE_TIMEOUT = 15
 app.config.REQUEST_MAX_SIZE = 1024 * 1024 * (1 + secret.REQUEST_MAX_SIZE_MB)
-
-
-def get_http_client(_req: Request) -> httpx.AsyncClient:
-    return httpx.AsyncClient(
-        http2=True,
-        mounts=secret.OAUTH_HTTP_MOUNTS,
-        timeout=secret.OAUTH_HTTP_TIMEOUT,
-    )
 
 
 def get_worker(req: Request) -> Worker:
@@ -53,32 +43,6 @@ async def setup_game_state(cur_app: Sanic, _loop: Any) -> None:  # type:ignore[t
     await worker._before_run()
     cur_app.ctx._worker_task = asyncio.create_task(worker._mainloop())
     cur_app.ctx.startup_finished = time.time()
-
-
-async def handle_error(req: Request, exc: Exception) -> HTTPResponse:
-    if isinstance(exc, SanicException):
-        if isinstance(exc, ValidationError):
-            return response.json({'status': 'error', 'title': 'INVALID PARAMS', 'message': '参数格式错误'})
-        raise exc
-
-    try:
-        user = get_cur_user(req)
-        debug_info = f'{req.id} {req.uri_template} U#{"--" if user is None else user.model.id}'
-    except Exception as e:
-        debug_info = f'no debug info, {repr(e)}'
-
-    req.app.ctx.worker.log(
-        'error', 'app.handle_error', f'exception in request ({debug_info}): {utils.get_traceback(exc)}'
-    )
-    return response.html(
-        '<!doctype html>'
-        '<h1>🤡 500 — Internal Server Error</h1>'
-        '<p>This accident is recorded.</p>'
-        f'<p>If you believe there is a bug, tell admin about this request ID: {req.id}</p>'
-        '<br>'
-        '<p>😭 <i>Project Guiding Star</i></p>',
-        status=500,
-    )
 
 
 app.error_handler.add(Exception, handle_error)
