@@ -56,6 +56,12 @@ server {
         add_header Cache-Control "public";
     }
 
+    location /metadata/ {
+        root /app/frontend-build/;
+        expires 4h;
+        add_header Cache-Control "public";
+    }
+
     location /media/ {
         {%- if hide_media %}
         if ($cookie_admin_2fa != '{{ admin_2fa }}') {
