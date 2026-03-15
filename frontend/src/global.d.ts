@@ -1,4 +1,20 @@
-import type { Button, Image, Input, InputNumber, Modal, Slider } from 'antd';
+import {
+    Alert,
+    Button,
+    Checkbox,
+    ConfigProvider,
+    Image,
+    Input,
+    InputNumber,
+    Modal,
+    Popconfirm,
+    Select,
+    Slider,
+    Switch,
+    Tag,
+    Tooltip,
+    message,
+} from 'antd';
 import type { MessageInstance } from 'antd/es/message/interface';
 import type { useLocation, useParams } from 'react-router';
 
@@ -43,19 +59,30 @@ declare global {
         };
         exports: {
             React: typeof import('react');
+            AntDesign: {
+                Alert: typeof Alert;
+                Button: typeof Button;
+                Checkbox: typeof Checkbox;
+                ConfigProvider: typeof ConfigProvider;
+                Image: typeof Image;
+                Input: typeof Input;
+                InputNumber: typeof InputNumber;
+                Modal: typeof Modal;
+                Popconfirm: typeof Popconfirm;
+                Select: typeof Select;
+                Slider: typeof Slider;
+                Switch: typeof Switch;
+                Tag: typeof Tag;
+                Tooltip: typeof Tooltip;
+                message: typeof message;
+            };
         };
         components: {
             Loading: typeof Loading;
             WishError: typeof WishError;
             SyncTextarea: typeof SyncTextarea;
-            Button: typeof Button;
-            Image: typeof Image;
-            Modal: typeof Modal;
-            Popconfirm: typeof Popconfirm;
-            Input: typeof Input;
-            InputNumber: typeof InputNumber;
-            Slider: typeof Slider;
         };
+        adhoc: {};
     }
 }
 
