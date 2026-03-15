@@ -356,21 +356,19 @@ class Team(WithGameLifecycle):
 
     @property
     def member_info_list(self) -> list[dict[str, str]]:
-        leader_email = self.leader.model.user_info.email
         rst = [
             {
                 'nickname': self.leader.model.user_info.nickname,
-                'avatar_url': f'https://cravatar.cn/avatar/{utils.calc_md5(leader_email)}?d=mp',
+                'avatar_url': self.leader.avatar_url,
                 'type': 'leader',
             }
         ]
         for member in self.members:
             if member != self.leader:
-                member_email = member.model.user_info.email
                 rst.append(
                     {
                         'nickname': member.model.user_info.nickname,
-                        'avatar_url': f'https://cravatar.cn/avatar/{utils.calc_md5(member_email)}?d=mp',
+                        'avatar_url': member.avatar_url,
                         'type': 'member',
                     }
                 )

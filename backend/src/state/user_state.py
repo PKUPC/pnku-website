@@ -123,7 +123,11 @@ class User(WithGameLifecycle):
 
     @property
     def avatar_url(self) -> str:
-        return f'https://cravatar.cn/avatar/{utils.calc_md5(self.model.user_info.email)}?d=mp'
+        email_md5 = utils.calc_md5(self.model.user_info.email)
+        if self.model.user_info.avatar_service == 'cravatar':
+            return f'https://cravatar.cn/avatar/{email_md5}?d=mp'
+        elif self.model.user_info.avatar_service == 'weavatar':
+            return f'https://weavatar.com/avatar/{email_md5}?d=mp'
 
     @property
     def is_staff(self) -> bool:
