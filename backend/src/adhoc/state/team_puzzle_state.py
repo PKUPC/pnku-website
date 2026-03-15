@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Hashable
+from collections.abc import Callable, Hashable
 from typing import TYPE_CHECKING, Any
 
 from src import secret, utils
 from src.adhoc.constants import PuzzleVisibleStatusLiteral
-from src.store import PuzzleActionEvent
+from src.store import PuzzleActionEvent, PuzzleStateStore
 
 
 if TYPE_CHECKING:
@@ -103,6 +103,7 @@ class SubmissionResult:
 class TeamPuzzleState:
     def __init__(self, game_state: TeamGameState, team: Team, puzzle: Puzzle):
         self.game_state = game_state
+        self.game = game_state.game
         self.team: Team = team
         self.puzzle: Puzzle = puzzle
         self.visible: PuzzleVisibleStatusLiteral = 'lock'
@@ -115,6 +116,39 @@ class TeamPuzzleState:
     @property
     def passed(self) -> bool:
         return self.puzzle.model.key in self.game_state.passed_puzzle_keys
+
+    @property
+    def stored_state(self) -> PuzzleStateStore | None:
+        """
+        获取持久化 stored_state，一定需要处理为 None 的情况，并且需要由特殊题目自行检查 json 字段的合法性。
+        """
+        return self.game.puzzle_states.puzzle_state_store_by_puzzle_key_and_team_id.get(
+            (self.puzzle.model.key, self.team.model.id), None
+        )
+
+    def check_puzzle_state_update(
+        self,
+        param: dict[str, str | int],
+        stored_user_log: Callable[[str, str, str, dict[str, int | str | bool]], None],
+    ) -> dict[str, str] | None:
+        """
+        检查用于更新 stored state 的参数是否合法，由特殊题目自定义检查逻辑。
+        stored_user_log 用于在内部记录用户操作日志，参数为：
+        module: str, event: str, message: str, extra: dict[str, int | str | bool]
+        """
+        return None
+
+    def update_puzzle_state(self, old_state: dict[str, Any], param: dict[str, str | int]) -> dict[str, Any]:
+        """
+        更新 stored state，由特殊题目自定义更新逻辑。
+        """
+        return old_state
+
+    def after_update_puzzle_state(self) -> None:
+        """
+        在更新 stored state 后调用，由特殊题目自定义调用逻辑。
+        """
+        pass
 
     def on_submission(self, submission: Submission, is_reloading: bool = False) -> None:
         assert submission.cleaned_content not in self.submission_set

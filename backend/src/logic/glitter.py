@@ -46,6 +46,7 @@ class EventType(Enum):
 
     UPDATE_HINT = b'\x50'
     TEAM_EVENT_RECEIVED = b'\x51'
+    UPDATE_PUZZLE_STATE = b'\x52'
 
     TEAM_CREATE_TICKET = b'\x60'
     TICKET_MESSAGE = b'\x61'
@@ -220,6 +221,14 @@ class VMe50Req(ActionReq):
 
 @dataclass
 class PuzzleActionReq(ActionReq):
+    user_id: int
+    team_id: int
+    puzzle_key: str
+    content: dict[str, str | int]
+
+
+@dataclass
+class UpdatePuzzleStateReq(ActionReq):
     user_id: int
     team_id: int
     puzzle_key: str

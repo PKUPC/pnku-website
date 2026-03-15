@@ -128,6 +128,14 @@ async def push(req: Request, ws: WebsocketImplProtocol) -> None:
                                 payload['puzzle_key'] = hashed_puzzle_key
                                 store_user_log(req, 'ws.send', 'type_puzzle_errata', '', payload)
                                 await ws.send(json.dumps(payload))
+                        case 'wish_mutate':
+                            to_groups = msg.get('to_groups', None)
+                            to_users = msg.get('to_users', None)
+
+                            if to_groups is None or user.model.group in to_groups:
+                                if to_users is None or user.model.id in to_users:
+                                    store_user_log(req, 'ws.send', 'type_wish_mutate', '', payload)
+                                    await ws.send(json.dumps(payload))
 
     finally:
         worker.log('debug', 'api.ws.push', f'disconnected from {user}')

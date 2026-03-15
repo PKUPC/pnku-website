@@ -12,12 +12,14 @@ from typing import Any
 import zmq
 
 from sqlalchemy import and_, select
+from sqlalchemy.dialects.mysql import insert
 from zmq.asyncio import Socket
 
 from src import secret, utils
 from src.state import Announcements, Trigger
 from src.store import (
     MessageStore,
+    PuzzleStateStore,
     TeamEventStore,
     TeamEventType,
     TeamStore,
@@ -712,6 +714,43 @@ class Reducer(StateContainerBase):
 
         team_event_id: int = team_event.id
         await self.emit_event(glitter.Event(glitter.EventType.TEAM_EVENT_RECEIVED, self.state_counter, team_event_id))
+        return None
+
+    @on_action(glitter.UpdatePuzzleStateReq)
+    async def on_update_puzzle_state(self, req: glitter.UpdatePuzzleStateReq) -> str | None:
+        puzzle = self.game_nocheck.puzzles.puzzle_by_key[req.puzzle_key]
+        team = self.game_nocheck.teams.team_by_id[req.team_id]
+        team_puzzle_state = team.game_state.puzzle_state_by_key[puzzle.model.key]
+
+        with self.SqlSession() as session:
+            # 使用 on_duplicate_key_update 创建默认行
+            stmt = insert(PuzzleStateStore).values(
+                puzzle_key=req.puzzle_key,
+                team_id=req.team_id,
+                data={},
+            )
+            stmt = stmt.on_duplicate_key_update(id=stmt.inserted.id)
+            session.execute(stmt)
+            session.commit()
+
+            puzzle_state_store: PuzzleStateStore | None = (
+                session.query(PuzzleStateStore)
+                .filter_by(puzzle_key=req.puzzle_key, team_id=req.team_id)
+                .with_for_update()
+                .scalar()
+            )
+            assert puzzle_state_store is not None, f'puzzle state for {req.puzzle_key} {req.team_id} not found'
+
+            new_state = team_puzzle_state.update_puzzle_state(puzzle_state_store.data, req.content)
+            puzzle_state_store.data = new_state
+            puzzle_state_store.updated_at = int(time.time() * 1000)
+            session.commit()
+
+            self.state_counter += 1
+
+        await self.emit_event(
+            glitter.Event(glitter.EventType.UPDATE_PUZZLE_STATE, self.state_counter, puzzle_state_store.id)
+        )
         return None
 
     @on_action(glitter.TeamCreateTicketReq)
