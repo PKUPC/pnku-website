@@ -1,5 +1,6 @@
 import diff from 'fast-diff';
 import { useEffect, useMemo, useState } from 'react';
+import { YKeyValue } from 'y-utility/y-keyvalue';
 import * as Y from 'yjs';
 
 import { YClient } from '@/logic/YClient';
@@ -303,6 +304,85 @@ export function useYArray<T = any>({
             removeAt,
             setAt,
             getAt,
+            clear,
+        },
+    };
+}
+
+export type YKeyValueBind<T = any> = {
+    value: Record<string, T>;
+    set: (key: string, val: T) => void;
+    get: (key: string) => T | undefined;
+    delete: (key: string) => void;
+    clear: () => void;
+};
+
+export function useYKeyValue<T = any>({
+    client,
+    name,
+}: {
+    client: YClient;
+    name: string;
+}): {
+    yKeyValue: YKeyValue<T>;
+    keyValue: YKeyValueBind<T>;
+} {
+    const yKeyValue = useMemo(
+        () => new YKeyValue(client.doc.getArray<{ key: string; val: T }>(name)),
+        [client.doc, name],
+    );
+
+    const [value, setValue] = useState<Record<string, T>>({});
+
+    useEffect(() => {
+        const initialValue: Record<string, T> = {};
+        yKeyValue.map.forEach((val, key) => {
+            initialValue[key] = val.val;
+        });
+        setValue(initialValue);
+
+        const observer = () => {
+            const newValue: Record<string, T> = {};
+            yKeyValue.map.forEach((val, key) => {
+                newValue[key] = val.val;
+            });
+            setValue(newValue);
+        };
+
+        yKeyValue.on('change', observer);
+
+        return () => {
+            yKeyValue.off('change', observer);
+        };
+    }, [yKeyValue]);
+
+    const set = (key: string, val: T) => {
+        yKeyValue.set(key, val);
+    };
+
+    const get = (key: string): T | undefined => {
+        return yKeyValue.get(key);
+    };
+
+    const deleteKey = (key: string) => {
+        yKeyValue.delete(key);
+    };
+
+    const clear = () => {
+        yKeyValue.doc.transact(() => {
+            for (const key of yKeyValue.map.keys()) {
+                yKeyValue.delete(key);
+            }
+        });
+    };
+
+    return {
+        yKeyValue,
+        keyValue: {
+            value,
+            set,
+            get,
+            delete: deleteKey,
             clear,
         },
     };
