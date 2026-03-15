@@ -447,6 +447,7 @@ export namespace Wish {
             return?: string;
             area_name?: string;
             stories?: string[];
+            bgm_list?: string[];
         };
 
         export type GetDetailApi = {
