@@ -261,3 +261,38 @@ export function mixColor(color1: string, color2: string, ratio: number) {
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
+
+export function calcRectangleOverlap(
+    rect1: { x: number; y: number; width: number; height: number },
+    rect2: { x: number; y: number; width: number; height: number },
+) {
+    const left = Math.max(rect1.x, rect2.x);
+    const right = Math.min(rect1.x + rect1.width, rect2.x + rect2.width);
+    const top = Math.max(rect1.y, rect2.y);
+    const bottom = Math.min(rect1.y + rect1.height, rect2.y + rect2.height);
+
+    const width = right - left;
+    const height = bottom - top;
+
+    // 如果宽度或高度小于等于0，说明没有重叠
+    if (width <= 0 || height <= 0) {
+        return null;
+    }
+
+    return {
+        x: left,
+        y: top,
+        width: width,
+        height: height,
+    };
+}
+
+export function genRGBColor(seed: string): { r: number; g: number; b: number } {
+    const hue = stringToHue(seed);
+    const rgba = hslaToRgba(hue / 360, 0.8, 0.8, 1);
+    return {
+        r: rgba[0],
+        g: rgba[1],
+        b: rgba[2],
+    };
+}

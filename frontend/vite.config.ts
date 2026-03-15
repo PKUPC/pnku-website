@@ -25,6 +25,7 @@ process.env.VITE_APP_BUILD_INFO = getCurrentTimeFormatted();
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
     const DEV_BACKEND_URL = env.DEV_BACKEND_URL || 'http://127.0.0.1:8080';
+    const DEV_BACKEND_SYNCER_URL = env.DEV_BACKEND_SYNCER_URL || 'http://127.0.0.1:8090';
     const DEV_FRONTEND_PORT = Number(env.DEV_FRONTEND_PORT) || 3333;
     const DEV_FRONTEND_HOST = env.DEV_FRONTEND_HOST || 'localhost';
 
@@ -198,6 +199,11 @@ export default defineConfig(({ mode }) => {
             host: DEV_FRONTEND_HOST,
             port: DEV_FRONTEND_PORT,
             proxy: {
+                '/service/sync/': {
+                    target: DEV_BACKEND_SYNCER_URL,
+                    changeOrigin: true,
+                    ws: true,
+                },
                 '/service/': {
                     target: DEV_BACKEND_URL,
                     changeOrigin: true,

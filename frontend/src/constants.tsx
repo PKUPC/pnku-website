@@ -7,6 +7,7 @@ export const WISH_ROOT = SERVICE_ROOT + 'wish/';
 export const AUTH_ROOT = SERVICE_ROOT + 'auth/';
 export const TEMPLATE_ROOT = SERVICE_ROOT + 'template/';
 export const WS_ROOT = SERVICE_ROOT + 'ws/';
+export const SYNC_ROOT = SERVICE_ROOT + 'sync/';
 
 export const HEADER_MAX_WIDTH = 1200;
 export const HEADER_BREAK_POINT = 780;

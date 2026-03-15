@@ -1,6 +1,7 @@
 import { Button, ConfigProvider, Image, Input, InputNumber, Modal, Popconfirm, Slider, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import React, { ReactNode, useContext, useEffect } from 'react';
+import { useLocation, useParams } from 'react-router';
 import { SWRConfig } from 'swr';
 
 import { WishError } from '@/components/WishError.tsx';
@@ -9,12 +10,15 @@ import { GameStatusContextProvider } from '@/logic/GameStatusContext';
 import { GameSettingContextProvider } from '@/logic/SiteSettingContext.tsx';
 import { WindowInfoContextProvider } from '@/logic/WindowInfoContext.tsx';
 import { PushDaemonWrapper } from '@/logic/WsDaemon';
-import { GameInfoContext, useTheme } from '@/logic/contexts.ts';
+import { GameInfoContext, useSuccessGameInfo, useTheme } from '@/logic/contexts.ts';
 import { wish } from '@/logic/wish.ts';
 import { setup } from '@/setup.ts';
 import { mixColor } from '@/utils.ts';
 
 import { Loading } from './components/Loading';
+import { SyncTextarea } from './components/SyncTextarea';
+import { useYArray, useYClient, useYMap, useYText } from './hooks/useYClient';
+import { YClient } from './logic/YClient';
 import { useWishData } from './logic/swrWrappers';
 
 setup();
@@ -48,10 +52,19 @@ function App({ children }: { children: ReactNode }) {
             wish,
             messageApi,
             useWishData,
+            useSuccessGameInfo,
+            YClient,
+            useYClient,
+            useYText,
+            useYMap,
+            useYArray,
+            useParams,
+            useLocation,
         };
         window.components = {
             Loading,
             WishError,
+            SyncTextarea,
             Button,
             Image,
             Modal,
