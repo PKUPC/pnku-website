@@ -96,7 +96,7 @@ export function TeamMemberForm() {
             <FancyCard title="队伍成员列表">
                 <div>
                     {info.team.members.map((item) => (
-                        <div key={item.id} className="not-last:border-b py-3 px-1 text-sm flex">
+                        <div key={item.id} className="not-last:border-b border-base-content/20 py-3 px-1 text-sm flex">
                             <div className="flex items-center gap-2 grow">
                                 <ProfileAvatar src={item.avatar_url} alt={item.nickname} size={'2rem'} />
                                 {item.nickname}
@@ -126,18 +126,27 @@ export function TeamMemberForm() {
                         </div>
                     ))}
                 </div>
-                <br />
+
                 {info.team.id !== 0 && (
-                    <Button danger size="large" block onClick={onLeaveTeam} disabled={info.team.status !== 'preparing'}>
-                        <WarningOutlined />{' '}
-                        {isLeader
-                            ? info.team.status === 'preparing'
-                                ? '解散队伍'
-                                : '游戏中不能解散队伍'
-                            : info.team.status === 'preparing'
-                              ? '退出队伍'
-                              : '游戏中不能退出队伍'}
-                    </Button>
+                    <>
+                        <br />
+                        <Button
+                            danger
+                            size="large"
+                            block
+                            onClick={onLeaveTeam}
+                            disabled={info.team.status !== 'preparing'}
+                        >
+                            <WarningOutlined />{' '}
+                            {isLeader
+                                ? info.team.status === 'preparing'
+                                    ? '解散队伍'
+                                    : '游戏中不能解散队伍'
+                                : info.team.status === 'preparing'
+                                  ? '退出队伍'
+                                  : '游戏中不能退出队伍'}
+                        </Button>
+                    </>
                 )}
             </FancyCard>
         </div>
