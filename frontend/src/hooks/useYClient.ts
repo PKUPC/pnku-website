@@ -13,6 +13,7 @@ interface UseYClientOptions {
 export function useYClient({ roomId, statusHandler, syncHandler }: UseYClientOptions) {
     const [client, setClient] = useState<YClient | null>(null);
     const [synced, setSynced] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         console.log(`[useYClient] Init YClient for room: ${roomId}`);
@@ -22,8 +23,12 @@ export function useYClient({ roomId, statusHandler, syncHandler }: UseYClientOpt
         });
         yClient.provider.on('connection-close', (event: CloseEvent | null) => {
             if (event) {
-                if (event.code !== 1000) {
+                if (event.code === 4337) {
                     setClient(null);
+                    setErrorMessage(`协作服务器拒绝了连接，原因是：${event.reason}。`);
+                } else if (event.code !== 1000) {
+                    setClient(null);
+                    setErrorMessage(`连接协作服务器失败，请稍后尝试刷新页面。如果您一直遇到此问题，请联系工作人员。`);
                 }
             }
         });
@@ -64,7 +69,7 @@ export function useYClient({ roomId, statusHandler, syncHandler }: UseYClientOpt
         };
     }, [roomId, statusHandler, syncHandler]);
 
-    return { client, synced };
+    return { client, synced, errorMessage };
 }
 
 /**
