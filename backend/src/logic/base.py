@@ -20,6 +20,7 @@ from src.state import (
     Hint,
     Hints,
     Puzzle,
+    PuzzleStates,
     Puzzles,
     Submission,
     Team,
@@ -118,6 +119,7 @@ class StateContainerBase(ABC):
             Tickets.constructed = False
             Ticket.constructed_ids = set()
             Submission.constructed_ids = set()
+            PuzzleStates.constructed = False
             try:
                 self._game = Game(
                     worker=self,
