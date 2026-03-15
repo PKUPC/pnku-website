@@ -16,6 +16,12 @@ export function PuzzleBody({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetai
 
     return (
         <>
+            {puzzleData.alert &&
+                puzzleData.alert.length > 0 &&
+                puzzleData.alert.map((alert, idx) => (
+                    <Alert key={idx} className="mb-4" type={alert.type} showIcon={true} message={alert.message} />
+                ))}
+
             <div className={styles.puzzleBody}>{puzzleBody}</div>
 
             {puzzleData.actions.map((action, idx) => (

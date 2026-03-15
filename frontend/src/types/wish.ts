@@ -448,6 +448,8 @@ export namespace Wish {
             area_name?: string;
             stories?: string[];
             bgm_list?: string[];
+            solution?: string;
+            alert?: { type: 'info' | 'warning' | 'error' | 'success'; message: string }[];
         };
 
         export type GetDetailApi = {

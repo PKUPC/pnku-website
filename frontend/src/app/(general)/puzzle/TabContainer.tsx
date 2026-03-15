@@ -61,7 +61,7 @@ export function TabContainer({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDet
                 key: '/puzzle/manual-hints/' + puzzleKey,
             });
 
-        if (ARCHIVE_MODE || info.user?.group === 'staff')
+        if (ARCHIVE_MODE || info.user?.group === 'staff' || puzzleData.solution)
             items.push({
                 label: '解析',
                 icon: <FileDoneOutlined />,
