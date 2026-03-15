@@ -232,7 +232,7 @@ class UpdatePuzzleStateReq(ActionReq):
     user_id: int
     team_id: int
     puzzle_key: str
-    content: dict[str, str | int]
+    content: dict[str, Any]
 
 
 @dataclass
