@@ -8,6 +8,7 @@ import NotFound from '@/app/NotFound.tsx';
 import { Loading } from '@/components/Loading.tsx';
 import { Reloader } from '@/components/Reloader';
 import { fetchTemplateFile } from '@/logic/wish';
+import { RemoteComponent } from '@/remote/RemoteComponent';
 
 import './Template.css';
 import styles from './Template.module.css';
@@ -35,6 +36,19 @@ export function TemplateStr({ name, children }: { name: string; children: string
                                     </div>
                                 );
                             }
+                        }
+                        if (domNode.attribs.class.includes('template-remote-component')) {
+                            const name = domNode.attribs['data-name'];
+                            const url = domNode.attribs['data-url'];
+                            let props = {};
+                            try {
+                                if (domNode.attribs['data-props']) {
+                                    props = JSON.parse(domNode.attribs['data-props']);
+                                }
+                            } catch {
+                                props = {};
+                            }
+                            return <RemoteComponent componentName={name} componentUrl={url} {...props} />;
                         }
                     }
                 },

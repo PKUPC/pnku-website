@@ -11,7 +11,7 @@ import globals from 'globals';
 
 export default defineConfig([
     {
-        ignores: ['**/build', '**/pnpm-lock.yaml', '**/node_modules/', 'src/archive'],
+        ignores: ['**/build', '**/build_remote', '**/pnpm-lock.yaml', '**/node_modules/', 'src/archive'],
     },
     {
         files: ['**/*.{js,jsx}'],
