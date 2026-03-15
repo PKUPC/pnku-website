@@ -29,6 +29,7 @@ class SubmissionResult:
         extra: str = '',
         pass_after_meta: bool = False,
         pass_after_finished: bool = False,
+        manual_type_name: str | None = None,
     ) -> None:
         self.type = sub_type
         self.info = sub_info
@@ -36,8 +37,11 @@ class SubmissionResult:
         self.extra = extra
         self.pass_after_meta = pass_after_meta
         self.pass_after_finished = pass_after_finished
+        self.manual_type_name = manual_type_name
 
     def describe_status(self) -> str:
+        if self.manual_type_name is not None:
+            return self.manual_type_name
         match self.type:
             case 'wrong':
                 return '答案错误'
@@ -52,7 +56,45 @@ class SubmissionResult:
             case 'staff_pass':
                 return '答案正确'
             case _:
-                return ''
+                return '未知错误'
+
+    def describe_response(self) -> dict[str, str]:
+        """
+        API 返回的响应。
+        """
+
+        status = 'error'
+        title = self.describe_status()
+        message = '请联系网站管理员。'
+
+        match self.type:
+            case 'wrong':
+                status = 'error'
+                message = '答案错误！你没有得到任何信息！'
+            case 'milestone':
+                status = 'info'
+                message = f'你收到了一条信息：\n{self.info}'
+            case 'pass':
+                status = 'success'
+                message = f'{self.info}'
+            case 'multipass':
+                status = 'success'
+                message = f'{self.info}'
+            case 'staff_pass':
+                status = 'success'
+                message = f'{self.info}'
+            case 'staff_wrong':
+                status = 'error'
+                message = f'{self.info}'
+
+        if self.manual_type_name is not None:
+            title = self.manual_type_name
+
+        return {
+            'status': status,
+            'title': title,
+            'message': message,
+        }
 
     def __repr__(self) -> str:
         return f'SubmissionResult[{self.type}, {self.info}, {self.trigger_value}, {self.extra}]'
