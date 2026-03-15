@@ -1,4 +1,5 @@
 import { Alert } from 'antd';
+import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import NotFound from '@/app/NotFound.tsx';
@@ -16,25 +17,34 @@ function CurrencyChangeHistory({ currencyType }: { currencyType: Adhoc.CurrencyT
         endpoint: 'team/get_currency_change_history',
         payload: { currency_type: currencyType as Adhoc.CurrencyType },
     });
+    const info = useSuccessGameInfo();
+
+    const currencyInfo = info.game.currencies.find((c) => c.type === currencyType);
+    const columns: TableColumnsType<Wish.Team.TeamCurrencyHistorySingleRecord> = useMemo(() => {
+        const baseColumns: TableColumnsType<Wish.Team.TeamCurrencyHistorySingleRecord> = [
+            { title: '时间', dataIndex: 'timestamp_s', render: (text) => format_ts(text) },
+            {
+                title: '变动',
+                dataIndex: 'change',
+                render: (text) => {
+                    if (text > 0) return '+' + text;
+                    else if (text < 0) return text;
+                    else return '--';
+                },
+            },
+        ];
+
+        if (currencyInfo?.increaseByTime) {
+            baseColumns.push({ title: '随时间增长', dataIndex: 'time_based_change' });
+        }
+
+        baseColumns.push({ title: '当前余额', dataIndex: 'current' }, { title: '备注', dataIndex: 'info' });
+
+        return baseColumns;
+    }, [currencyInfo?.increaseByTime]);
 
     if (!data) return <Loading />;
     if (data.status === 'error') return <WishError res={data} />;
-
-    const columns: TableColumnsType<Wish.Team.TeamCurrencyHistorySingleRecord> = [
-        { title: '时间', dataIndex: 'timestamp_s', render: (text) => format_ts(text) },
-        {
-            title: '变动',
-            dataIndex: 'change',
-            render: (text) => {
-                if (text > 0) return '+' + text;
-                else if (text < 0) return text;
-                else return '--';
-            },
-        },
-        { title: '随时间增长', dataIndex: 'time_based_change' },
-        { title: '当前余额', dataIndex: 'current' },
-        { title: '备注', dataIndex: 'info' },
-    ];
 
     return (
         <>
