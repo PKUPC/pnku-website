@@ -45,7 +45,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
-    "@tailwindcss/postcss": "^4.1.14",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.18.6",
