@@ -192,7 +192,7 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
             'id': user.model.team_id,
             'team_name': user.team.model.team_name,
             'team_info': user.team.model.team_info,
-            'team_secret': None if user.team.leader is not user else user.team.model.team_secret,
+            'team_secret': user.team.model.team_secret,
             'status': user.team.status,
             'gaming': user.team.gaming,
             'extra_status': user.team.model.ban_status,
