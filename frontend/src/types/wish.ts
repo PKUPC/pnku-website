@@ -234,6 +234,7 @@ export namespace Wish {
                           id: number;
                           profile: {
                               nickname: string;
+                              avatarService: 'cravatar' | 'weavatar';
                               email: string;
                               avatar_url: string;
                           };
