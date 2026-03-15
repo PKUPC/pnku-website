@@ -10,6 +10,7 @@ import { ConfigProvider, Menu } from 'antd';
 import type { MenuProps } from 'antd';
 import { useCallback, useMemo } from 'react';
 import { BiNavigation } from 'react-icons/bi';
+import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import { EveryUserIcon, HomeIcon, IdCardIcon, PlazaIcon, RankingIcon } from '@/SvgIcons.tsx';
@@ -185,6 +186,14 @@ function genHeaderMenu(info: ReturnType<typeof useSuccessGameInfo>, compact: boo
             key: '/setting',
         });
 
+        if (info.user.admin) {
+            submenuItems.push({
+                icon: <MdOutlineAdminPanelSettings />,
+                label: '管理员工具',
+                key: '_/console',
+            });
+        }
+
         submenuItems.push({
             icon: <DisconnectOutlined />,
             label: '注销',
@@ -241,6 +250,8 @@ function NavigationMenu() {
                 navigate('/about/introduction');
             } else if (e.key.startsWith('_/info')) {
                 navigate('/info/announcements');
+            } else if (e.key.startsWith('_/console')) {
+                navigate('/console/user');
             }
         },
         [navigate, info],
@@ -253,6 +264,9 @@ function NavigationMenu() {
         }
         if (pathname.startsWith('/about')) {
             result.push('_/about');
+        }
+        if (pathname.startsWith('/console')) {
+            result.push('_/console');
         }
         if (pathname.startsWith('/info')) {
             result.push('_/info');

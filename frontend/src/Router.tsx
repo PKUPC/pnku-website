@@ -206,6 +206,30 @@ const routes: RouteObject[] = [
                             },
                         ],
                     },
+                    {
+                        path: '/console',
+                        async lazy() {
+                            const { ConsoleLayout } = await import('@/app/(general)/console/ConsoleLayout.tsx');
+                            return { Component: ConsoleLayout };
+                        },
+                        children: [
+                            { index: true, element: <Navigate to="/console/user" /> },
+                            {
+                                path: '/console/user',
+                                async lazy() {
+                                    const { Page } = await import('@/app/(general)/console/user/Page.tsx');
+                                    return { Component: Page };
+                                },
+                            },
+                            {
+                                path: '/console/document',
+                                async lazy() {
+                                    const { Page } = await import('@/app/(general)/console/document/Page.tsx');
+                                    return { Component: Page };
+                                },
+                            },
+                        ],
+                    },
                 ],
             },
             { path: '*', element: <NotFound /> },
