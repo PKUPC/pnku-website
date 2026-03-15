@@ -72,12 +72,12 @@ export function MessageBox({ teamId }: { teamId: number }) {
             },
         }).then((res) => {
             if (res.status === 'error') {
-                message.error({ content: '似乎出了点错误', key: 'Message', duration: 3 }).then();
+                messageApi.error({ content: '似乎出了点错误', key: 'Message', duration: 3 }).then();
             }
             setHasNewMessage(false);
             reloadMessage();
         });
-    }, [info.status, info.user, messages, reloadMessage, setHasNewMessage, teamId]);
+    }, [info.status, info.user, messageApi, messages, reloadMessage, setHasNewMessage, teamId]);
 
     if (error) return <WishError res={error} reload={reloadMessage} />;
 

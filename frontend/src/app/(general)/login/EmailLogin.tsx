@@ -13,6 +13,7 @@ export function EmailLogin() {
     const [captchaToken, setCaptchaToken] = useState<string>('');
     const recaptchaRef: React.RefObject<ReCAPTCHA> = React.createRef();
     const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+    const [messageApi, messageContextHolder] = message.useMessage();
     const info = useSuccessGameInfo();
 
     const onChangeStatus = () => {
@@ -34,7 +35,7 @@ export function EmailLogin() {
         })
             .then((res) => {
                 if (res.status !== 200) {
-                    message.error({ content: `HTTP 错误 ${res.body}`, key: 'HTTP_ERROR', duration: 3 }).then();
+                    messageApi.error({ content: `HTTP 错误 ${res.body}`, key: 'HTTP_ERROR', duration: 3 }).then();
                     return;
                 }
                 if (res.redirected) {
@@ -49,7 +50,7 @@ export function EmailLogin() {
 
     const signUp = (values: { email: string }) => {
         // console.log("sign_up");
-        message.loading({ content: '注册中，请稍后', key: 'EMAIL_SIGN_IN', duration: 10 }).then();
+        messageApi.loading({ content: '注册中，请稍后', key: 'EMAIL_SIGN_IN', duration: 10 }).then();
         fetch(`/service/auth/email/register?rem=${window.rem}&ram=${window.ram}`, {
             method: 'POST',
             headers: {
@@ -71,7 +72,7 @@ export function EmailLogin() {
                     const redirectedURL = new URL(res.url);
                     if (redirectedURL.pathname === '/login/error') {
                         const msgValue = redirectedURL.searchParams.get('msg');
-                        message.error({ content: msgValue, key: 'EMAIL_SIGN_IN', duration: 3 }).then();
+                        messageApi.error({ content: msgValue, key: 'EMAIL_SIGN_IN', duration: 3 }).then();
                         return {
                             status: 'error',
                             message: msgValue,
@@ -87,11 +88,11 @@ export function EmailLogin() {
             })
             .then((res) => {
                 if (res.status === 'success') {
-                    message.success({ content: '注册成功，请查收邮件', key: 'EMAIL_SIGN_IN', duration: 5 }).then();
+                    messageApi.success({ content: '注册成功，请查收邮件', key: 'EMAIL_SIGN_IN', duration: 5 }).then();
                     if (recaptchaRef.current) recaptchaRef.current.reset();
                     setState(!sign_in);
                 } else {
-                    message
+                    messageApi
                         .error({
                             content: res.message,
                             key: 'EMAIL_SIGN_IN',
@@ -112,16 +113,16 @@ export function EmailLogin() {
     };
 
     const onFinish = (values: { email: string; password: string } | { email: string }) => {
-        if (info.feature.recaptcha && captchaToken === '') message.error('请进行人机身份验证').then();
+        if (info.feature.recaptcha && captchaToken === '') messageApi.error('请进行人机身份验证').then();
         else {
             sign_in ? signIn(values as { email: string; password: string }) : signUp(values);
         }
         // recaptchaRef.current.reset();
     };
 
-    // TODO: 换掉 antd 的 Form 组件
     return (
         <div>
+            {messageContextHolder}
             <p>
                 <b>账号密码登录</b>
             </p>

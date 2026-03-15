@@ -4,6 +4,7 @@ import { useState } from 'react';
 export function DevLogin() {
     const [identity, setIdentity] = useState('');
     const [loading, setLoading] = useState(false);
+    const [messageApi, messageContextHolder] = message.useMessage();
 
     const onFinish = () => {
         setLoading(true);
@@ -22,7 +23,7 @@ export function DevLogin() {
                     window.location.href = res.url;
                 }
                 if (res.status !== 200) {
-                    message.error({ content: `HTTP 错误 ${res.body}`, key: 'HTTP_ERROR', duration: 3 }).then();
+                    messageApi.error({ content: `HTTP 错误 ${res.body}`, key: 'HTTP_ERROR', duration: 3 }).then();
                     return;
                 }
                 return res.json();
@@ -44,6 +45,7 @@ export function DevLogin() {
     };
     return (
         <>
+            {messageContextHolder}
             <br />
             <hr />
             <br />
