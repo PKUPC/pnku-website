@@ -7,7 +7,7 @@ import type { SyncTextarea } from './components/SyncTextarea';
 import type { WishError } from './components/WishError';
 import type { useYArray, useYClient, useYMap, useYText } from './hooks/useYClient';
 import type { YClient } from './logic/YClient';
-import type { useSuccessGameInfo } from './logic/contexts';
+import type { useSuccessGameInfo, useWindowInfo } from './logic/contexts';
 import type { useWishData } from './logic/swrWrappers';
 import type { Wish } from './types/wish';
 
@@ -39,6 +39,7 @@ declare global {
             useParams: typeof useParams;
             useLocation: typeof useLocation;
             useSuccessGameInfo: typeof useSuccessGameInfo;
+            useWindowInfo: typeof useWindowInfo;
         };
         exports: {
             React: typeof import('react');
