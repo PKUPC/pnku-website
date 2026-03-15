@@ -1,6 +1,7 @@
 import { CarryOutOutlined, MessageOutlined, NotificationOutlined, RocketOutlined } from '@ant-design/icons';
 import { MessageInstance } from 'antd/es/message/interface';
 import { NotificationInstance } from 'antd/es/notification/interface';
+import Md5 from 'crypto-js/md5';
 import { ScopedMutator } from 'swr/_internal';
 
 import { WS_ROOT } from '@/constants';
@@ -103,6 +104,7 @@ export class PushClient {
                     icon: <MessageOutlined />,
                     message: data.title,
                     description: data.message,
+                    key: Md5(data.message).toString(),
                 });
                 break;
             }
