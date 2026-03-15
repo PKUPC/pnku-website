@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import asyncio
+
 from collections.abc import Awaitable, Callable, Coroutine
 from typing import TYPE_CHECKING, Any
 
 from pycrdt import Doc, TransactionEvent, YMessageType, YSyncMessageType
 from sanic import Websocket
+from sanic.exceptions import WebsocketClosed
 from websockets.exceptions import ConnectionClosed
 
 from .room_manager import RoomManager, SyncRoom
@@ -62,16 +65,51 @@ class SyncIntegration:
         else:
             handler = self._handle_message
 
+        heartbeat_task = asyncio.create_task(self._heartbeat_loop(ws))
+
         try:
-            # 消息循环
             async for message in ws:
                 await handler(room, ws, message, extra)
 
         except ConnectionClosed:
-            self.worker.log('debug', 'sync_integration.handle_sync_websocket', f'connection closed for room {room_id}')
+            self.worker.log(
+                'debug',
+                'sync_integration.handle_sync_websocket',
+                f'got ConnectionClosed, connection closed for room {room_id}',
+            )
+        except WebsocketClosed:
+            self.worker.log(
+                'debug',
+                'sync_integration.handle_sync_websocket',
+                f'got WebsocketClosed, connection closed for room {room_id}',
+            )
         finally:
+            heartbeat_task.cancel()
+            try:
+                await heartbeat_task
+            except asyncio.CancelledError:
+                pass
             self.worker.log('debug', 'sync_integration.handle_sync_websocket', f'removing client from room {room_id}')
             room.remove_client(ws)
+
+    async def _heartbeat_loop(self, ws: Websocket) -> None:
+        """
+        用于保持 y-websocket 连接活跃的心跳包。
+        y-websocket 会根据最后一次收到的 ws 消息的时间决定要不要断开连接，但是断开后又会重连。
+        https://github.com/yjs/y-websocket/blob/4bf25a69f01b8d845d1e15b95beb273b64a3cedc/src/y-websocket.js#L393
+        这里的 b'\x00\x02\x02\x00\x00' 是一个合法的 UPDATE 包，不做任何更新，在这里用于保持连接活跃。
+        """
+
+        heartbeat = b'\x00\x02\x02\x00\x00'
+        try:
+            while True:
+                await asyncio.sleep(25)
+                try:
+                    await ws.send(heartbeat)
+                except (ConnectionClosed, WebsocketClosed):
+                    break
+        except asyncio.CancelledError:
+            pass
 
     async def _handle_message(
         self, room: SyncRoom, ws: Websocket, data: bytes, extra: dict[str, Any] | None = None
