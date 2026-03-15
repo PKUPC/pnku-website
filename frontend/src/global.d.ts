@@ -13,4 +13,7 @@ interface Window {
         setInputAnswer: (v: string) => void;
         reloadPuzzleDetail: () => void;
     };
+    exports: {
+        React: typeof import('react');
+    };
 }

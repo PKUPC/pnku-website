@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 build
+build_remote
 dist
 dist-ssr
 *.local

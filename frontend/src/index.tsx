@@ -9,6 +9,10 @@ import { ThemeContextProvider } from '@/logic/ThemeContext.tsx';
 import App from './App.tsx';
 import './globals.css';
 
+window.exports = {
+    React,
+};
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <AppErrorBoundary>
