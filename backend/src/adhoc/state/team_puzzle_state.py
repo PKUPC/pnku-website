@@ -144,7 +144,7 @@ class TeamPuzzleState:
 
     def check_puzzle_state_update(
         self,
-        param: dict[str, str | int],
+        param: dict[str, Any],
         stored_user_log: Callable[[str, str, str, dict[str, int | str | bool]], None],
     ) -> dict[str, str] | None:
         """
@@ -154,7 +154,7 @@ class TeamPuzzleState:
         """
         return None
 
-    def update_puzzle_state(self, old_state: dict[str, Any], param: dict[str, str | int]) -> dict[str, Any]:
+    def update_puzzle_state(self, old_state: dict[str, Any], param: dict[str, Any]) -> dict[str, Any]:
         """
         更新 stored state，由特殊题目自定义更新逻辑。
         """
