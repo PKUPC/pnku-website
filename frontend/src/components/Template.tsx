@@ -2,6 +2,7 @@ import { ConfigProvider, Image } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import parse from 'html-react-parser';
 import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { Link } from 'react-router';
 import useSWR from 'swr';
 
 import NotFound from '@/app/NotFound.tsx';
@@ -36,8 +37,11 @@ export function TemplateStr({ name, children }: { name: string; children: string
                                     </div>
                                 );
                             }
-                        }
-                        if (domNode.attribs.class.includes('template-remote-component')) {
+                        } else if (domNode.attribs.class.includes('template-navigate-link')) {
+                            const text = domNode.attribs['data-text'];
+                            const href = domNode.attribs['data-href'];
+                            return <Link to={href}>{text}</Link>;
+                        } else if (domNode.attribs.class.includes('template-remote-component')) {
                             const name = domNode.attribs['data-name'];
                             const url = domNode.attribs['data-url'];
                             let props = {};
@@ -49,6 +53,12 @@ export function TemplateStr({ name, children }: { name: string; children: string
                                 props = {};
                             }
                             return <RemoteComponent componentName={name} componentUrl={url} {...props} />;
+                        }
+                    } else if (domNode.type === 'tag' && domNode.tagName === 'span' && domNode.attribs?.class) {
+                        if (domNode.attribs.class.includes('template-navigate-link')) {
+                            const text = domNode.attribs['data-text'];
+                            const href = domNode.attribs['data-href'];
+                            return <Link to={href}>{text}</Link>;
                         }
                     }
                 },

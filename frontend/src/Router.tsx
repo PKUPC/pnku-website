@@ -40,6 +40,7 @@ import { Loading } from '@/components/Loading.tsx';
 import { Header } from '@/components/layout/Header.tsx';
 
 import { PublicPage } from './app/(general)/puzzle/PublicPuzzlePage';
+import { ComponentPage } from './app/component/page';
 
 function AppLayout() {
     console.debug('Rendering AppLayout');
@@ -64,6 +65,7 @@ const routes: RouteObject[] = [
             { path: '/area/:areaName', element: <AreaPage /> },
             { path: '/puzzle-list', element: <PuzzleListPage /> },
             { path: '/story-list', element: <StoryListPage /> },
+            { path: '/component', element: <ComponentPage /> },
             {
                 element: <GeneralLayout />,
                 children: [
