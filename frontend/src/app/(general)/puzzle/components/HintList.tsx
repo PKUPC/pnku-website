@@ -69,10 +69,7 @@ function LockedHint({
                 return (
                     <span key={priceItem.type}>
                         {(priceItem.price / currency.denominator).toFixed(currency.precision)} {currency.name}{' '}
-                        <NamedIcon
-                            iconName={currency.icon}
-                            style={{ color: 'transparent', transform: 'translateY(0.1em)' }}
-                        />
+                        <NamedIcon iconName={currency.icon} />
                     </span>
                 );
             }
