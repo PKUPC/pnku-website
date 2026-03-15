@@ -90,6 +90,7 @@ class PuzzleView(BaseView):
     def _export_puzzle(puzzle: PuzzleStore) -> dict[str, Any]:
         return {
             'key': puzzle.key,
+            'slug': puzzle.slug,
             'title': puzzle.title,
             'category': puzzle.category,
             'subcategory': puzzle.subcategory,
@@ -105,6 +106,7 @@ class PuzzleView(BaseView):
     @staticmethod
     def _import_puzzle(data: dict[str, Any], puzzle: PuzzleStore) -> None:
         puzzle.key = data['key']
+        puzzle.slug = data['slug']
         puzzle.title = data['title']
         puzzle.category = data['category']
         puzzle.subcategory = data['subcategory']

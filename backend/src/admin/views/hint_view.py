@@ -21,10 +21,20 @@ class HintView(BaseView):
     can_create = True
     can_delete = False
 
-    column_list = ['id', 'enable', 'effective_after_ts', 'puzzle_key', 'type', 'question', 'answer', 'extra']
+    column_list = [
+        'id',
+        'sorting_index',
+        'enable',
+        'effective_after_ts',
+        'puzzle_key',
+        'type',
+        'question',
+        'answer',
+        'extra',
+    ]
     column_display_pk = True
     column_searchable_list = ['puzzle_key']
-    column_default_sort = ('id', False)
+    column_default_sort = 'sorting_index'
 
     column_descriptions = {
         'extra': '额外的自定义信息',
