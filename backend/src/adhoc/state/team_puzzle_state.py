@@ -117,6 +117,7 @@ class TeamPuzzleState:
         self.submission_set: set[str] = set()
 
         self.correct_answers: list[str] = []
+        self.triggered_milestone_count: int = 0
 
     @property
     def passed(self) -> bool:
@@ -130,6 +131,16 @@ class TeamPuzzleState:
         return self.game.puzzle_states.puzzle_state_store_by_puzzle_key_and_team_id.get(
             (self.puzzle.model.key, self.team.model.id), None
         )
+
+    @property
+    def total_milestone_count(self) -> int:
+        """
+        里程碑数量，特殊题目可能需要自定义这个数量。
+        """
+        if self.puzzle.model.puzzle_metadata.manual_milestone_count is not None:
+            return self.puzzle.model.puzzle_metadata.manual_milestone_count
+
+        return sum(1 for trigger in self.puzzle.model.triggers if trigger.type == 'milestone')
 
     def check_puzzle_state_update(
         self,
@@ -178,6 +189,8 @@ class TeamPuzzleState:
                 self.handle_wrong_submission(submission)
             case 'pass':
                 self.correct_answers.append(submission.result.trigger_value)
+            case 'milestone':
+                self.triggered_milestone_count += 1
 
     def test_submission(self, submission: str) -> SubmissionResult:
         cleaned_submission = utils.clean_submission(submission)
