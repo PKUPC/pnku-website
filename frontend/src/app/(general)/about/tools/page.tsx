@@ -1,5 +1,5 @@
-import { SimpleTemplateFile } from '@/components/Template';
+import { TemplateFile } from '@/components/Template';
 
 export function ToolsPage() {
-    return <SimpleTemplateFile name={'tools'} />;
+    return <TemplateFile name={'tools'} />;
 }

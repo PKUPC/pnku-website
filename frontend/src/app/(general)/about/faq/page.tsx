@@ -1,5 +1,5 @@
-import { SimpleTemplateFile } from '@/components/Template';
+import { TemplateFile } from '@/components/Template';
 
 export function FaqPage() {
-    return <SimpleTemplateFile name={'faq'} />;
+    return <TemplateFile name={'faq'} />;
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import NotFound from '@/app/NotFound';
-import { SimpleTemplateFile } from '@/components/Template';
+import { TemplateFile } from '@/components/Template';
 import { ARCHIVE_MODE } from '@/constants';
 import { Wish } from '@/types/wish.ts';
 
@@ -20,7 +20,7 @@ export function Solution({ templateKey }: { templateKey: string }) {
                 if (!clear) setClear(true);
             }}
         >
-            <SimpleTemplateFile name={templateKey} />
+            <TemplateFile name={templateKey} />
         </div>
     );
 }
