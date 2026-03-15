@@ -23,7 +23,10 @@ class CurrencyState:
     icon: str = 'DEFAULT'
     currency_type: CurrencyType
 
-    # TODO: 这两个字段尚未使用，目前仅作保留
+    # 是否随时间增长
+    increase_by_time: bool = True
+
+    # TODO: 这两个字段的功能尚未实现，目前仅作保留
     # 是否可以被 staff 修改
     can_modify: bool = True
     # 是否显示货币变动记录
@@ -107,7 +110,7 @@ class CurrencyState:
 
         self.change_event.append(event)
 
-    def get_currency_history(self, with_time_based_changes: bool = True) -> list[dict[str, str | int]]:
+    def get_currency_history(self) -> list[dict[str, str | int]]:
         """
         获取货币的历史变动记录
 
@@ -135,7 +138,7 @@ class CurrencyState:
                 }
             )
 
-        if with_time_based_changes:
+        if self.increase_by_time:
             # 随时间增长总量为 accumulated_time_based_changes + 从上次 event 到现在的增长量
             cur_timestamp_s = int(time.time())
             current_policy = self.increase_policy_from_last_event()

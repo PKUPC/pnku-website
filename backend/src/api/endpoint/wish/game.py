@@ -169,6 +169,7 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
                     'icon': CurrencyTypeToClass[currency_type].icon,
                     'denominator': CurrencyTypeToClass[currency_type].denominator,
                     'precision': CurrencyTypeToClass[currency_type].precision,
+                    'increaseByTime': CurrencyTypeToClass[currency_type].increase_by_time,
                 }
             )
 
