@@ -10,6 +10,8 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import svgr from 'vite-plugin-svgr';
 import zlib from 'zlib';
 
+import { remoteComponentPlugin } from './vite-plugin-remote-component';
+
 export default defineConfig(({}) => {
     const componentName = process.argv.find((arg) => arg.startsWith('--component='))?.split('=')[1] ?? 'HelloWorld';
     console.info(`Trying to build ${componentName}`);
@@ -68,6 +70,15 @@ export default defineConfig(({}) => {
             legalComments: 'none',
         },
         plugins: [
+            remoteComponentPlugin({
+                libraries: [
+                    {
+                        packageName: 'react',
+                        globalName: 'window.exports.React',
+                    },
+                ],
+                debug: true,
+            }),
             react({
                 jsxRuntime: 'classic',
             }),
