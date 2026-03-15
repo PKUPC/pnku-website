@@ -109,6 +109,7 @@ MEDIA_PATH = pathlib.Path(BASE_PATH + '/media').resolve()  # 原始 MEDIA 文件
 EXPORT_MEDIA_PATH = pathlib.Path(BASE_PATH + '/m').resolve()  # 对外暴露的 MEDIA，对文件名做了哈希，自动生成
 SYBIL_LOG_PATH = pathlib.Path(BASE_PATH + '/sybil_log').resolve()
 EXTRA_DATA_PATH = pathlib.Path(BASE_PATH + '/extra').resolve()
+SYNC_LEVELDB_PATH = pathlib.Path(BASE_PATH + '/leveldb/sync').resolve()
 
 # windows 上的 pyzmq 可能用不了 ipc，在 windows 上开发时可以使用 tcp
 # GLITTER_ACTION_SOCKET_ADDR = 'tcp://localhost:10000'
@@ -125,6 +126,15 @@ WORKER_API_SERVER_KWARGS = lambda idx0: {  # will be passed to `Sanic.run` # noq
     'port': 10010 + idx0,
     'debug': False,
     'access_log': False,  # nginx already does this. disabling sanic access log makes it faster.
+}
+
+# syncer 设置
+USE_SYNCER = True
+SYNCER_KWARGS = {
+    'host': '127.0.0.1',
+    'port': 10011,
+    'debug': False,
+    'access_log': False,
 }
 
 # flask admin 的端口

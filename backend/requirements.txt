@@ -7,7 +7,9 @@ aiosmtplib==4.0.2
 annotated-types==0.7.0
     # via pydantic
 anyio==4.11.0
-    # via httpx
+    # via
+    #   httpx
+    #   pycrdt
 bleach==6.2.0
     # via backend
 bleach-allowlist==1.0.3
@@ -85,10 +87,14 @@ markupsafe==3.0.3
     #   wtforms
 multidict==6.7.0
     # via sanic
+plyvel-ci==1.5.1
+    # via backend
 psutil==7.1.0
     # via backend
 pycparser==2.23 ; (implementation_name == 'pypy' and platform_python_implementation != 'CPython') or (implementation_name != 'PyPy' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (implementation_name == 'pypy' and sys_platform != 'win32')
     # via cffi
+pycrdt==0.12.42
+    # via backend
 pydantic==2.12.0
     # via backend
 pydantic-core==2.41.1

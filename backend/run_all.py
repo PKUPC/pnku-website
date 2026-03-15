@@ -3,8 +3,9 @@ import multiprocessing
 import time
 
 from run_reducer_admin import start_reducer_admin
+from run_syncer import start_syncer
 from run_worker_api import start_worker_api
-from src import utils
+from src import secret, utils
 
 
 if __name__ == '__main__':
@@ -17,6 +18,10 @@ if __name__ == '__main__':
         time.sleep(2)
         worker_processes = start_worker_api()
         process_list = [reducer_process] + worker_processes
+        if secret.USE_SYNCER:
+            syncer_process = start_syncer()
+            process_list.append(syncer_process)
+
         for process in process_list:
             process.join()
 

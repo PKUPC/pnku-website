@@ -22,6 +22,7 @@ class PuzzleMetadataModel(BaseModel):
     story_before: str | None = Field(default=None)
     story_after: str | None = Field(default=None)
     solution: str | None = Field(default=None)
+    use_sync: bool = Field(default=False)
 
 
 class MediaActionModel(BaseModel):
