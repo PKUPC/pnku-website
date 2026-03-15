@@ -26,6 +26,10 @@ PLAYGROUND_MODE = False
 # 是否开启 RECAPTCHA
 USE_RECAPTCHA = False
 
+# 是否使用 secure cookie，开启时在 http 环境下会导致 set cookie 无法生效
+# 开发时可能会在局域网中用其他设备访问本地开发服务器（例如测试手机访问等），此时可能需要关闭
+USE_SECURE_COOKIE = True
+
 # 队伍人数限制
 TEAM_MAX_MEMBER = 5
 
