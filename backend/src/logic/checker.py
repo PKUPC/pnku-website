@@ -76,6 +76,34 @@ class Checker:
 
         return None
 
+    @on_action(glitter.UpdatePuzzleStateReq)
+    async def on_update_puzzle_state(
+        self, req: glitter.UpdatePuzzleStateReq, http_req: Request | None = None
+    ) -> dict[str, str] | None:
+        # 这里已经保证了 used_id team_id puzzle_key 的合法性
+        team = self.game.teams.team_by_id[req.team_id]
+        puzzle = self.game.puzzles.puzzle_by_key[req.puzzle_key]
+        if puzzle.model.key not in team.game_state.unlock_puzzle_keys:
+            store_user_log(
+                http_req,
+                'checker.on_update_puzzle_state',
+                'abnormal',
+                '试图更新未解锁的题目状态。',
+                {
+                    'user_id': req.user_id,
+                    'team_id': req.team_id,
+                    'puzzle_key': req.puzzle_key,
+                    'content': str(req.content),
+                },
+            )
+            return {'status': 'error', 'title': 'BAD_REQUEST', 'message': '非法操作！异常行为已记录！'}
+
+        puzzle_state = team.game_state.puzzle_state_by_key[puzzle.model.key]
+
+        return puzzle_state.check_puzzle_state_update(
+            req.content, lambda module, event, message, extra: store_user_log(http_req, module, event, message, extra)
+        )
+
     @on_action(glitter.SubmitAnswerReq)
     async def on_team_submit_answer(
         self, req: glitter.SubmitAnswerReq, http_req: Request | None = None

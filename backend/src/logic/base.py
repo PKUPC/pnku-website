@@ -310,6 +310,15 @@ class StateContainerBase(ABC):
         self._game.team_events.append(team_event)
         self._game.on_team_event(team_event)
 
+    @on_event(glitter.EventType.UPDATE_PUZZLE_STATE)
+    def on_update_puzzle_state(self, event: glitter.Event) -> None:
+        puzzle_state_store = self.load_one_data(PuzzleStateStore, event.data)
+        assert puzzle_state_store is not None
+        self._game.puzzle_states.on_store_update(puzzle_state_store)
+        team = self._game.teams.team_by_id[puzzle_state_store.team_id]
+        puzzle_state = team.game_state.puzzle_state_by_key[puzzle_state_store.puzzle_key]
+        puzzle_state.after_update_puzzle_state()
+
     @on_event(glitter.EventType.STAFF_READ_MSG)
     def on_staff_read_message(self, event: glitter.Event) -> None:
         msg_store = self.load_one_data(MessageStore, event.data)
