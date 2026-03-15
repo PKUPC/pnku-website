@@ -73,6 +73,7 @@ class SpeedRunBoard(Board):
         match reloading_type:
             case 'all':
                 self.clear_render_cache()
+                self.time_cost = {}
 
     def on_team_event(self, event: TeamEvent, is_reloading: bool) -> None:
         match event.model.info:
