@@ -10,7 +10,7 @@ import { GameStatusContextProvider } from '@/logic/GameStatusContext';
 import { GameSettingContextProvider } from '@/logic/SiteSettingContext.tsx';
 import { WindowInfoContextProvider } from '@/logic/WindowInfoContext.tsx';
 import { PushDaemonWrapper } from '@/logic/WsDaemon';
-import { GameInfoContext, useSuccessGameInfo, useTheme } from '@/logic/contexts.ts';
+import { GameInfoContext, useSuccessGameInfo, useTheme, useWindowInfo } from '@/logic/contexts.ts';
 import { wish } from '@/logic/wish.ts';
 import { setup } from '@/setup.ts';
 import { mixColor } from '@/utils.ts';
@@ -60,6 +60,7 @@ function App({ children }: { children: ReactNode }) {
             useYArray,
             useParams,
             useLocation,
+            useWindowInfo,
         };
         window.components = {
             Loading,
