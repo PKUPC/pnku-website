@@ -42,7 +42,7 @@ jobs:
         name: Install Node.js
         if: steps.frontend-check.outputs.has_changes == 'true'
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
           cache-dependency-path: 'frontend/pnpm-lock.yaml'
 
