@@ -23,6 +23,8 @@ dependencies = [
     "pytz>=2025.2",
     "email-validator>=2.2.0,<3.0",
     "gevent>=25.5.0,<26.0",
+    "plyvel-ci>=1.5.1",
+    "pycrdt>=0.12.42",
 ]
 
 [dependency-groups]

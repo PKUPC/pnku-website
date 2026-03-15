@@ -26,6 +26,10 @@ upstream backend_worker {
 {%- endfor %}
 }
 
+upstream backend_syncer {
+    server {{ syncer_ip }}:{{ syncer_port }} fail_timeout=0s;
+}
+
 server {
     listen 80;
     server_name _;
@@ -94,6 +98,20 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
     }
+    {%- if use_syncer %}
+
+    location /service/sync {
+        proxy_pass      http://backend_syncer/service/sync;
+        proxy_http_version 1.1;
+        proxy_redirect $host/ $http_host/;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+    {%- endif %}
 
     location {{ admin_url }}/ {
         if ($cookie_admin_2fa != '{{ admin_2fa }}') {
@@ -134,5 +152,8 @@ print(
         admin_url=secret.ADMIN_URL,
         admin_2fa=secret.ADMIN_2FA_COOKIE,
         hide_media=hide_media,
+        use_syncer=secret.USE_SYNCER,
+        syncer_ip=secret.SYNCER_KWARGS['host'],
+        syncer_port=secret.SYNCER_KWARGS['port'],
     )
 )

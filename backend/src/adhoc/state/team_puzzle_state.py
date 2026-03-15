@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Hashable
+from collections.abc import Awaitable, Callable, Coroutine, Hashable
 from typing import TYPE_CHECKING, Any
+
+from pycrdt import Doc, TransactionEvent
 
 from src import secret, utils
 from src.adhoc.constants import PuzzleVisibleStatusLiteral
@@ -9,7 +11,10 @@ from src.store import PuzzleActionEvent, PuzzleStateStore
 
 
 if TYPE_CHECKING:
+    from sanic import Websocket
+
     from src.state import Puzzle, Submission, Team
+    from src.sync.core.room_manager import SyncRoom
 
     from .team_game_state import TeamGameState
 
@@ -149,6 +154,21 @@ class TeamPuzzleState:
         在更新 stored state 后调用，由特殊题目自定义调用逻辑。
         """
         pass
+
+    def get_custom_sync_handler(
+        self,
+    ) -> Callable[[SyncRoom, Websocket, bytes, dict[str, Any] | None], Coroutine[Any, Any, None]] | None:
+        return None
+
+    def get_custom_sync_doc_initializer(self) -> Callable[[SyncRoom, Doc[Any]], None] | None:
+        return None
+
+    def get_custom_sync_observer_maker(
+        self,
+    ) -> (
+        Callable[[SyncRoom], Callable[[TransactionEvent], None] | Callable[[TransactionEvent], Awaitable[None]]] | None
+    ):
+        return None
 
     def on_submission(self, submission: Submission, is_reloading: bool = False) -> None:
         assert submission.cleaned_content not in self.submission_set
