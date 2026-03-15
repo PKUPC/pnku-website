@@ -475,26 +475,12 @@ class Reducer(StateContainerBase):
             session.commit()
             self.state_counter += 1
         tid: int = team_event.id
-        # 理论上应当在添加完成 team event 之后读取结果，但是有点麻烦，因为没做 team_event_by_id
-        # 先 test 应当是一样的
+
+        # 这里逻辑上应该保证 test_submission 的结果和这个 event emit 之后处理的结果是一致的
+        # 在目前的调用顺序中应该自然是一致的
         submission_result = user.team.game_state.test_submission(req.puzzle_key, req.content)
         await self.emit_event(glitter.Event(glitter.EventType.NEW_SUBMISSION, self.state_counter, tid))
-
-        res = {'status': 'error', 'title': '未知错误！', 'message': '请联系网站管理员。'}
-
-        if submission_result.type == 'wrong':
-            res = {'status': 'error', 'title': '答案错误！', 'message': '答案错误！你没有得到任何信息！'}
-        elif submission_result.type == 'milestone':
-            res = {'status': 'info', 'title': '里程碑！', 'message': f'你收到了一条信息：\n{submission_result.info}'}
-        elif submission_result.type == 'pass':
-            res = {'status': 'success', 'title': '答案正确！', 'message': f'{submission_result.info}'}
-        elif submission_result.type == 'multipass':
-            res = {'status': 'success', 'title': '答案正确！', 'message': f'{submission_result.info}'}
-        elif submission_result.type == 'staff_pass':
-            res = {'status': 'success', 'title': '答案正确！', 'message': f'{submission_result.info}'}
-        elif submission_result.type == 'staff_wrong':
-            res = {'status': 'error', 'title': '答案错误！', 'message': f'{submission_result.info}'}
-        return res
+        return submission_result.describe_response()
 
     @on_action(glitter.TeamBuyHintReq)
     async def on_team_buy_hint(self, req: glitter.TeamBuyHintReq) -> str | None:
