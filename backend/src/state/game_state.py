@@ -11,7 +11,7 @@ from .base import WithGameLifecycle
 from .game_policy_state import GamePolicy
 from .hint_state import Hints
 from .message_state import Messages
-from .puzzle_state import Puzzles
+from .puzzle_state import PuzzleStates, Puzzles
 from .submission_state import Submission
 from .team_event_state import TeamEvent
 from .team_state import Teams
@@ -28,6 +28,7 @@ if TYPE_CHECKING:
         GamePolicyStore,
         HintStore,
         MessageStore,
+        PuzzleStateStore,
         PuzzleStore,
         TeamEventStore,
         TeamStore,
@@ -50,6 +51,7 @@ class Game(WithGameLifecycle):
         team_stores: list[TeamStore],
         message_stores: list[MessageStore],
         puzzle_stores: list[PuzzleStore],
+        puzzle_state_stores: list[PuzzleStateStore],
         hint_stores: list[HintStore],
         team_event_stores: list[TeamEventStore],
         ticket_stores: list[TicketStore],
@@ -61,25 +63,30 @@ class Game(WithGameLifecycle):
         self.cur_tick: int = cur_tick
         self.need_updating_scoreboard: bool = False
         self.need_reload_team_event: bool = True
+
         # puzzle key hash
         self.team_and_key_to_hash: dict[tuple[int, str], str] = {}
         self.hash_to_team_and_key: dict[str, tuple[int, str]] = {}
         self.puzzle_key_to_hash: dict[str, str] = {}
         self.hash_to_puzzle_key: dict[str, str] = {}
+
         # hint id hash
         self.hint_id_to_hash: dict[int, int] = {}
         self.hash_to_hint_id: dict[int, int] = {}
+
         # submission 是一个特殊的状态
         # submission 应该是 team event 中的一种，但是合并进去又会让处理变得很麻烦
         # 这里的 submission 相当于是 SubmissionEvent 附带的一个状态对象，在 on_team_event 时更新
         self.submission_list: list[Submission] = []
         self.submissions_by_id: dict[int, Submission] = {}
         self.submissions_by_puzzle_key: dict[str, list[Submission]] = {}
+
         # 以下是独立的 State，不需要考虑构造顺序
         self.trigger: Trigger = Trigger(self, trigger_stores)
         self.policy: GamePolicy = GamePolicy(self, game_policy_stores)
         self.announcements: Announcements = Announcements(self, announcement_stores)
         self.puzzles: Puzzles = Puzzles(self, puzzle_stores)
+        self.puzzle_states: PuzzleStates = PuzzleStates(self, puzzle_state_stores)
         # user 表中存了 team_id，而 team 表中没有存 user 信息
         # 因此在恢复时，需要先创建出队伍的 State，然后在创建 UserState 时查找对应的队伍并建立二者之间的联系
         self.teams: Teams = Teams(self, team_stores)
