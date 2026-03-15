@@ -6,7 +6,7 @@
 
 @custom-variant not-last (&:not(:last-child));
 
-@plugin "daisyui" {
+@plugin 'daisyui' {
   themes: light, corporate, cupcake, dark, dracula, luxury;
 }
 
