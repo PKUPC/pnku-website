@@ -100,7 +100,18 @@ async def _register_or_reset(
     login_key = 'email:' + email
     user = worker.game.users.user_by_login_key.get(login_key)
 
+    # 新用户注册
     if user is None:
+        if secret.EMAIL_REG_PERMISSION:
+            if email not in secret.VALID_EMAILS:
+                raise AuthError('注册限制已启用，该邮箱禁止注册！')
+
+        if not worker.game_nocheck.policy.cur_policy_model.feature.user_register.is_enabled(
+            worker.game_nocheck.cur_tick
+        ):
+            if email not in secret.VALID_EMAILS:
+                raise AuthError('当前不是可注册时间！')
+
         salt = utils.gen_random_str(16, crypto=True)
         jwt_salt = utils.gen_random_str(4, crypto=True)
         if secret.MANUAL_AUTH_ENABLED and email in secret.MANUAL_PASSWORDS:

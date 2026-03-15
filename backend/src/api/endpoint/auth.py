@@ -57,20 +57,15 @@ class AuthEmailRegParam(BaseModel):
 async def auth_email_reg(_req: Request, body: AuthEmailRegParam, _worker: Worker) -> AuthResponse:
     if not secret.EMAIL_AUTH_ENABLE:
         raise AuthError('邮箱登录已禁用')
+    if secret.USE_RECAPTCHA and not (await utils.check_recaptcha_response(body.captcha)):
+        raise AuthError('reCAPTCHA验证错误')
     try:
         email_validator.validate_email(body.email, check_deliverability=False)
     except email_validator.EmailNotValidError:
         raise AuthError('非法的邮箱地址')
-    if secret.USE_RECAPTCHA and not (await utils.check_recaptcha_response(body.captcha)):
-        raise AuthError('reCAPTCHA验证错误')
     VAL_EMAIL = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
     if not VAL_EMAIL.match(body.email):
         raise AuthError('邮箱格式错误')
-    if secret.EMAIL_REG_PERMISSION:
-        if body.email.lower() not in secret.VALID_EMAILS:
-            raise AuthError('注册限制已启用，该邮箱禁止注册')
-    # print(body.email.lower())
-    # print(str(body.email.lower()))
 
     return f'{body.email.lower()}', {}, 'register'
 
