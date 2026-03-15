@@ -68,6 +68,7 @@ export default defineConfig(({ mode }) => {
                             'swr',
                             'colorjs.io',
                             'tailwind-merge',
+                            'react-h5-audio-player',
                         ],
                         antd: [
                             'antd/es/form',
