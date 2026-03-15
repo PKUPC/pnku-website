@@ -1,4 +1,20 @@
-import { Button, ConfigProvider, Image, Input, InputNumber, Modal, Popconfirm, Slider, message } from 'antd';
+import {
+    Alert,
+    Button,
+    Checkbox,
+    ConfigProvider,
+    Image,
+    Input,
+    InputNumber,
+    Modal,
+    Popconfirm,
+    Select,
+    Slider,
+    Switch,
+    Tag,
+    Tooltip,
+    message,
+} from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import React, { ReactNode, useContext, useEffect } from 'react';
 import { useLocation, useParams } from 'react-router';
@@ -38,15 +54,28 @@ function App({ children }: { children: ReactNode }) {
     console.log(style);
 
     useEffect(() => {
-        // TODO: 这两个之后需要删除，统一到 window.websiteUtils 中
-        window.wish = wish;
-        window.messageApi = messageApi;
-
         window.recaptchaOptions = {
             useRecaptchaNet: true,
         };
         window.exports = {
             React,
+            AntDesign: {
+                Alert,
+                Button,
+                Checkbox,
+                ConfigProvider,
+                Image,
+                Input,
+                InputNumber,
+                Modal,
+                Popconfirm,
+                Select,
+                Slider,
+                Switch,
+                Tag,
+                Tooltip,
+                message,
+            },
         };
         window.websiteUtils = {
             wish,
@@ -66,14 +95,8 @@ function App({ children }: { children: ReactNode }) {
             Loading,
             WishError,
             SyncTextarea,
-            Button,
-            Image,
-            Modal,
-            Popconfirm,
-            Input,
-            InputNumber,
-            Slider,
         };
+        window.adhoc = {};
 
         console.log(window.rem);
         console.log(window.ram);
