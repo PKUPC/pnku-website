@@ -73,6 +73,12 @@ export namespace WsClient {
         message: string;
     };
 
+    export type WishMutate = {
+        type: 'wish_mutate';
+        endpoint: string;
+        payload: any;
+    };
+
     export type WsData =
         | NewAnnouncementData
         | UpdateAnnouncements
@@ -85,5 +91,6 @@ export namespace WsClient {
         | NewTicketData
         | NewTicketMessageData
         | TicketStatusUpdate
-        | PuzzleErrata;
+        | PuzzleErrata
+        | WishMutate;
 }

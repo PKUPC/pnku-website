@@ -274,6 +274,20 @@ export class PushClient {
                 });
                 break;
             }
+            case 'wish_mutate': {
+                if (!data.payload) {
+                    this.swrMutate({
+                        endpoint: data.endpoint,
+                    }).then();
+                } else {
+                    this.swrMutate({
+                        endpoint: data.endpoint,
+                        payload: data.payload,
+                    }).then();
+                }
+
+                break;
+            }
         }
     }
 
