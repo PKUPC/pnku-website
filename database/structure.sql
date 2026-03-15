@@ -138,6 +138,23 @@ CREATE TABLE `puzzle`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for puzzle_state
+-- ----------------------------
+DROP TABLE IF EXISTS `puzzle_state`;
+CREATE TABLE `puzzle_state`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `updated_at` bigint(20) NOT NULL,
+  `puzzle_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `team_id` int(11) NOT NULL,
+  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_puzzle_team` (`puzzle_key`,`team_id`) USING BTREE,
+  INDEX `idx_puzzle_key`(`puzzle_key`) USING BTREE,
+  INDEX `idx_team_id`(`team_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for team
 -- ----------------------------
 DROP TABLE IF EXISTS `team`;
