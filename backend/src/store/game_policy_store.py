@@ -49,6 +49,55 @@ class GamePolicyStoreModel(BaseModel):
     effective_after: int
     json_policy: PolicyModel
 
+    @classmethod
+    def need_reload_team_event(cls, old_model: GamePolicyStoreModel, new_model: GamePolicyStoreModel) -> bool:
+        """
+        检查是否需要 reload team event。
+        目前只检查 currency_increase_policy 字段，判断条件为改变的项的时间是否至少距离现在 3 分钟。
+        """
+        old_policy = old_model.json_policy.currency_increase_policy
+        new_policy = new_model.json_policy.currency_increase_policy
+
+        # 获取当前时间（分钟级别）
+        current_time_min = int(time.time()) // 60
+        min_future_minutes = 3  # 至少 3 分钟
+
+        old_policy_dict: dict[CurrencyType, list[CurrencyIncreasePolicy]] = {}
+        for item in old_policy:
+            old_policy_dict[item.type] = item.increase_policy
+
+        # 检查每种货币类型
+        for new_item in new_policy:
+            currency_type = new_item.type
+            new_increase_policy = new_item.increase_policy
+            old_increase_policy = old_policy_dict.get(currency_type, [])
+
+            old_policy_set = {(item.begin_time_min, item.increase_per_min) for item in old_increase_policy}
+            new_policy_set = {(item.begin_time_min, item.increase_per_min) for item in new_increase_policy}
+
+            diff_set = (old_policy_set | new_policy_set) - (old_policy_set & new_policy_set)
+
+            if len(diff_set) == 0:
+                continue
+
+            # 分析时间最小的变化项
+            min_diff_item = min(diff_set, key=lambda x: x[0])
+
+            print(diff_set)
+
+            # model 中的时间一定是合法的
+            date_obj = datetime.strptime(min_diff_item[0], '%Y-%m-%d %H:%M')
+            time_min = int(time.mktime(date_obj.timetuple())) // 60
+            if time_min < current_time_min + min_future_minutes:
+                return True
+
+        new_policy_types = {item.type for item in new_policy}
+        old_policy_types = {item.type for item in old_policy}
+        if not new_policy_types.issuperset(old_policy_types):
+            return True
+
+        return False
+
 
 class GamePolicyStore(Table):
     __tablename__ = 'game_policy'

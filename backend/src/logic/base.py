@@ -184,9 +184,9 @@ class StateContainerBase(ABC):
     def on_reinit(self, _event: glitter.Event) -> None:
         self.debug_reinit = True
 
-    @on_event(glitter.EventType.RELOAD_GAME_POLICY)
-    def on_reload_game_policy(self, _event: glitter.Event) -> None:
-        self._game.policy.on_store_reload(self.load_all_data(GamePolicyStore))
+    @on_event(glitter.EventType.UPDATE_GAME_POLICY)
+    def on_reload_game_policy(self, event: glitter.Event) -> None:
+        self._game.policy.on_store_update(event.data, self.load_one_data(GamePolicyStore, event.data))
 
     @on_event(glitter.EventType.RELOAD_TRIGGER)
     def on_reload_trigger(self, _event: glitter.Event) -> None:
@@ -476,8 +476,8 @@ class StateContainerBase(ABC):
 
     def reload_or_update_if_needed(self) -> None:
         if self._game.need_reload_team_event:
-            self.log('debug', 'base.reload_scoreboard_if_needed', 'need_reload_team_event')
-            with utils.log_slow(self.log, 'base.reload_scoreboard_if_needed', 'need_reload_team_event'):
+            self.log('info', 'base.need_reload_team_event', 'need_reload_team_event')
+            with utils.log_slow(self.log, 'base.need_reload_team_event', 'need_reload_team_event'):
                 self._game.on_preparing_to_reload_team_event()
                 for team_event in self._game.team_events:
                     self._game.on_team_event(team_event, is_reloading=True)
@@ -485,8 +485,8 @@ class StateContainerBase(ABC):
             self._game.need_reload_team_event = False
             self._game.need_updating_scoreboard = False
         elif self._game.need_updating_scoreboard:
-            self.log('debug', 'base.reload_scoreboard_if_needed', 'need update')
-            with utils.log_slow(self.log, 'base.update_scoreboard_if_needed', 'update scoreboard'):
+            self.log('debug', 'base.need_updating_scoreboard', 'need_updating_scoreboard')
+            with utils.log_slow(self.log, 'base.need_updating_scoreboard', 'need_updating_scoreboard'):
                 self._game.on_team_event_reload_done()
             self._game.need_updating_scoreboard = False
 
