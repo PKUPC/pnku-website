@@ -22,6 +22,7 @@ const form_style = {
 export function TeamInfoCard({ data }: { data: StaffTeamDetail; reloadData: () => void }) {
     const [form] = Form.useForm();
     const [edit, set_edit] = useState(false);
+    const [messageApi, messageContextHolder] = message.useMessage();
 
     // form.in
 
@@ -40,11 +41,12 @@ export function TeamInfoCard({ data }: { data: StaffTeamDetail; reloadData: () =
     };
 
     const onUpdateTeamInfo = () => {
-        message.error('NOT IMPLEMENT').then();
+        messageApi.error('NOT IMPLEMENT').then();
     };
 
     return (
         <div className={styles.teamInfoCard}>
+            {messageContextHolder}
             <FancyCard title="队伍基本信息">
                 <Form form={form} name="team-info" {...form_style}>
                     <Form.Item name="team_id" label="队伍ID" initialValue={data.team_id}>
