@@ -88,7 +88,7 @@ requires-dist = [
     { name = "bleach-allowlist", specifier = ">=1.0,<2.0" },
     { name = "email-validator", specifier = ">=2.2.0,<3.0" },
     { name = "flask", specifier = ">=3.1,<4.0" },
-    { name = "flask-admin", specifier = "==2.0.0a5" },
+    { name = "flask-admin", specifier = "==2.0.0" },
     { name = "flask-sqlalchemy", specifier = ">=3.1,<4.0" },
     { name = "gevent", specifier = ">=25.5.0,<26.0" },
     { name = "httpx", extras = ["http2"], specifier = ">=0.28.0,<1.0" },
@@ -281,7 +281,7 @@ wheels = [
 
 [[package]]
 name = "flask-admin"
-version = "2.0.0a5"
+version = "2.0.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "flask" },
@@ -290,9 +290,9 @@ dependencies = [
     { name = "werkzeug" },
     { name = "wtforms" },
 ]
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5d/f5/99ebcd48adf1ee8bcb4833b8a2545dc2f385db65ae5574648442b75e8b59/flask_admin-2.0.0a5.tar.gz", hash = "sha256:3d6badd62b3bd77115596655033fb34ab0d2d044511672533a4add1719b771c6", size = 5528298, upload-time = "2025-10-09T13:16:48.708Z" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e4/78/7cf5a70ea875b1eb0aa26caa9954fa1c323dd808bebd5d28769b8715acea/flask_admin-2.0.0.tar.gz", hash = "sha256:c5878ab1ea92c9e8345c0e1a2cd15851f5ecf2e1616d7fb9158487769f188e81", size = 5528485, upload-time = "2025-10-25T08:57:20.083Z" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/f8/83/d3a71ee9f9d29bcdec7a9113d68e8c526c6f2dc9de4e710e3996605427fe/flask_admin-2.0.0a5-py3-none-any.whl", hash = "sha256:a1134fb04df7079dcf425abf7bebdc4c30efcb4444df9e7753b2c7724b417165", size = 6458887, upload-time = "2025-10-09T13:16:46.088Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/41/d2/e54d4aa3c865e5ccf7d5e2853fcaea27674829ea81706e6d37b15d81f3e1/flask_admin-2.0.0-py3-none-any.whl", hash = "sha256:3b2dc1f13c2ec450e2c9197f58cd684be5b96a9497e1ffb9d9efb9f7f59825f9", size = 6458454, upload-time = "2025-10-25T08:57:17.749Z" },
 ]
 
 [[package]]
