@@ -1,4 +1,4 @@
-from .email import send_email, send_reg_email
+from .email import exception_handler, send_email, send_reg_email
 from .enum import EnhancedEnum
 from .hash_tools import calc_md5, calc_sha1, hash_int
 from .http_tools import add_cookie
@@ -23,6 +23,7 @@ from .template import pure_render_template, render_template
 
 
 __all__ = [
+    'exception_handler',
     'send_email',
     'send_reg_email',
     'EnhancedEnum',

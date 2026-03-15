@@ -110,7 +110,12 @@ async def _register_or_reset(
         password_email_md5 = utils.calc_md5(password + login_key)
         password_md5 = utils.calc_md5(password_email_md5 + salt)
 
-        email_status, info = await utils.send_reg_email(password, email)
+        email_status, email_exception = await utils.send_reg_email(password, email)
+
+        if not email_status:
+            assert email_exception is not None, 'email_exception should not be None when email_status is False'
+            error_msg = utils.exception_handler(email_exception, worker.log)
+            raise AuthError(f'邮件发送失败：{error_msg}')
 
         rep = await worker.perform_action(
             glitter.UserRegReq(
@@ -133,11 +138,6 @@ async def _register_or_reset(
             user = worker.game.users.user_by_login_key.get(login_key)
             assert user is not None, 'user should be created'
             store_user_log(req, 'auth._register_or_reset', 'register', '', {'init_password': password, 'email': email})
-        elif not email_status:
-            store_user_log(
-                req, 'auth._register_or_reset', 'register_email_fail', '', {'init_password': password, 'email': email}
-            )
-            raise AuthError('重置密码成功，但是邮件发送失败了，请联系工作人员处理！')
         else:
             raise AuthError(f'注册账户失败：{rep.result}')
 
@@ -162,7 +162,12 @@ async def _register_or_reset(
         )  # md5 没那么安全，但是也没那么不安全，随机 salt + md5 应该够了
         cur_cnt += 1
 
-        email_status, info = await utils.send_reg_email(password, email)
+        email_status, email_exception = await utils.send_reg_email(password, email)
+
+        if not email_status:
+            assert email_exception is not None, 'email_exception should not be None when email_status is False'
+            error_msg = utils.exception_handler(email_exception, worker.log)
+            raise AuthError(f'邮件发送失败：{error_msg}')
 
         rep = await worker.perform_action(
             glitter.UserResetReq(
@@ -186,11 +191,6 @@ async def _register_or_reset(
             store_user_log(
                 req, 'auth._register_or_reset', 'reset_password', '', {'reset_password': password, 'email': email}
             )
-        elif not email_status:
-            store_user_log(
-                req, 'auth._register_or_reset', 'register_email_fail', '', {'init_password': password, 'email': email}
-            )
-            raise AuthError('重置密码成功，但是邮件发送失败了，请联系工作人员处理！')
         else:
             raise AuthError(f'重置密码失败：{rep.result}')
         pass

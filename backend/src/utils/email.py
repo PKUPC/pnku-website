@@ -1,12 +1,17 @@
+from collections.abc import Callable
 from email.header import Header
 from email.message import Message
 from email.mime.text import MIMEText
 
 import aiosmtplib
 
-from aiosmtplib.errors import SMTPTimeoutError
+from aiosmtplib.errors import (
+    SMTPRecipientRefused,
+    SMTPTimeoutError,
+)
 
 from src import secret
+from src.utils.logging import LogLevel
 
 
 _HTML_TEMPLATE = """
@@ -38,11 +43,42 @@ _HTML_TEMPLATE = """
 """
 
 
-# <class 'aiosmtplib.errors.SMTPDataError'>
-# (554, 'Reject by behaviour spamANTISPAM_BAT[01201311R2268S1430114234, maildocker-behaviorspam033045086103]: too frequently sending')
+def exception_handler(exception: Exception, logger: Callable[[LogLevel, str, str], None]) -> str:
+    """
+    处理邮件发送异常，记录日志并返回用户友好的错误消息。
+
+    Args:
+        exception: 捕获的异常对象
+        logger: 日志记录函数，格式为 log(level: str, module: str, message: str)
+
+    Returns:
+        返回给用户看的错误消息字符串
+    """
+    exception_type = type(exception).__name__
+    exception_msg = str(exception)
+
+    # 记录异常详细信息
+    logger('error', 'email.exception_handler', f'邮件发送异常: {exception_type} - {exception_msg}')
+
+    # 超时错误 - 可以给用户看
+    if isinstance(exception, SMTPTimeoutError):
+        return '邮件发送超时，请稍后再试。如果您反复遇到此问题，请联系工作人员。'
+
+    # 收件人被拒绝 - 可以给用户看
+    if isinstance(exception, SMTPRecipientRefused):
+        recipient = getattr(exception, 'recipient', '未知')
+        return f'邮箱地址 {recipient} 无效或被拒绝，请检查邮箱地址是否正确。'
+
+    return '内部错误，请联系工作人员。'
 
 
-async def send_email(massage: Message) -> tuple[bool, None | str]:
+async def send_email(massage: Message) -> tuple[bool, None | Exception]:
+    """
+    发送邮件。
+
+    Returns:
+        (成功标志, None或异常对象): 成功时返回 (True, None)，失败时返回 (False, Exception)
+    """
     try:
         await aiosmtplib.send(
             massage,
@@ -54,19 +90,12 @@ async def send_email(massage: Message) -> tuple[bool, None | str]:
             timeout=secret.EMAIL_TIMEOUT,
             use_tls=secret.EMAIL_USE_TLS,
         )
-    except SMTPTimeoutError as e:
-        print(e)
-        return False, '发送邮件超时，请稍后再试。'
     except Exception as e:
-        print('unknown email error')
-        print(type(e))
-        print(e)
-        return False, '内部错误，请通知网站管理员'
+        return False, e
     return True, None
 
 
-async def send_reg_email(password: str, to: str) -> tuple[bool, None | str]:
-    # msg = MIMEText(password, "plain", "utf-8")
+async def send_reg_email(password: str, to: str) -> tuple[bool, None | Exception]:
     msg = MIMEText(
         _HTML_TEMPLATE.format(
             PASSWORD=password,
