@@ -233,10 +233,11 @@ function genHeaderMenu(info: ReturnType<typeof useSuccessGameInfo>, compact: boo
 }
 
 function NavigationMenu() {
+    const HEADER_BREAKPOINT = 640;
     const { windowWidth } = useWindowInfo();
     const info = useSuccessGameInfo();
     const navigate = useNavigate();
-    const headerItems = useMemo(() => genHeaderMenu(info, windowWidth < 640), [info, windowWidth]);
+    const headerItems = useMemo(() => genHeaderMenu(info, windowWidth < HEADER_BREAKPOINT), [info, windowWidth]);
     const { color } = useTheme();
     const { pathname } = useLocation();
 
@@ -286,6 +287,7 @@ function NavigationMenu() {
                         popupBg: color.neutral,
                         darkItemBg: color.neutral,
                         darkItemSelectedBg: color.neutral,
+                        itemPaddingInline: windowWidth < HEADER_BREAKPOINT ? 8 : 12,
                     },
                 },
             }}
@@ -312,11 +314,11 @@ export function Header() {
             <div className="flex items-center justify-between h-12 max-w-300 mx-auto px-2">
                 {/* <div className="flex-1"> */}
                 <Link to={'/home'}>
-                    <div className="text-[1.1rem] font-semibold lg:w-64 md:w-32 flex flex-row items-center cursor-pointer text-neutral-100">
+                    <div className="text-[1.1rem] font-semibold lg:w-64 md:w-32 flex flex-row items-center cursor-pointer text-neutral-content">
                         <div
                             className="w-7 inline-block ml-[0.2rem] mr-[0.3rem]"
                             style={{
-                                filter: 'invert(100%)',
+                                filter: 'invert(85%)',
                                 transform: 'translateY(0rem) scale(1.4)',
                             }}
                         >
