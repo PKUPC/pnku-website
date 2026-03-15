@@ -9,7 +9,8 @@ import { TableLoader as Table, type TableColumnsType } from '@/components/lazy/T
 import { NeverError } from '@/errors';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { useWishData } from '@/logic/swrWrappers';
-import { Adhoc, Wish } from '@/types/wish.ts';
+import { Adhoc } from '@/types/adhoc';
+import { Wish } from '@/types/wish.ts';
 import { format_ts } from '@/utils.ts';
 
 function CurrencyChangeHistory({ currencyType }: { currencyType: Adhoc.CurrencyType }) {

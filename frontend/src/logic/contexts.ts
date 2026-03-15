@@ -2,7 +2,8 @@ import { createContext, useContext } from 'react';
 import { KeyedMutator } from 'swr';
 
 import { InfoError } from '@/errors.ts';
-import { Adhoc, Wish } from '@/types/wish.ts';
+import { Adhoc } from '@/types/adhoc';
+import { Wish } from '@/types/wish.ts';
 
 type PuzzleListConfig = 'off' | 'show' | 'drawer';
 
