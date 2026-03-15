@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react';
 import Md5 from 'crypto-js/md5';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
+import { analyzer } from 'vite-bundle-analyzer';
 import { compression, defineAlgorithm } from 'vite-plugin-compression2';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import svgr from 'vite-plugin-svgr';
@@ -12,7 +13,10 @@ import zlib from 'zlib';
 
 import { remoteComponentPlugin } from './vite-plugin-remote-component';
 
-export default defineConfig(({}) => {
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, process.cwd(), '');
+    const DEV_FRONTEND_PORT = Number(env.DEV_FRONTEND_PORT) || 3333;
+
     const componentName = process.argv.find((arg) => arg.startsWith('--component='))?.split('=')[1] ?? 'HelloWorld';
     console.info(`Trying to build ${componentName}`);
 
@@ -85,21 +89,41 @@ export default defineConfig(({}) => {
             svgr(),
             tailwindcss(),
             cssInjectedByJsPlugin(),
-            compression({
-                include: /\.*$/,
-                exclude: /\.(png|jpg|jpeg|webp|mp3|ogg|webm)$/i,
-                algorithms: [
-                    defineAlgorithm('brotliCompress', {
-                        params: {
-                            [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
-                            [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
-                        },
-                    }),
-                    defineAlgorithm('gzip', {
-                        level: zlib.constants.Z_BEST_COMPRESSION,
-                    }),
-                ],
-            }),
+            ...(process.env.ANALYZE_BUNDLE === 'true'
+                ? [
+                      analyzer({
+                          analyzerMode: 'server',
+                          analyzerPort: DEV_FRONTEND_PORT + 1,
+                          openAnalyzer: true,
+                          defaultSizes: 'brotli',
+                          brotliOptions: {
+                              params: {
+                                  [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+                                  [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+                              },
+                          },
+                          gzipOptions: {
+                              level: zlib.constants.Z_BEST_COMPRESSION,
+                          },
+                      }),
+                  ]
+                : [
+                      compression({
+                          include: /\.*$/,
+                          exclude: /\.(png|jpg|jpeg|webp|mp3|ogg|webm)$/i,
+                          algorithms: [
+                              defineAlgorithm('brotliCompress', {
+                                  params: {
+                                      [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+                                      [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+                                  },
+                              }),
+                              defineAlgorithm('gzip', {
+                                  level: zlib.constants.Z_BEST_COMPRESSION,
+                              }),
+                          ],
+                      }),
+                  ]),
         ],
     };
 });

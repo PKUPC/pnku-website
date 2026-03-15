@@ -8,6 +8,7 @@
     "build": "tsc -b && cross-env VITE_REMOTE_COMPONENT_DEV_MODE=false vite build",
     "build:analyze": "tsc -b && cross-env ANALYZE_BUNDLE=true vite build",
     "build:remote": "tsc -b && vite build --config vite.config.remote.ts",
+    "build:remote:analyze": "tsc -b && cross-env ANALYZE_BUNDLE=true vite build --config vite.config.remote.ts",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prettier:fix": "prettier --write .",
