@@ -62,7 +62,9 @@ export class YClient {
                 return;
             }
         } else {
-            console.log(`[YClient ${this.roomId}] connection closed (no event details)`);
+            console.log(
+                `[YClient ${this.roomId}] connection closed (no event details, maybe no message received in a long time)`,
+            );
         }
     };
 
