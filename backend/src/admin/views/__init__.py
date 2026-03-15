@@ -6,6 +6,7 @@ from .hint_view import HintView
 from .log_user_view import LogUserView
 from .log_view import LogView
 from .message_view import MessageView
+from .puzzle_state_view import PuzzleStateView
 from .puzzle_view import PuzzleView
 from .status_view import StatusView
 from .team_event_view import TeamEventView
@@ -26,6 +27,7 @@ VIEWS = {
     'UserStore': UserView,
     'MessageStore': MessageView,
     'PuzzleStore': PuzzleView,
+    'PuzzleStateStore': PuzzleStateView,
     'HintStore': HintView,
     'TeamEventStore': TeamEventView,
     'TicketStore': TicketView,
@@ -42,6 +44,7 @@ __all__ = [
     'LogUserView',
     'LogView',
     'MessageView',
+    'PuzzleStateView',
     'PuzzleView',
     'StatusView',
     'TeamEventView',

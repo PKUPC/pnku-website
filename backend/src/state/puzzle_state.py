@@ -12,7 +12,7 @@ from .base import WithGameLifecycle
 
 
 if TYPE_CHECKING:
-    from src.store import PuzzleStore
+    from src.store import PuzzleStateStore, PuzzleStore
 
     from . import Game, Submission, Team, TeamEvent, User
 
@@ -247,3 +247,24 @@ class Puzzle(WithGameLifecycle):
 
     def __repr__(self) -> str:
         return f'[Puzzle#{self.model.key}: {self.model.title}]'
+
+
+class PuzzleStates:
+    constructed: bool = False
+
+    def __init__(self, game: Game, stores: list[PuzzleStateStore]):
+        assert not PuzzleStates.constructed
+        PuzzleStates.constructed = True
+
+        self.game: Game = game
+        self.stores: list[PuzzleStateStore] = stores
+
+        self.puzzle_state_store_by_id: dict[int, PuzzleStateStore] = {}
+        self.puzzle_state_store_by_puzzle_key_and_team_id: dict[tuple[str, int], PuzzleStateStore] = {}
+        for store in stores:
+            self.puzzle_state_store_by_id[store.id] = store
+            self.puzzle_state_store_by_puzzle_key_and_team_id[(store.puzzle_key, store.team_id)] = store
+
+    def on_store_update(self, store: PuzzleStateStore) -> None:
+        self.puzzle_state_store_by_id[store.id] = store
+        self.puzzle_state_store_by_puzzle_key_and_team_id[(store.puzzle_key, store.team_id)] = store
