@@ -11,7 +11,6 @@ import { Wish } from '@/types/wish.ts';
 import styles from './PuzzleTab.module.css';
 
 export function PuzzleBody({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetailData }) {
-    const puzzleBody = <TemplateStr name={'puzzle-desc'}>{puzzleData.desc}</TemplateStr>;
     const { mutate } = useSWRConfig();
 
     return (
@@ -22,7 +21,9 @@ export function PuzzleBody({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetai
                     <Alert key={idx} className="mb-4" type={alert.type} showIcon={true} message={alert.message} />
                 ))}
 
-            <div className={styles.puzzleBody}>{puzzleBody}</div>
+            <div className={styles.puzzleBody}>
+                <TemplateStr name={'puzzle-desc'}>{puzzleData.desc}</TemplateStr>
+            </div>
 
             {puzzleData.actions.map((action, idx) => (
                 <p key={idx} className={styles.puzzleAction}>
