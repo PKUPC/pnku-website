@@ -118,6 +118,7 @@ function LockedHint({
             title: '购买提示确认',
             icon: <ExclamationCircleFilled />,
             content: <span>该提示花费：{priceInfo.priceElement}</span>,
+            getContainer: false,
             onOk() {
                 wish({
                     endpoint: 'puzzle/buy_hint',
