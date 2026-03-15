@@ -197,15 +197,18 @@ class Puzzle(WithGameLifecycle):
     def render_desc(self, user: User) -> str:
         extra: tuple[tuple[str, str | int | tuple[Hashable, ...]], ...] = tuple()
         is_finished = False
+        puzzle_key = None
         if user.team is not None:
             extra = user.team.game_state.get_render_info(self.model.key)
             is_finished = user.team.game_state.finished
+            puzzle_key = self.game.hash_puzzle_key(user.team.model.id, self.model.key)
         return self._render_template(
             tick=self.game.cur_tick,
             passed=user.team in self.passed_teams or user.model.group == 'staff',
             is_staff=user.is_staff,
             is_finished=is_finished,
             is_archived=False,
+            puzzle_key=puzzle_key,
             extra=extra,
         )
 
@@ -222,6 +225,7 @@ class Puzzle(WithGameLifecycle):
         is_staff: bool = False,
         is_finished: bool = False,
         is_archived: bool = False,
+        puzzle_key: str | None = None,
         extra: tuple[tuple[str, str | int], ...] | None = None,
     ) -> str:
         render_dict: dict[str, str | int] = {
@@ -231,6 +235,8 @@ class Puzzle(WithGameLifecycle):
             'is_finished': is_finished,
             'is_archived': is_archived,
         }
+        if puzzle_key is not None:
+            render_dict['puzzle_key'] = puzzle_key
         if extra is not None:
             for item in extra:
                 render_dict[item[0]] = item[1]
