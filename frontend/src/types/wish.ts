@@ -1,10 +1,6 @@
 import type React from 'react';
 
-// ADHOC: 在这里修改各种 adhoc 类型定义
-export namespace Adhoc {
-    // api 交互时统一为小写，大写字母形式显示在 url 中很怪
-    export type CurrencyType = 'hint_point';
-}
+import { type Adhoc } from './adhoc';
 
 export namespace Wish {
     export type ErrorRes = { status: 'error'; message: string; title: string };
@@ -273,7 +269,6 @@ export namespace Wish {
             response: ErrorRes | (SuccessRes & { data: ListArea[] });
         };
 
-        // ADHOC: 根据需求修改可选的货币类型
         export type GetTeamCurrencyDetailApi = {
             request: {
                 endpoint: 'game/team_currency_detail';
@@ -947,9 +942,6 @@ export namespace Wish {
         export type UserApis = UpdateProfileApi | ChangePasswordApi;
     }
 
-    // ADHOC: 特殊题目的接口，如果有需要就加在这里，开发远程组件时可能用得到
-    export namespace Special {}
-
     export type WishApis =
         | Game.GameApis
         | Message.MessageApis
@@ -958,7 +950,8 @@ export namespace Wish {
         | Team.TeamApis
         | Ticket.TicketApis
         | Upload.UploadApis
-        | User.UserApis;
+        | User.UserApis
+        | Adhoc.WishApis;
 
     export type WishConfirmApis =
         | Team.RemoveUserApi
@@ -969,7 +962,8 @@ export namespace Wish {
         | Puzzle.BuyHintApi
         | Game.GameStartApi
         | Staff.VMe50Api
-        | Staff.UpdateExtraTeamInfoApi;
+        | Staff.UpdateExtraTeamInfoApi
+        | Adhoc.WishConfirmApis;
 
     type ExtractParam<T> = T extends { request: infer P } ? P : never;
 

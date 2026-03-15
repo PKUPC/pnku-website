@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 import { wish } from '@/logic/wish';
-import { Adhoc } from '@/types/wish';
+import { Adhoc } from '@/types/adhoc';
 import { calcCurrentBalance, getCurrentIncrease } from '@/utils';
 
 type CurrencyData = {
