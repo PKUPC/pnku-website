@@ -202,6 +202,7 @@ export namespace Wish {
             icon: string;
             denominator: number;
             precision: number;
+            increaseByTime: boolean;
         };
 
         export type GameInfoApi = {
@@ -570,6 +571,7 @@ export namespace Wish {
             icon: string;
             denominator: number;
             precision: number;
+            increaseByTime: boolean;
             current: number;
             change: number;
             history: StaffTeamDetailCurrencyHistory[];

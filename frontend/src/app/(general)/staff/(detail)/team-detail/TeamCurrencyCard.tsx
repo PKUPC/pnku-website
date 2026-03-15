@@ -48,7 +48,7 @@ export function TeamCurrencyCard({
             <FancyCard title={`队伍${data.name}信息`}>
                 <Form
                     form={form}
-                    name="change-currency-panel"
+                    name={`change-currency-panel-${data.type}`}
                     {...form_style}
                     onValuesChange={(_changedValues, values) => {
                         if (values.new_change && values.reason) setChanged(true);
