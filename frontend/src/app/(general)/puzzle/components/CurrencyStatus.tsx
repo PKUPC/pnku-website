@@ -6,27 +6,23 @@ import { CurrencyDetail, GameStatusContext } from '@/logic/contexts.ts';
 
 export default function CurrencyStatus({ currencyDetail }: { currencyDetail: CurrencyDetail }) {
     return (
-        <div>
+        <div className="inline-block">
             <Tag>
                 <span>
                     {`当前${currencyDetail.name}`} :{' '}
                     {(currencyDetail.balance / currencyDetail.denominator).toFixed(currencyDetail.precision)}{' '}
-                    <NamedIcon
-                        iconName={currencyDetail.icon}
-                        style={{ color: 'transparent', transform: 'translateY(0.1em)' }}
-                    />
+                    <NamedIcon iconName={currencyDetail.icon} />
                 </span>
-                <span>
-                    {' '}
-                    (+{(currencyDetail.currentIncrease / currencyDetail.denominator).toFixed(
-                        currencyDetail.precision,
-                    )}{' '}
-                    <NamedIcon
-                        iconName={currencyDetail.icon}
-                        style={{ color: 'transparent', transform: 'translateY(0.1em)' }}
-                    />{' '}
-                    / min)
-                </span>
+                {currencyDetail.currentIncrease !== 0 && (
+                    <span>
+                        {' '}
+                        (+
+                        {(currencyDetail.currentIncrease / currencyDetail.denominator).toFixed(
+                            currencyDetail.precision,
+                        )}{' '}
+                        <NamedIcon iconName={currencyDetail.icon} /> / min)
+                    </span>
+                )}
             </Tag>
         </div>
     );
