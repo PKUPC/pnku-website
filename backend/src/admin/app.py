@@ -34,7 +34,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = secret.ADMIN_SESSION_SECRET
-
+app.config['MAX_FORM_MEMORY_SIZE'] = None
 db = SQLAlchemy(app, model_class=store.Table)
 
 
