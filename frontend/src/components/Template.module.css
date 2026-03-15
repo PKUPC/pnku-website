@@ -129,4 +129,8 @@
       color: #1677ff;
     }
   }
+
+  :global(.codehilite) {
+    overflow: auto;
+  }
 }
