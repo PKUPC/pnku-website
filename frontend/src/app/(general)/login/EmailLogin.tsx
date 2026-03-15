@@ -39,7 +39,17 @@ export function EmailLogin() {
                     return;
                 }
                 if (res.redirected) {
-                    window.location.href = res.url;
+                    const redirectedURL = new URL(res.url);
+                    if (redirectedURL.pathname === '/login/error') {
+                        const msgValue = redirectedURL.searchParams.get('msg');
+                        messageApi.error({ content: msgValue, key: 'EMAIL_SIGN_IN', duration: 3 }).then();
+                        return {
+                            status: 'error',
+                            message: msgValue,
+                        };
+                    } else {
+                        window.location.href = res.url;
+                    }
                 } else return res.json();
             })
             .then((res) => {
@@ -78,10 +88,7 @@ export function EmailLogin() {
                             message: msgValue,
                         };
                     } else {
-                        return {
-                            status: 'error',
-                            message: '未知错误，请联系网站管理员。',
-                        };
+                        window.location.href = res.url;
                     }
                 }
                 return res.json();
