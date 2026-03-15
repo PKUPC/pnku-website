@@ -62,7 +62,7 @@ function IntroAnswerInput() {
     const [inputAnswer, setInputAnswer] = useState('');
     const wishArgs = useMemo(() => ({ content: inputAnswer }), [inputAnswer]);
     const { reloadInfo } = useContext(GameInfoContext);
-    const { setNeedReloadArea } = useContext(GameStatusContext);
+    const { setNeedReloadArea, syncAllCurrencies } = useContext(GameStatusContext);
 
     const doSubmit = () => {
         if (!inputAnswer) {
@@ -105,6 +105,7 @@ function IntroAnswerInput() {
                     if (res.need_reload_info) {
                         reloadInfo();
                         setNeedReloadArea(true);
+                        syncAllCurrencies();
                     }
                 }}
             />
