@@ -479,6 +479,7 @@ async def game_start(req: Request, body: GameStartParam, worker: Worker, user: U
         )
         if rep.result is not None:
             return rep.result
+        reply['need_reload_info'] = True  # type: ignore[assignment]
 
     return reply
 
