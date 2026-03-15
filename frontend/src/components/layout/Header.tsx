@@ -76,7 +76,7 @@ function genHeaderMenu(info: ReturnType<typeof useSuccessGameInfo>, compact: boo
 
         const infoItem = {
             label: '信息',
-            key: '/info/announcements',
+            key: '_/info',
             icon: <NotificationOutlined />,
         };
         if (compact) compactItems.push(infoItem);
@@ -130,7 +130,7 @@ function genHeaderMenu(info: ReturnType<typeof useSuccessGameInfo>, compact: boo
 
         const infoItem = {
             label: '信息',
-            key: '/info/announcements',
+            key: '_/info',
             icon: <NotificationOutlined />,
         };
         if (compact) compactItems.push(infoItem);
@@ -239,6 +239,8 @@ function NavigationMenu() {
                 navigate(`/boards/${info.game.boards[0]}`);
             } else if (e.key.startsWith('_/about')) {
                 navigate('/about/introduction');
+            } else if (e.key.startsWith('_/info')) {
+                navigate('/info/announcements');
             }
         },
         [navigate, info],
@@ -251,6 +253,9 @@ function NavigationMenu() {
         }
         if (pathname.startsWith('/about')) {
             result.push('_/about');
+        }
+        if (pathname.startsWith('/info')) {
+            result.push('_/info');
         }
         return result;
     }, [pathname]);
