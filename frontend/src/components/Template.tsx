@@ -24,7 +24,7 @@ export function TemplateStr({ name, children }: { name: string; children: string
     const result = useMemo(
         () =>
             parse(children, {
-                replace: (domNode) => {
+                replace: (domNode, index) => {
                     if (domNode.type === 'tag' && domNode.tagName === 'div' && domNode.attribs?.class) {
                         if (domNode.attribs.class.includes('template-antd-image')) {
                             const src = domNode.attribs['data-src'];
@@ -52,7 +52,14 @@ export function TemplateStr({ name, children }: { name: string; children: string
                             } catch {
                                 props = {};
                             }
-                            return <RemoteComponent componentName={name} componentUrl={url} {...props} />;
+                            return (
+                                <RemoteComponent
+                                    key={name + url + index}
+                                    componentName={name}
+                                    componentUrl={url}
+                                    {...props}
+                                />
+                            );
                         }
                     } else if (domNode.type === 'tag' && domNode.tagName === 'span' && domNode.attribs?.class) {
                         if (domNode.attribs.class.includes('template-navigate-link')) {
