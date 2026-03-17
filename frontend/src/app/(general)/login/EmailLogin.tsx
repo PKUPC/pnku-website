@@ -120,10 +120,8 @@ export function EmailLogin() {
     };
 
     const onFinish = (values: { email: string; password: string } | { email: string }) => {
-        if (info.feature.recaptcha && captchaToken === '') messageApi.error('请进行人机身份验证').then();
-        else {
-            sign_in ? signIn(values as { email: string; password: string }) : signUp(values);
-        }
+        // 不强制要求进行人机身份验证，后端处理，用于豁免某些邮箱
+        sign_in ? signIn(values as { email: string; password: string }) : signUp(values);
         // recaptchaRef.current.reset();
     };
 
