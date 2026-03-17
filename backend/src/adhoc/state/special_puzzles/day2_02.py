@@ -31,6 +31,6 @@ class Day202State(TeamPuzzleState):
         virtual_minute = (virtual_seconds // 60) % 60
         return ('hour', virtual_hour), ('minute', virtual_minute)
 
-    def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
+    def on_puzzle_action(self, event: PuzzleActionEvent, is_reloading: bool = False) -> None:
         self.real_seconds = int(event.content.get('real_seconds', -1))
         self.target_seconds = int(event.content.get('target_seconds', -1))
