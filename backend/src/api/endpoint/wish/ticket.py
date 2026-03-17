@@ -153,7 +153,8 @@ async def get_manual_hints(req: Request, body: GetHintListParam, worker: Worker,
 
     hint_list: list[dict[str, Any]] = []
     for ticket in worker.game_nocheck.tickets.tickets_by_team_id.get(user.team.model.id, []):
-        if not isinstance(ticket.model.extra, ManualHintModel) or ticket.model.extra.puzzle_key != puzzle_key:
+        # 每个题目的人工提示数量很少，可以全部返回
+        if not isinstance(ticket.model.extra, ManualHintModel):
             continue
         hint_list.append(
             {
@@ -164,6 +165,8 @@ async def get_manual_hints(req: Request, body: GetHintListParam, worker: Worker,
                 'subject': ticket.model.subject,
             }
         )
+        hint_list = sorted(hint_list, key=lambda x: x['last_message_ts'], reverse=True)
+
     rst: dict[str, Any] = {'list': hint_list}
 
     effective_after_ts = user.team.game_state.unlock_puzzle_keys[puzzle_key] + adhoc.MANUAL_HINT_COOLDOWN
