@@ -79,6 +79,11 @@ export namespace WsClient {
         payload: any;
     };
 
+    export type RefreshData = {
+        type: 'refresh_data';
+        target: 'currency';
+    };
+
     export type WsData =
         | NewAnnouncementData
         | UpdateAnnouncements
@@ -92,5 +97,6 @@ export namespace WsClient {
         | NewTicketMessageData
         | TicketStatusUpdate
         | PuzzleErrata
-        | WishMutate;
+        | WishMutate
+        | RefreshData;
 }

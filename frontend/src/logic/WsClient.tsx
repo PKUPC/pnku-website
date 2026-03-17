@@ -27,6 +27,7 @@ export class PushClient {
     private readonly setHasNewMessage: GameStatusContextType['setHasNewMessage'];
     private readonly setNeedReloadArea: GameStatusContextType['setNeedReloadArea'];
     private readonly updateAllCurrencies: GameStatusContextType['updateAllCurrencies'];
+    private readonly syncAllCurrencies: GameStatusContextType['syncAllCurrencies'];
 
     private swrMutate: ScopedMutator;
 
@@ -38,6 +39,7 @@ export class PushClient {
         setHasNewMessage: GameStatusContextType['setHasNewMessage'],
         setNeedReloadArea: GameStatusContextType['setNeedReloadArea'],
         updateAllCurrencies: GameStatusContextType['updateAllCurrencies'],
+        syncAllCurrencies: GameStatusContextType['syncAllCurrencies'],
         swrMutate: ScopedMutator,
     ) {
         this.ws = null;
@@ -50,6 +52,7 @@ export class PushClient {
         this.setHasNewMessage = setHasNewMessage;
         this.setNeedReloadArea = setNeedReloadArea;
         this.updateAllCurrencies = updateAllCurrencies;
+        this.syncAllCurrencies = syncAllCurrencies;
         this.swrMutate = swrMutate;
 
         setTimeout(() => {
@@ -285,7 +288,15 @@ export class PushClient {
                         payload: data.payload,
                     }).then();
                 }
-
+                break;
+            }
+            case 'refresh_data': {
+                switch (data.target) {
+                    case 'currency': {
+                        this.syncAllCurrencies();
+                        break;
+                    }
+                }
                 break;
             }
         }
