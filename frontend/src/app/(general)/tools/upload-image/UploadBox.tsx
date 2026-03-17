@@ -147,7 +147,7 @@ export function UploadBox() {
         if (imageFile?.originFileObj) form.append('file', imageFile?.originFileObj);
         setUploading(true);
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', WISH_ROOT + 'upload/upload_image');
+        xhr.open('POST', `${WISH_ROOT}upload/upload_image?rem=${window.rem}&ram=${window.ram}`);
         xhr.setRequestHeader('X-Wish-Version', WISH_VER);
         xhr.withCredentials = true;
         xhr.responseType = 'json';
