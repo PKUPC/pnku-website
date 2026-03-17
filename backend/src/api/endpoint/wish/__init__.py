@@ -33,6 +33,15 @@ def wish_response(fn: WishHandler) -> RouteHandler:
         if 'worker' not in kwargs:
             response.json({'status': 'error', 'title': 'NO_WORKER', 'message': '服务暂时不可用，请稍候再来吧。'})
 
+        rem = req.args.get('rem', None)
+        ram = req.args.get('ram', None)
+
+        if rem is None or ram is None:
+            store_user_log(
+                req, 'api.wish_response', 'abnormal', 'rem or ram is None', {'req_url': req.url, 'rem': rem, 'ram': ram}
+            )
+            return response.json({'status': 'error', 'title': 'BAD_REQUEST', 'message': '非法操作！'})
+
         retval_ = fn(req, *args, **kwargs)
         retval = (await retval_) if isawaitable(retval_) else retval_
 

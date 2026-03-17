@@ -1,3 +1,7 @@
+"""
+用户行为记录相关功能，请发挥想象力自行实现。
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -18,6 +22,10 @@ def store_user_log(
     manual_user: User | None = None,
 ) -> None:
     return
+
+
+def get_user_request_key(req: Request) -> str:
+    return ''
 
 
 def handle_report(req: Request) -> HTTPResponse:
