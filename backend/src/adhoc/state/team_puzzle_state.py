@@ -61,6 +61,8 @@ class SubmissionResult:
                 return '答案错误'
             case 'staff_pass':
                 return '答案正确'
+            case 'surprise':
+                return '发现彩蛋'
             case _:
                 return '未知错误'
 
@@ -92,6 +94,9 @@ class SubmissionResult:
             case 'staff_wrong':
                 status = 'error'
                 message = f'{self.info}'
+            case 'surprise':
+                status = 'info'
+                message = f'你发现了一个彩蛋：\n{self.info}'
 
         if self.manual_type_name is not None:
             title = self.manual_type_name
