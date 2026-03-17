@@ -10,12 +10,12 @@ import { GameInfoContext, GameInfoContextType, GameStatusContext } from '@/logic
 export function PushDaemon({ info, reloadInfo }: GameInfoContextType) {
     const { setNeedReloadAnnouncement, setHasNewMessage, setNeedReloadArea, updateAllCurrencies } =
         useContext(GameStatusContext);
-    const [wsNotification, contextHolder] = notification.useNotification({
+    const [wsNotification, notificationContextHolder] = notification.useNotification({
         stack: { threshold: 3 },
         placement: 'topRight',
         top: 70,
     });
-    const [wsMessage] = message.useMessage();
+    const [wsMessage, messageContextHolder] = message.useMessage();
     const { mutate } = useSWRConfig();
 
     if (info.status !== 'success') throw new NeverError();
@@ -53,7 +53,12 @@ export function PushDaemon({ info, reloadInfo }: GameInfoContextType) {
         wsNotification,
     ]);
 
-    return <>{contextHolder}</>;
+    return (
+        <>
+            {notificationContextHolder}
+            {messageContextHolder}
+        </>
+    );
 }
 
 export function PushDaemonWrapper({ children }: { children: React.ReactNode }) {

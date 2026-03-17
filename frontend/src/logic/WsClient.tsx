@@ -217,8 +217,8 @@ export class PushClient {
                         PushClient.notification.success({
                             ...notificationConfig,
                             icon: <RocketOutlined />,
-                            message: '新神谕提醒',
-                            description: `你的队友请求了一条神谕。${data.extra_info ?? ''}`,
+                            message: '新邮件提醒',
+                            description: `你的队友向校长信箱发送了一封邮件。${data.extra_info ?? ''}`,
                         });
                     }
                 }
@@ -244,16 +244,16 @@ export class PushClient {
                         PushClient.notification.success({
                             ...notificationConfig,
                             icon: <RocketOutlined />,
-                            message: '神谕提醒',
-                            description: `你的队友回复了一条神谕。${data.extra_info ?? ''}`,
+                            message: '邮件回复提醒',
+                            description: `你的队友回复了一封邮件。${data.extra_info ?? ''}`,
                         });
                 } else if (data.direction === 'TO_PLAYER' && this.info.user.group === 'player') {
                     if (data.ticket_type === '人工提示') {
                         PushClient.notification.success({
                             ...notificationConfig,
                             icon: <RocketOutlined />,
-                            message: '神谕提醒',
-                            description: `芈雨回复了一条神谕。${data.extra_info ?? ''}`,
+                            message: '邮件回复提醒',
+                            description: `校长回复了你的邮件。${data.extra_info ?? ''}`,
                         });
                     }
                 }
@@ -312,6 +312,16 @@ export class PushClient {
             if (e.code === 4337) {
                 console.log('PushClient: socket closed by server, will not retry', e.reason);
                 this.stopped = true;
+                return;
+            }
+            if (e.code === 4396) {
+                console.log('PushClient: socket closed by server, will not retry', e.reason);
+                this.stopped = true;
+                PushClient.notification.error({
+                    key: 'PushDaemon.Error',
+                    message: `消息推送服务连接失败！${e.reason}`,
+                    duration: null,
+                });
                 return;
             }
             console.log('PushClient: socket closed, will reconnect later', e);
