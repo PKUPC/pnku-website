@@ -218,7 +218,7 @@ class TeamPuzzleState:
     def get_render_info(self) -> tuple[tuple[str, str | int | tuple[Hashable, ...]], ...]:
         return tuple()
 
-    def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
+    def on_puzzle_action(self, event: PuzzleActionEvent, is_reloading: bool = False) -> None:
         pass
 
     def get_dyn_actions(self) -> list[dict[str, Any]]:
