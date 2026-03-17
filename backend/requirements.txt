@@ -135,7 +135,7 @@ typing-extensions==4.15.0
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
-ujson==5.11.0 ; implementation_name == 'cpython' and sys_platform != 'win32'
+ujson==5.12.0 ; implementation_name == 'cpython' and sys_platform != 'win32'
     # via sanic
 uvloop==0.21.0 ; implementation_name == 'cpython' and sys_platform != 'win32'
     # via sanic
