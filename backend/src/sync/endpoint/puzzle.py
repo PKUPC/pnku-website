@@ -126,6 +126,7 @@ async def puzzle(req: Request, ws: WebsocketImplProtocol, puzzle_key: str) -> No
     try:
         await sync_integration.handle_sync_websocket(
             ws,
+            user,
             room_id,
             custom_handler=custom_sync_handler,
             doc_initializer=custom_sync_doc_initializer,
