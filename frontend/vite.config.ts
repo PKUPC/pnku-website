@@ -158,7 +158,34 @@ export default defineConfig(({ mode }) => {
                     unicodeEscapeSequence: true,
                 },
             }),
-            createHtmlPlugin({ minify: true }),
+            createHtmlPlugin({
+                minify: true,
+                inject: {
+                    tags:
+                        env.VITE_USE_ALIYUN_CAPTCHA === 'true'
+                            ? [
+                                  {
+                                      injectTo: 'head-prepend', // 或 'head'
+                                      tag: 'script',
+                                      children: `
+                              window.AliyunCaptchaConfig = {
+                                region: "${env.VITE_ALIYUN_CAPTCHA_REGION}",
+                                prefix: "${env.VITE_ALIYUN_CAPTCHA_PREFIX}",
+                              };
+                            `,
+                                  },
+                                  {
+                                      injectTo: 'head',
+                                      tag: 'script',
+                                      attrs: {
+                                          type: 'text/javascript',
+                                          src: 'https://o.alicdn.com/captcha-frontend/aliyunCaptcha/AliyunCaptcha.js',
+                                      },
+                                  },
+                              ]
+                            : [],
+                },
+            }),
             ...(process.env.ANALYZE_BUNDLE === 'true'
                 ? [
                       analyzer({

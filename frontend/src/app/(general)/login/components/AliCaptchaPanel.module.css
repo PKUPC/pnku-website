@@ -1,0 +1,45 @@
+.container {
+  :global(#aliyunCaptcha-captcha-logo) {
+    transform: scale(1.5);
+    filter: invert(0.3);
+    [data-theme='dark'] & {
+      filter: invert(0.6);
+    }
+  }
+
+  :global(#aliyunCaptcha-start-icon) {
+    [data-theme='dark'] & {
+      filter: invert(0.6);
+    }
+  }
+
+  :global(#aliyunCaptcha-captcha-body) {
+    [data-theme='dark'] & {
+      background: var(--color-base-300) !important;
+    }
+  }
+
+  :global(#aliyunCaptcha-window-float) {
+    [data-theme='dark'] & {
+      background: var(--color-base-200) !important;
+    }
+  }
+
+  :global(#aliyunCaptcha-sliding-body) {
+    [data-theme='dark'] & {
+      background: var(--color-base-200) !important;
+    }
+  }
+
+  :global(#aliyunCaptcha-sliding-left) {
+    [data-theme='dark'] & {
+      background: var(--color-green-700) !important;
+    }
+  }
+
+  :global(#aliyunCaptcha-sliding-slider) {
+    [data-theme='dark'] & {
+      background: var(--color-base-300) !important;
+    }
+  }
+}
