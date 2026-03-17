@@ -61,10 +61,22 @@ HASH_PUZZLE_KEY: Literal['none', 'slug', 'hash_key', 'hash_key_and_team'] = 'non
 # None: 不使用验证码功能
 USE_CAPTCHA: Literal['recaptcha', 'aliyun', 'none'] = 'none'
 
-CAPTCHA_CONFIG: dict[str, Any] = {
-    'secret': 'xxx',
-    'verify_addr': 'https://recaptcha.net/recaptcha/api/siteverify',
-}
+CAPTCHA_CONFIG: dict[str, Any] = {}
+
+# reCAPTCHA v2 所需的配置
+# CAPTCHA_CONFIG: dict[str, Any] = {
+#     'secret': 'xxx',
+#     'verify_addr': 'https://recaptcha.net/recaptcha/api/siteverify',
+# }
+
+# 阿里云验证码所需的配置
+# CAPTCHA_CONFIG: dict[str, Any] = {
+#     'endpoint': 'captcha.cn-shanghai.aliyuncs.com',
+#     'scence_id': 'xxx',
+#     'access_key_id': 'xxx',
+#     'access_key_secret': 'xxx',
+# }
+
 
 # 性能警报设置
 HEALTH_CHECK_THROTTLE = {
