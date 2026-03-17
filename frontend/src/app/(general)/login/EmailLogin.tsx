@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
 import styles from './EmailLogin.module.css';
+import { AliCaptchaPanel } from './components/AliCaptchaPanel';
 import { ReCaptchaPanel } from './components/ReCaptchaPanel';
 
 export interface CaptchaPanelRef {
@@ -156,6 +157,10 @@ export function EmailLogin() {
 
                 {info.feature.captcha === 'recaptcha' && (
                     <ReCaptchaPanel setCaptchaData={setCaptchaData} ref={captchaPanelRef} />
+                )}
+
+                {info.feature.captcha === 'aliyun' && (
+                    <AliCaptchaPanel setCaptchaData={setCaptchaData} ref={captchaPanelRef} />
                 )}
 
                 <Form.Item className={'submit-form-item'}>

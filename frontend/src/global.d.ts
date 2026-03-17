@@ -37,6 +37,18 @@ declare global {
         messageStorage?: { [key: `team#${string}`]: Wish.Message.MessageInfo[] };
         wish: <T extends Wish.WishParams>(args: T) => Promise<Wish.ResponseMapping[T['endpoint']]>;
         messageApi: MessageInstance;
+        initAliyunCaptcha?: (config: {
+            SceneId: string;
+            mode: 'popup' | 'embed';
+            element: string;
+            button: string;
+            success?: (param: any) => void;
+            error?: (param: any) => void;
+            getInstance?: (instance: any) => void;
+            slideStyle?: { width?: number; height?: number };
+            language?: 'cn' | 'tw' | 'en';
+            captchaLogoImg?: string;
+        }) => void;
         puzzleApi?: {
             setDisableInput: (v: boolean) => void;
             setSubmitAnswer: (v: string) => void;
