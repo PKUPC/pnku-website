@@ -1,7 +1,7 @@
 import { ConfigProvider, Image } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import parse from 'html-react-parser';
-import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import useSWR from 'swr';
 
@@ -14,16 +14,16 @@ import { RemoteComponent } from '@/remote/RemoteComponent';
 import './Template.css';
 import styles from './Template.module.css';
 
-export function SimpleTemplateStr({ name, children }: { name: string; children: string }) {
-    return <div className={`template-${name} ` + styles.template} dangerouslySetInnerHTML={{ __html: children }} />;
-}
+export const SimpleTemplateStr = memo(function SimpleTemplateStr({ name, data }: { name: string; data: string }) {
+    return <div className={`template-${name} ` + styles.template} dangerouslySetInnerHTML={{ __html: data }} />;
+});
 
-export function TemplateStr({ name, children }: { name: string; children: string }) {
+export const TemplateStr = memo(function TemplateStr({ name, data }: { name: string; data: string }) {
     const templateRef = useRef<HTMLDivElement>(null);
 
     const result = useMemo(
         () =>
-            parse(children, {
+            parse(data, {
                 replace: (domNode, index) => {
                     if (domNode.type === 'tag' && domNode.tagName === 'div' && domNode.attribs?.class) {
                         if (domNode.attribs.class.includes('template-antd-image')) {
@@ -70,7 +70,7 @@ export function TemplateStr({ name, children }: { name: string; children: string
                     }
                 },
             }),
-        [children],
+        [data],
     );
 
     const executeScripts = useCallback(() => {
@@ -97,7 +97,7 @@ export function TemplateStr({ name, children }: { name: string; children: string
     useLayoutEffect(() => {
         const timer = setTimeout(executeScripts, 0);
         return () => clearTimeout(timer);
-    }, [children, executeScripts]);
+    }, [data, executeScripts]);
 
     console.log('template rendered!');
     return (
@@ -105,7 +105,7 @@ export function TemplateStr({ name, children }: { name: string; children: string
             {result}
         </div>
     );
-}
+});
 
 export function TemplateFile({ name }: { name: string }) {
     console.log('getting template', name);
@@ -118,7 +118,7 @@ export function TemplateFile({ name }: { name: string }) {
     }
     if (!data) return <Loading style={{ height: 500 }} />;
 
-    return <TemplateStr name={name}>{data}</TemplateStr>;
+    return <TemplateStr name={name} data={data} />;
 }
 
 export function SimpleTemplateFile({ name }: { name: string }) {
@@ -132,5 +132,5 @@ export function SimpleTemplateFile({ name }: { name: string }) {
     }
     if (!data) return <Loading />;
 
-    return <SimpleTemplateStr name={name}>{data}</SimpleTemplateStr>;
+    return <SimpleTemplateStr name={name} data={data} />;
 }

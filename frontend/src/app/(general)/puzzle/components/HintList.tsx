@@ -182,7 +182,7 @@ function UnlockedHint({ hint }: { hint: Wish.Puzzle.HintItem }) {
                     <Tag>{hint.type}</Tag>
                 </span>
             ),
-            children: <SimpleTemplateStr name="hint">{hint.answer}</SimpleTemplateStr>,
+            children: <SimpleTemplateStr name="hint" data={hint.answer} />,
         },
     ];
     return <Collapse items={collapseItem} key={`hint-collapse-${hint.id}`} />;
@@ -199,7 +199,7 @@ export function HintList({ puzzleKey }: { puzzleKey: string }) {
 
     let component;
     if (data.data.list.length === 0)
-        component = <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'暂时没有可用的观测。'} />;
+        component = <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'暂时没有可用的提示。'} />;
     else
         component = data.data.list.map((hint) =>
             hint.unlock ? (
