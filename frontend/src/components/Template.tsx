@@ -1,7 +1,5 @@
-import { ConfigProvider, Image } from 'antd';
-import zhCN from 'antd/locale/zh_CN';
 import parse from 'html-react-parser';
-import { memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { CSSProperties, memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import useSWR from 'swr';
 
@@ -13,6 +11,7 @@ import { RemoteComponent } from '@/remote/RemoteComponent';
 
 import './Template.css';
 import styles from './Template.module.css';
+import { TemplateImage } from './template/TemplateImage';
 
 export const SimpleTemplateStr = memo(function SimpleTemplateStr({ name, data }: { name: string; data: string }) {
     return <div className={`template-${name} ` + styles.template} dangerouslySetInnerHTML={{ __html: data }} />;
@@ -27,14 +26,30 @@ export const TemplateStr = memo(function TemplateStr({ name, data }: { name: str
                 replace: (domNode, index) => {
                     if (domNode.type === 'tag' && domNode.tagName === 'div' && domNode.attribs?.class) {
                         if (domNode.attribs.class.includes('template-antd-image')) {
-                            const src = domNode.attribs['data-src'];
+                            const src = domNode.attribs['data-src'] as string | undefined;
+                            const alt = domNode.attribs['data-alt'] as string | undefined;
+                            const aspectRatio = domNode.attribs['data-aspect-ratio'] as string | undefined;
+                            const className = domNode.attribs['data-class'] as string | undefined;
+                            const preview = domNode.attribs['data-preview'] as string | undefined;
+                            let jsonStyle: CSSProperties = {};
+                            try {
+                                if (domNode.attribs['data-style']) {
+                                    jsonStyle = JSON.parse(domNode.attribs['data-style']);
+                                }
+                            } catch {
+                                jsonStyle = {};
+                            }
+                            console.log(domNode);
                             if (src) {
                                 return (
-                                    <div className={domNode.attribs.class} data-src={src}>
-                                        <ConfigProvider locale={zhCN}>
-                                            <Image src={src} alt={'image'} />
-                                        </ConfigProvider>
-                                    </div>
+                                    <TemplateImage
+                                        src={src}
+                                        alt={alt}
+                                        aspectRatio={aspectRatio}
+                                        className={className}
+                                        preview={preview === 'true'}
+                                        style={jsonStyle}
+                                    />
                                 );
                             }
                         } else if (domNode.attribs.class.includes('template-navigate-link')) {
