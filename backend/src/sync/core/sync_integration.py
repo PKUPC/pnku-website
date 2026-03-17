@@ -18,6 +18,7 @@ from .websocket_handler import YWebSocketHandler
 
 if TYPE_CHECKING:
     from src.logic import Worker
+    from src.state import User
 
 
 class SyncIntegration:
@@ -33,6 +34,7 @@ class SyncIntegration:
     async def handle_sync_websocket(
         self,
         ws: Websocket,
+        user: User,
         room_id: str,
         *,
         custom_handler: Callable[[SyncRoom, Websocket, bytes, dict[str, Any] | None], Coroutine[Any, Any, None]]
@@ -59,7 +61,7 @@ class SyncIntegration:
         room = self.room_manager.get_or_create_room(
             room_id, doc_initializer=doc_initializer, observer_maker=observer_maker
         )
-        room.add_client(ws)
+        room.add_client(ws, user.model.id)
         self.worker.log('debug', 'sync_integration.handle_sync_websocket', f'adding client to room {room_id}')
 
         if custom_handler is not None:
@@ -92,7 +94,7 @@ class SyncIntegration:
             except asyncio.CancelledError:
                 pass
             self.worker.log('debug', 'sync_integration.handle_sync_websocket', f'removing client from room {room_id}')
-            room.remove_client(ws)
+            room.remove_client(ws, user.model.id)
 
     async def _heartbeat_loop(self, ws: Websocket) -> None:
         """
