@@ -54,11 +54,19 @@ class AuthEmailRegParam(BaseModel):
 @bp.route('/email/register', ['POST'])
 @validate(json=AuthEmailRegParam)
 @auth_response
-async def auth_email_reg(_req: Request, body: AuthEmailRegParam, _worker: Worker) -> AuthResponse:
+async def auth_email_reg(_req: Request, body: AuthEmailRegParam, worker: Worker) -> AuthResponse:
     if not secret.EMAIL_AUTH_ENABLE:
         raise AuthError('邮箱登录已禁用')
-    if secret.USE_RECAPTCHA and not (await utils.check_recaptcha_response(body.captcha)):
-        raise AuthError('reCAPTCHA验证错误')
+
+    if (
+        secret.USE_RECAPTCHA
+        and body.email.lower() not in worker.game_nocheck.policy.cur_policy_model.skip_recaptcha_emails
+    ):
+        if body.captcha == '':
+            raise AuthError('请进行人机身份验证')
+        if not (await utils.check_recaptcha_response(body.captcha)):
+            raise AuthError('reCAPTCHA验证错误')
+
     try:
         email_validator.validate_email(body.email, check_deliverability=False)
     except email_validator.EmailNotValidError:
@@ -79,7 +87,7 @@ class AuthEmailLoginParam(BaseModel):
 @bp.route('/email/login', ['POST'])
 @validate(json=AuthEmailLoginParam)
 @auth_response
-async def auth_email_login(_req: Request, body: AuthEmailLoginParam, _worker: Worker) -> AuthResponse:
+async def auth_email_login(_req: Request, body: AuthEmailLoginParam, worker: Worker) -> AuthResponse:
     if not secret.EMAIL_AUTH_ENABLE:
         raise AuthError('邮箱登录已禁用')
     try:
@@ -89,8 +97,16 @@ async def auth_email_login(_req: Request, body: AuthEmailLoginParam, _worker: Wo
     VAL_EMAIL = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
     if not VAL_EMAIL.match(body.email):
         raise AuthError('邮箱格式错误')
-    if secret.USE_RECAPTCHA and not (await utils.check_recaptcha_response(body.captcha)):
-        raise AuthError('reCAPTCHA验证错误')
+
+    if (
+        secret.USE_RECAPTCHA
+        and body.email.lower() not in worker.game_nocheck.policy.cur_policy_model.skip_recaptcha_emails
+    ):
+        if body.captcha == '':
+            raise AuthError('请进行人机身份验证')
+        if not (await utils.check_recaptcha_response(body.captcha)):
+            raise AuthError('reCAPTCHA验证错误')
+
     return f'email:{body.email.lower()}', {'password': body.password}, 'email-login'
 
 
