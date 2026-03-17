@@ -65,6 +65,7 @@ class PolicyModel(BaseModel):
     currency_increase_policy: list[CurrencyIncreaseModel] = Field(default_factory=list)
     board_setting: BoardSetting
     feature: FeatureModel = Field(default_factory=FeatureModel)
+    skip_recaptcha_emails: list[str] = Field(default_factory=list)
 
 
 class GamePolicyStoreModel(BaseModel):
