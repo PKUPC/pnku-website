@@ -74,6 +74,11 @@ body {
   overflow-y: scroll !important;
 }
 
+/* AntD 某些时候会强制减去滚动条宽度，但是我们已经开启了 overflow-y: scorll */
+html body {
+  width: 100% !important;
+}
+
 a {
   /*color: inherit;*/
   text-decoration: none;
