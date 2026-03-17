@@ -49,7 +49,7 @@ export function Announcement({
                 </>
             </div>
             <div className=" h-full w-full p-3" style={{ backgroundColor: contentBgColor }}>
-                <SimpleTemplateStr name="announcement">{announcement.content}</SimpleTemplateStr>
+                <SimpleTemplateStr name="announcement" data={announcement.content} />
             </div>
         </div>
     );
