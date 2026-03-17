@@ -12,6 +12,7 @@ import { RemoteComponent } from '@/remote/RemoteComponent';
 import './Template.css';
 import styles from './Template.module.css';
 import { TemplateImage } from './template/TemplateImage';
+import { TemplateNavigateButton } from './template/TemplateNavigateButton';
 
 export const SimpleTemplateStr = memo(function SimpleTemplateStr({ name, data }: { name: string; data: string }) {
     return <div className={`template-${name} ` + styles.template} dangerouslySetInnerHTML={{ __html: data }} />;
@@ -56,6 +57,36 @@ export const TemplateStr = memo(function TemplateStr({ name, data }: { name: str
                             const text = domNode.attribs['data-text'];
                             const href = domNode.attribs['data-href'];
                             return <Link to={href}>{text}</Link>;
+                        } else if (domNode.attribs.class.includes('template-navigate-button')) {
+                            const url = domNode.attribs['data-url'] as string;
+                            const text = domNode.attribs['data-text'] as string;
+                            const type = domNode.attribs['data-type'] as
+                                | 'primary'
+                                | 'default'
+                                | 'link'
+                                | 'text'
+                                | 'dashed'
+                                | undefined;
+                            const className = domNode.attribs['data-class'] as string | undefined;
+                            const size = domNode.attribs['data-size'] as 'large' | 'middle' | 'small' | undefined;
+                            let jsonStyle: CSSProperties = {};
+                            try {
+                                if (domNode.attribs['data-style']) {
+                                    jsonStyle = JSON.parse(domNode.attribs['data-style']);
+                                }
+                            } catch {
+                                jsonStyle = {};
+                            }
+                            return (
+                                <TemplateNavigateButton
+                                    url={url}
+                                    text={text}
+                                    type={type || 'default'}
+                                    className={className}
+                                    style={jsonStyle}
+                                    size={size}
+                                />
+                            );
                         } else if (domNode.attribs.class.includes('template-remote-component')) {
                             const name = domNode.attribs['data-name'];
                             const url = domNode.attribs['data-url'];
