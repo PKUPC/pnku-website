@@ -1,6 +1,7 @@
 import re
 
 from dataclasses import dataclass
+from typing import Any
 
 import email_validator
 
@@ -46,25 +47,35 @@ async def auth_manual(_req: Request, body: AuthManualParam, _worker: Worker) -> 
     return f'manual:{body.identity.lower()}', {'type': 'manual'}, 'manual'
 
 
+async def check_captcha(req: Request, _worker: Worker, data: dict[str, Any]) -> bool:
+    if secret.USE_CAPTCHA == 'recaptcha':
+        if 'response' not in data:
+            store_user_log(req, 'auth.check_captcha', 'abnormal', '缺少 reCAPTCHA 所需的数据', data)
+            raise AuthError('请进行人机身份验证')
+        if data['response'] == '':
+            raise AuthError('请进行人机身份验证')
+        return await utils.check_recaptcha_response(data['response'])
+    else:
+        return True
+
+
 class AuthEmailRegParam(BaseModel):
     email: str = Field(description='邮箱', examples=['user@email.com'])
-    captcha: str = Field(description='reCAPTCHA返回的token')
+    captcha: dict[str, Any] = Field(description='captcha 服务所需的数据')
 
 
 @bp.route('/email/register', ['POST'])
 @validate(json=AuthEmailRegParam)
 @auth_response
-async def auth_email_reg(_req: Request, body: AuthEmailRegParam, worker: Worker) -> AuthResponse:
+async def auth_email_reg(req: Request, body: AuthEmailRegParam, worker: Worker) -> AuthResponse:
     if not secret.EMAIL_AUTH_ENABLE:
         raise AuthError('邮箱登录已禁用')
 
     if (
-        secret.USE_RECAPTCHA
+        secret.USE_CAPTCHA != 'none'
         and body.email.lower() not in worker.game_nocheck.policy.cur_policy_model.skip_recaptcha_emails
     ):
-        if body.captcha == '':
-            raise AuthError('请进行人机身份验证')
-        if not (await utils.check_recaptcha_response(body.captcha)):
+        if not (await check_captcha(req, worker, body.captcha)):
             raise AuthError('reCAPTCHA验证错误')
 
     try:
@@ -81,13 +92,13 @@ async def auth_email_reg(_req: Request, body: AuthEmailRegParam, worker: Worker)
 class AuthEmailLoginParam(BaseModel):
     email: str = Field(description='邮箱', examples=['user@email.com'])
     password: str = Field(description='密码')
-    captcha: str = Field(description='reCAPTCHA返回的token')
+    captcha: dict[str, Any] = Field(description='captcha 服务所需的数据')
 
 
 @bp.route('/email/login', ['POST'])
 @validate(json=AuthEmailLoginParam)
 @auth_response
-async def auth_email_login(_req: Request, body: AuthEmailLoginParam, worker: Worker) -> AuthResponse:
+async def auth_email_login(req: Request, body: AuthEmailLoginParam, worker: Worker) -> AuthResponse:
     if not secret.EMAIL_AUTH_ENABLE:
         raise AuthError('邮箱登录已禁用')
     try:
@@ -99,12 +110,10 @@ async def auth_email_login(_req: Request, body: AuthEmailLoginParam, worker: Wor
         raise AuthError('邮箱格式错误')
 
     if (
-        secret.USE_RECAPTCHA
+        secret.USE_CAPTCHA != 'none'
         and body.email.lower() not in worker.game_nocheck.policy.cur_policy_model.skip_recaptcha_emails
     ):
-        if body.captcha == '':
-            raise AuthError('请进行人机身份验证')
-        if not (await utils.check_recaptcha_response(body.captcha)):
+        if not (await check_captcha(req, worker, body.captcha)):
             raise AuthError('reCAPTCHA验证错误')
 
     return f'email:{body.email.lower()}', {'password': body.password}, 'email-login'

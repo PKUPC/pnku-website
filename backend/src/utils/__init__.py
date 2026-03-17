@@ -1,3 +1,4 @@
+from .captcha import check_recaptcha_response
 from .email import exception_handler, send_email, send_reg_email
 from .enum import EnhancedEnum
 from .hash_tools import calc_md5, calc_sha1, hash_int
@@ -6,7 +7,6 @@ from .jwt_tools import jwt_decode, jwt_encode
 from .logging import LogLevel, log_slow, make_logging_handlers
 from .media import media_wrapper, prepare_media_files, update_media_files
 from .pydantic_utils import validate_time_minute_str, validate_time_second_str
-from .recaptcha import check_recaptcha_response
 from .string_tools import (
     check_string,
     clean_submission,

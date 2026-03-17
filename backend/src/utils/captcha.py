@@ -9,10 +9,10 @@ async def check_recaptcha_response(res: str) -> bool:
     async with httpx.AsyncClient(http2=True) as client:
         try:
             _res = await client.get(
-                secret.RE_CAPTCHA_VERIFY_ADDR,
+                secret.CAPTCHA_CONFIG['verify_addr'],
                 params={
                     'response': res,
-                    'secret': secret.RE_CAPTCHA_SECRET,
+                    'secret': secret.CAPTCHA_CONFIG['secret'],
                 },
             )
             print(_res.json())

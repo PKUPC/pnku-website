@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pathlib
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import httpx
 
@@ -22,9 +22,6 @@ DEBUG_WITH_FREE_ADMIN = True
 
 # playground 模式会关闭站内信、神谕等互动功能，用于赛后开放一个可以游玩的环境
 PLAYGROUND_MODE = False
-
-# 是否开启 RECAPTCHA
-USE_RECAPTCHA = False
 
 # 是否使用 secure cookie，开启时在 http 环境下会导致 set cookie 无法生效
 # 开发时可能会在局域网中用其他设备访问本地开发服务器（例如测试手机访问等），此时可能需要关闭
@@ -56,6 +53,18 @@ HASH_MEDIA_FILENAME = False
 # hash_key: 使用 hash 后的 puzzle_key
 # hash_key_and_team: 使用 team_id + puzzle_key 进行 hash，每个队伍的 key 不同
 HASH_PUZZLE_KEY: Literal['none', 'slug', 'hash_key', 'hash_key_and_team'] = 'none'
+
+# 注册、登陆时是否使用验证码功能
+# 可选项：recaptcha, aliyun, None
+# recaptcha: 使用 recaptcha 服务
+# aliyun: 使用阿里云验证码服务
+# None: 不使用验证码功能
+USE_CAPTCHA: Literal['recaptcha', 'aliyun', 'none'] = 'none'
+
+CAPTCHA_CONFIG: dict[str, Any] = {
+    'secret': 'xxx',
+    'verify_addr': 'https://recaptcha.net/recaptcha/api/siteverify',
+}
 
 # 性能警报设置
 HEALTH_CHECK_THROTTLE = {
@@ -164,11 +173,6 @@ PUSH_LOG_LEVEL: list[utils.LogLevel] = ['warning', 'error', 'critical']
 # URLS
 
 ADMIN_URL = '/megumi'  # flask admin 的前缀
-
-# recaptcha
-
-RE_CAPTCHA_SECRET = 'xxx'
-RE_CAPTCHA_VERIFY_ADDR = 'https://recaptcha.net/recaptcha/api/siteverify'
 
 # OAUTH 设置（目前没有启用）
 
