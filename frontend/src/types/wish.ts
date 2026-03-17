@@ -222,7 +222,7 @@ export namespace Wish {
                       feature: {
                           push: boolean;
                           debug: boolean;
-                          recaptcha: boolean;
+                          captcha: 'recaptcha' | 'aliyun' | 'none';
                           playground: boolean;
                           email_login: boolean;
                           sso_login: boolean;
@@ -389,7 +389,7 @@ export namespace Wish {
                 endpoint: 'puzzle/submit_answer';
                 payload: { puzzle_key: string; content: string };
             };
-            response: NormalRes & { need_reload?: boolean };
+            response: NormalRes & { need_reload?: boolean; redirect_to_story?: boolean };
         };
 
         export type SubmitPublicAnswerApi = {
@@ -397,7 +397,7 @@ export namespace Wish {
                 endpoint: 'puzzle/submit_public_answer';
                 payload: { puzzle_key: string; content: string };
             };
-            response: NormalRes & { need_reload?: boolean };
+            response: NormalRes & { need_reload?: boolean; redirect_to_story?: undefined };
         };
 
         export type SubmissionRecordData = {
