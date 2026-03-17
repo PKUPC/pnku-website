@@ -1,4 +1,4 @@
-from .captcha import check_recaptcha_response
+from .captcha import check_aliyun_captcha_response, check_recaptcha_response
 from .email import exception_handler, send_email, send_reg_email
 from .enum import EnhancedEnum
 from .hash_tools import calc_md5, calc_sha1, hash_int
@@ -39,6 +39,7 @@ __all__ = [
     'prepare_media_files',
     'update_media_files',
     'media_wrapper',
+    'check_aliyun_captcha_response',
     'check_recaptcha_response',
     'clean_submission',
     'check_string',

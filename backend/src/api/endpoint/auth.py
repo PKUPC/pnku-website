@@ -49,12 +49,15 @@ async def auth_manual(_req: Request, body: AuthManualParam, _worker: Worker) -> 
 
 async def check_captcha(req: Request, _worker: Worker, data: dict[str, Any]) -> bool:
     if secret.USE_CAPTCHA == 'recaptcha':
-        if 'response' not in data:
-            store_user_log(req, 'auth.check_captcha', 'abnormal', '缺少 reCAPTCHA 所需的数据', data)
-            raise AuthError('请进行人机身份验证')
-        if data['response'] == '':
+        response = data.get('response', '')
+        if response is None or response == '':
             raise AuthError('请进行人机身份验证')
         return await utils.check_recaptcha_response(data['response'])
+    elif secret.USE_CAPTCHA == 'aliyun':
+        response = data.get('response', '')
+        if response is None or response == '':
+            raise AuthError('请进行人机身份验证')
+        return await utils.check_aliyun_captcha_response(response)
     else:
         return True
 
@@ -75,8 +78,9 @@ async def auth_email_reg(req: Request, body: AuthEmailRegParam, worker: Worker) 
         secret.USE_CAPTCHA != 'none'
         and body.email.lower() not in worker.game_nocheck.policy.cur_policy_model.skip_recaptcha_emails
     ):
+        worker.log('info', 'auth.email.register', f'email: {body.email}, captcha: {body.captcha}')
         if not (await check_captcha(req, worker, body.captcha)):
-            raise AuthError('reCAPTCHA验证错误')
+            raise AuthError('人机身份验证错误')
 
     try:
         email_validator.validate_email(body.email, check_deliverability=False)
@@ -113,8 +117,9 @@ async def auth_email_login(req: Request, body: AuthEmailLoginParam, worker: Work
         secret.USE_CAPTCHA != 'none'
         and body.email.lower() not in worker.game_nocheck.policy.cur_policy_model.skip_recaptcha_emails
     ):
+        worker.log('info', 'auth.email.register', f'email: {body.email}, captcha: {body.captcha}')
         if not (await check_captcha(req, worker, body.captcha)):
-            raise AuthError('reCAPTCHA验证错误')
+            raise AuthError('人机身份验证错误')
 
     return f'email:{body.email.lower()}', {'password': body.password}, 'email-login'
 
