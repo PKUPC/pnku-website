@@ -10,6 +10,8 @@ from sanic import Websocket
 from sanic.exceptions import WebsocketClosed
 from websockets.exceptions import ConnectionClosed
 
+from src import utils
+
 from .room_manager import RoomManager, SyncRoom
 from .websocket_handler import YWebSocketHandler
 
@@ -135,4 +137,4 @@ class SyncIntegration:
                 self.worker.log('warning', 'sync_integration._handle_message', f'Unknown message type: {msg_type}')
 
         except Exception as e:
-            self.worker.log('critical', 'sync_integration._handle_message', f'Error handling message: {e}')
+            self.worker.log('critical', 'island_ex_3.sync_handler', f'Error handling message: {utils.get_traceback(e)}')
