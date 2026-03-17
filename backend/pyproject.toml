@@ -25,6 +25,7 @@ dependencies = [
     "gevent>=25.5.0,<26.0",
     "plyvel-ci>=1.5.1",
     "pycrdt>=0.12.42",
+    "alibabacloud-captcha20230305>=1.1.4",
 ]
 
 [dependency-groups]

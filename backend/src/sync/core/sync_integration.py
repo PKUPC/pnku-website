@@ -10,12 +10,15 @@ from sanic import Websocket
 from sanic.exceptions import WebsocketClosed
 from websockets.exceptions import ConnectionClosed
 
+from src import utils
+
 from .room_manager import RoomManager, SyncRoom
 from .websocket_handler import YWebSocketHandler
 
 
 if TYPE_CHECKING:
     from src.logic import Worker
+    from src.state import User
 
 
 class SyncIntegration:
@@ -31,6 +34,7 @@ class SyncIntegration:
     async def handle_sync_websocket(
         self,
         ws: Websocket,
+        user: User,
         room_id: str,
         *,
         custom_handler: Callable[[SyncRoom, Websocket, bytes, dict[str, Any] | None], Coroutine[Any, Any, None]]
@@ -57,7 +61,7 @@ class SyncIntegration:
         room = self.room_manager.get_or_create_room(
             room_id, doc_initializer=doc_initializer, observer_maker=observer_maker
         )
-        room.add_client(ws)
+        room.add_client(ws, user.model.id)
         self.worker.log('debug', 'sync_integration.handle_sync_websocket', f'adding client to room {room_id}')
 
         if custom_handler is not None:
@@ -90,7 +94,7 @@ class SyncIntegration:
             except asyncio.CancelledError:
                 pass
             self.worker.log('debug', 'sync_integration.handle_sync_websocket', f'removing client from room {room_id}')
-            room.remove_client(ws)
+            room.remove_client(ws, user.model.id)
 
     async def _heartbeat_loop(self, ws: Websocket) -> None:
         """
@@ -135,4 +139,4 @@ class SyncIntegration:
                 self.worker.log('warning', 'sync_integration._handle_message', f'Unknown message type: {msg_type}')
 
         except Exception as e:
-            self.worker.log('critical', 'sync_integration._handle_message', f'Error handling message: {e}')
+            self.worker.log('critical', 'island_ex_3.sync_handler', f'Error handling message: {utils.get_traceback(e)}')

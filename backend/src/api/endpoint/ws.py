@@ -49,7 +49,7 @@ async def push(req: Request, ws: WebsocketImplProtocol) -> None:
         return
 
     if online_uids[user.model.id] >= MAX_DEVICES_PER_USER:
-        await ws.close(code=4337, reason='同时在线设备过多')
+        await ws.close(code=4396, reason='您的同时在线页面过多，本页面无法使用实时消息推送功能！')
         return
 
     online_uids[user.model.id] += 1

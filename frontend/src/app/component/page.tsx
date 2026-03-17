@@ -62,7 +62,12 @@ export function ComponentPage() {
 
     return (
         <div className="mt-12 w-full">
-            <RemoteComponent componentName={data.name} componentUrl={data.url} {...data.props} />
+            <RemoteComponent
+                key={data.name + data.url}
+                componentName={data.name}
+                componentUrl={data.url}
+                {...data.props}
+            />
         </div>
     );
 }

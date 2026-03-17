@@ -93,6 +93,7 @@ async def puzzle(req: Request, ws: WebsocketImplProtocol, puzzle_key: str) -> No
     worker: Worker = req.app.ctx.worker
     sync_integration: SyncIntegration = req.app.ctx.sync_integration
     user = get_cur_user(req)
+    telemetry = worker.custom_telemetry_data
 
     worker.log('debug', 'sync.puzzle', f'got connection from {user}, begin checking!')
 
@@ -106,6 +107,15 @@ async def puzzle(req: Request, ws: WebsocketImplProtocol, puzzle_key: str) -> No
 
     assert user is not None
     assert user.team is not None
+
+    if online_uids[user.model.id] >= MAX_DEVICES_PER_USER:
+        await ws.close(code=4396, reason='您同时在线的协作题目过多，本页面无法连接协作服务器！')
+        return
+
+    online_uids[user.model.id] += 1
+
+    telemetry['ws_online_uids'] = len(online_uids)
+    telemetry['ws_online_clients'] = sum(online_uids.values())
 
     puzzle_key = data
 
@@ -126,6 +136,7 @@ async def puzzle(req: Request, ws: WebsocketImplProtocol, puzzle_key: str) -> No
     try:
         await sync_integration.handle_sync_websocket(
             ws,
+            user,
             room_id,
             custom_handler=custom_sync_handler,
             doc_initializer=custom_sync_doc_initializer,
@@ -142,3 +153,9 @@ async def puzzle(req: Request, ws: WebsocketImplProtocol, puzzle_key: str) -> No
         store_user_log(
             req, 'sync.puzzle', 'sync_websocket_disconnected', '', {'puzzle_key': puzzle_key, 'user_id': user.model.id}
         )
+        online_uids[user.model.id] -= 1
+        if online_uids[user.model.id] == 0:
+            del online_uids[user.model.id]
+
+        telemetry['ws_online_uids'] = len(online_uids)
+        telemetry['ws_online_clients'] = sum(online_uids.values())

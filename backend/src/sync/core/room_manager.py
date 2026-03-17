@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 
+from collections import defaultdict
 from collections.abc import Awaitable, Callable
 from typing import Any, overload
 from weakref import WeakSet
@@ -27,6 +28,7 @@ class SyncRoom:
         self.doc = Doc[Any]()
         self.store = store
         self.clients: WeakSet[Websocket] = WeakSet()  # WebSocket 连接集合
+        self.clients_by_user_id: defaultdict[int, WeakSet[Websocket]] = defaultdict(WeakSet)
         self.awareness = Awareness(self.doc, outdated_timeout=10000)
         self._initialized = False
         self._doc_initializer = doc_initializer
@@ -59,17 +61,49 @@ class SyncRoom:
         update = event.update
         self.store.save_doc(self.room_id, update)
 
-    def add_client(self, ws: Websocket) -> None:
+    def add_client(self, ws: Websocket, user_id: int) -> None:
         self.clients.add(ws)
+        self.clients_by_user_id[user_id].add(ws)
 
-    def remove_client(self, ws: Websocket) -> None:
+    def remove_client(self, ws: Websocket, user_id: int) -> None:
         self.clients.discard(ws)
+        self.clients_by_user_id[user_id].discard(ws)
 
-    async def broadcast(self, message: bytes, excludes: list[Websocket] = []) -> None:
+    async def broadcast(
+        self,
+        message: bytes,
+        *,
+        excludes: list[Websocket] = [],
+        exclude_user_ids: list[int] = [],
+        include_user_ids: list[int] | None = None,
+    ) -> None:
+        """
+        message: 要广播的消息
+        excludes: 要排除的客户端
+        exclude_user_ids: 要排除的用户 ID
+        include_user_ids: 要包含的用户 ID，如果为 None，则包含所有用户
+        """
         dead_clients = set()
-        for client in self.clients:
+
+        clients_set: WeakSet[Websocket] = WeakSet()
+        if include_user_ids is not None:
+            for user_id in include_user_ids:
+                clients_set.update(self.clients_by_user_id[user_id])
+        else:
+            clients_set.update(self.clients)
+
+        for client in clients_set:
+            # 查询忽略信息
+            ignore_flag = False
             if client in excludes:
+                ignore_flag = True
+            for user_id in exclude_user_ids:
+                if client in self.clients_by_user_id[user_id]:
+                    ignore_flag = True
+                    break
+            if ignore_flag:
                 continue
+
             try:
                 await client.send(message)
             except Exception:

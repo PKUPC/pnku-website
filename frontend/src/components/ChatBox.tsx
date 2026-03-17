@@ -41,7 +41,7 @@ export function Message({ message }: { message: MessageInfo }) {
                 </>
             }
         >
-            <SimpleTemplateStr name="message">{message.content}</SimpleTemplateStr>
+            <SimpleTemplateStr name="message" data={message.content} />
             <div className="italic text-sm text-base-content/60">
                 {' '}
                 发送于 {new Date(message.timestamp_s * 1000).toLocaleString()}

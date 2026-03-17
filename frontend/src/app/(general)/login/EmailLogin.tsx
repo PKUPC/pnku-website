@@ -1,23 +1,28 @@
 import { Button, Form, Input, message } from 'antd';
 import Md5 from 'crypto-js/md5';
-import React, { useState } from 'react';
-import ReCAPTCHA from 'react-google-recaptcha';
+import { useRef, useState } from 'react';
 
 import { useSuccessGameInfo } from '@/logic/contexts.ts';
 
 import styles from './EmailLogin.module.css';
+import { AliCaptchaPanel } from './components/AliCaptchaPanel';
+import { ReCaptchaPanel } from './components/ReCaptchaPanel';
+
+export interface CaptchaPanelRef {
+    reset: () => void;
+}
 
 export function EmailLogin() {
     // 默认为注册
-    const [sign_in, setState] = useState(true);
-    const [captchaToken, setCaptchaToken] = useState<string>('');
-    const recaptchaRef: React.RefObject<ReCAPTCHA> = React.createRef();
-    const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+    const [isSingIn, setIsSingIn] = useState(true);
+
+    const captchaPanelRef = useRef<CaptchaPanelRef>(null);
+    const [captchaData, setCaptchaData] = useState<Record<string, string>>({});
     const [messageApi, messageContextHolder] = message.useMessage();
     const info = useSuccessGameInfo();
 
     const onChangeStatus = () => {
-        setState(!sign_in);
+        setIsSingIn(!isSingIn);
     };
 
     const signIn = (values: { email: string; password: string }) => {
@@ -30,7 +35,7 @@ export function EmailLogin() {
             body: JSON.stringify({
                 email: values.email,
                 password: Md5(values.password + 'email:' + values.email.toLowerCase()).toString(),
-                captcha: captchaToken,
+                captcha: captchaData,
             }),
         })
             .then((res) => {
@@ -54,7 +59,10 @@ export function EmailLogin() {
             })
             .then((res) => {
                 console.log(res);
-                if (recaptchaRef.current) recaptchaRef.current.reset();
+                if (res.status === 'error') {
+                    messageApi.error({ content: res.message, key: 'EMAIL_SIGN_IN', duration: 3 }).then();
+                }
+                if (captchaPanelRef.current) captchaPanelRef.current.reset();
             });
     };
 
@@ -68,7 +76,7 @@ export function EmailLogin() {
             },
             body: JSON.stringify({
                 email: values.email,
-                captcha: captchaToken,
+                captcha: captchaData,
             }),
         })
             .then((res) => {
@@ -96,8 +104,8 @@ export function EmailLogin() {
             .then((res) => {
                 if (res.status === 'success') {
                     messageApi.success({ content: '注册成功，请查收邮件', key: 'EMAIL_SIGN_IN', duration: 5 }).then();
-                    if (recaptchaRef.current) recaptchaRef.current.reset();
-                    setState(!sign_in);
+                    if (captchaPanelRef.current) captchaPanelRef.current.reset();
+                    setIsSingIn(!isSingIn);
                 } else {
                     messageApi
                         .error({
@@ -109,22 +117,15 @@ export function EmailLogin() {
                 }
             })
             .then(() => {
-                if (recaptchaRef.current) {
-                    recaptchaRef.current.reset();
+                if (captchaPanelRef.current) {
+                    captchaPanelRef.current.reset();
                 }
             });
     };
 
-    const onFinishCaptcha = (value: string | null) => {
-        setCaptchaToken(value ?? '');
-    };
-
     const onFinish = (values: { email: string; password: string } | { email: string }) => {
-        if (info.feature.recaptcha && captchaToken === '') messageApi.error('请进行人机身份验证').then();
-        else {
-            sign_in ? signIn(values as { email: string; password: string }) : signUp(values);
-        }
-        // recaptchaRef.current.reset();
+        // 不强制要求进行人机身份验证，后端处理，用于豁免某些邮箱
+        isSingIn ? signIn(values as { email: string; password: string }) : signUp(values);
     };
 
     return (
@@ -143,7 +144,7 @@ export function EmailLogin() {
                 >
                     <Input />
                 </Form.Item>
-                {sign_in && (
+                {isSingIn && (
                     <Form.Item
                         className={'submit-form-item'}
                         label="密码"
@@ -154,29 +155,19 @@ export function EmailLogin() {
                     </Form.Item>
                 )}
 
-                {info.feature.recaptcha && (
-                    <div className="flex justify-center mb-6">
-                        <ReCAPTCHA
-                            ref={recaptchaRef}
-                            sitekey={import.meta.env.VITE_RECAPTCHA_KEY ?? ''}
-                            onChange={onFinishCaptcha}
-                            hl={navigator.language === 'zh-CN' ? 'zh-CN' : 'en'}
-                            size={'normal'}
-                            asyncScriptOnLoad={() => {
-                                console.log('recaptcha loaded!!');
-                                setRecaptchaLoaded(true);
-                            }}
-                        />
-                    </div>
+                {info.feature.captcha === 'recaptcha' && (
+                    <ReCaptchaPanel setCaptchaData={setCaptchaData} ref={captchaPanelRef} />
                 )}
-                {/* TODO: 想办法优化一下这里的加载 */}
-                {!recaptchaLoaded && info.feature.recaptcha && <div>人机验证加载中</div>}
+
+                {info.feature.captcha === 'aliyun' && (
+                    <AliCaptchaPanel setCaptchaData={setCaptchaData} ref={captchaPanelRef} />
+                )}
 
                 <Form.Item className={'submit-form-item'}>
-                    <Button htmlType="submit">{sign_in ? '登录' : '注册 / 重置'}</Button>
+                    <Button htmlType="submit">{isSingIn ? '登录' : '注册 / 重置'}</Button>
                     &nbsp;
                     <Button type="link" htmlType="button" onClick={onChangeStatus}>
-                        {sign_in ? '注册或重置密码' : '已有帐号，我要登录'}
+                        {isSingIn ? '注册或重置密码' : '已有帐号，我要登录'}
                     </Button>
                 </Form.Item>
             </Form>

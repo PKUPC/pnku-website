@@ -55,6 +55,11 @@ export class YClient {
                 this.stopped = true;
                 this.destroy();
                 return;
+            } else if (event.code === 4396) {
+                console.log(`[YClient ${this.roomId}] server closed connection, reason: ${event.reason}`);
+                this.stopped = true;
+                this.destroy();
+                return;
             } else {
                 console.log(`[YClient ${this.roomId}] connection closed, reason: ${event.reason}`);
                 this.stopped = true;

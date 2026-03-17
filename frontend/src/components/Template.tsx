@@ -1,7 +1,5 @@
-import { ConfigProvider, Image } from 'antd';
-import zhCN from 'antd/locale/zh_CN';
 import parse from 'html-react-parser';
-import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { CSSProperties, memo, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import useSWR from 'swr';
 
@@ -13,34 +11,82 @@ import { RemoteComponent } from '@/remote/RemoteComponent';
 
 import './Template.css';
 import styles from './Template.module.css';
+import { TemplateImage } from './template/TemplateImage';
+import { TemplateNavigateButton } from './template/TemplateNavigateButton';
 
-export function SimpleTemplateStr({ name, children }: { name: string; children: string }) {
-    return <div className={`template-${name} ` + styles.template} dangerouslySetInnerHTML={{ __html: children }} />;
-}
+export const SimpleTemplateStr = memo(function SimpleTemplateStr({ name, data }: { name: string; data: string }) {
+    return <div className={`template-${name} ` + styles.template} dangerouslySetInnerHTML={{ __html: data }} />;
+});
 
-export function TemplateStr({ name, children }: { name: string; children: string }) {
+export const TemplateStr = memo(function TemplateStr({ name, data }: { name: string; data: string }) {
     const templateRef = useRef<HTMLDivElement>(null);
 
     const result = useMemo(
         () =>
-            parse(children, {
-                replace: (domNode) => {
+            parse(data, {
+                replace: (domNode, index) => {
                     if (domNode.type === 'tag' && domNode.tagName === 'div' && domNode.attribs?.class) {
                         if (domNode.attribs.class.includes('template-antd-image')) {
-                            const src = domNode.attribs['data-src'];
+                            const src = domNode.attribs['data-src'] as string | undefined;
+                            const alt = domNode.attribs['data-alt'] as string | undefined;
+                            const aspectRatio = domNode.attribs['data-aspect-ratio'] as string | undefined;
+                            const className = domNode.attribs['data-class'] as string | undefined;
+                            const preview = domNode.attribs['data-preview'] as string | undefined;
+                            let jsonStyle: CSSProperties = {};
+                            try {
+                                if (domNode.attribs['data-style']) {
+                                    jsonStyle = JSON.parse(domNode.attribs['data-style']);
+                                }
+                            } catch {
+                                jsonStyle = {};
+                            }
+                            console.log(domNode);
                             if (src) {
                                 return (
-                                    <div className={domNode.attribs.class} data-src={src}>
-                                        <ConfigProvider locale={zhCN}>
-                                            <Image src={src} alt={'image'} />
-                                        </ConfigProvider>
-                                    </div>
+                                    <TemplateImage
+                                        src={src}
+                                        alt={alt}
+                                        aspectRatio={aspectRatio}
+                                        className={className}
+                                        preview={preview === 'true'}
+                                        style={jsonStyle}
+                                    />
                                 );
                             }
                         } else if (domNode.attribs.class.includes('template-navigate-link')) {
                             const text = domNode.attribs['data-text'];
                             const href = domNode.attribs['data-href'];
                             return <Link to={href}>{text}</Link>;
+                        } else if (domNode.attribs.class.includes('template-navigate-button')) {
+                            const url = domNode.attribs['data-url'] as string;
+                            const text = domNode.attribs['data-text'] as string;
+                            const type = domNode.attribs['data-type'] as
+                                | 'primary'
+                                | 'default'
+                                | 'link'
+                                | 'text'
+                                | 'dashed'
+                                | undefined;
+                            const className = domNode.attribs['data-class'] as string | undefined;
+                            const size = domNode.attribs['data-size'] as 'large' | 'middle' | 'small' | undefined;
+                            let jsonStyle: CSSProperties = {};
+                            try {
+                                if (domNode.attribs['data-style']) {
+                                    jsonStyle = JSON.parse(domNode.attribs['data-style']);
+                                }
+                            } catch {
+                                jsonStyle = {};
+                            }
+                            return (
+                                <TemplateNavigateButton
+                                    url={url}
+                                    text={text}
+                                    type={type || 'default'}
+                                    className={className}
+                                    style={jsonStyle}
+                                    size={size}
+                                />
+                            );
                         } else if (domNode.attribs.class.includes('template-remote-component')) {
                             const name = domNode.attribs['data-name'];
                             const url = domNode.attribs['data-url'];
@@ -52,7 +98,14 @@ export function TemplateStr({ name, children }: { name: string; children: string
                             } catch {
                                 props = {};
                             }
-                            return <RemoteComponent componentName={name} componentUrl={url} {...props} />;
+                            return (
+                                <RemoteComponent
+                                    key={name + url + index}
+                                    componentName={name}
+                                    componentUrl={url}
+                                    {...props}
+                                />
+                            );
                         }
                     } else if (domNode.type === 'tag' && domNode.tagName === 'span' && domNode.attribs?.class) {
                         if (domNode.attribs.class.includes('template-navigate-link')) {
@@ -63,7 +116,7 @@ export function TemplateStr({ name, children }: { name: string; children: string
                     }
                 },
             }),
-        [children],
+        [data],
     );
 
     const executeScripts = useCallback(() => {
@@ -90,7 +143,7 @@ export function TemplateStr({ name, children }: { name: string; children: string
     useLayoutEffect(() => {
         const timer = setTimeout(executeScripts, 0);
         return () => clearTimeout(timer);
-    }, [children, executeScripts]);
+    }, [data, executeScripts]);
 
     console.log('template rendered!');
     return (
@@ -98,7 +151,7 @@ export function TemplateStr({ name, children }: { name: string; children: string
             {result}
         </div>
     );
-}
+});
 
 export function TemplateFile({ name }: { name: string }) {
     console.log('getting template', name);
@@ -111,7 +164,7 @@ export function TemplateFile({ name }: { name: string }) {
     }
     if (!data) return <Loading style={{ height: 500 }} />;
 
-    return <TemplateStr name={name}>{data}</TemplateStr>;
+    return <TemplateStr name={name} data={data} />;
 }
 
 export function SimpleTemplateFile({ name }: { name: string }) {
@@ -125,5 +178,5 @@ export function SimpleTemplateFile({ name }: { name: string }) {
     }
     if (!data) return <Loading />;
 
-    return <SimpleTemplateStr name={name}>{data}</SimpleTemplateStr>;
+    return <SimpleTemplateStr name={name} data={data} />;
 }

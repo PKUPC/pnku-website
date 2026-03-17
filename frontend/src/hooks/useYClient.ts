@@ -24,9 +24,9 @@ export function useYClient({ roomId, statusHandler, syncHandler }: UseYClientOpt
         });
         yClient.provider.on('connection-close', (event: CloseEvent | null) => {
             if (event) {
-                if (event.code === 4337) {
+                if (event.code === 4337 || event.code === 4396) {
                     setClient(null);
-                    setErrorMessage(`协作服务器拒绝了连接，原因是：${event.reason}。`);
+                    setErrorMessage(`协作服务器拒绝了连接，原因是：${event.reason}`);
                 } else if (event.code !== 1000) {
                     setClient(null);
                     setErrorMessage(`连接协作服务器失败，请稍后尝试刷新页面。如果您一直遇到此问题，请联系工作人员。`);

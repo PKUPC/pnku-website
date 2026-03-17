@@ -227,7 +227,7 @@ async def game_info(_req: Request, worker: Worker, user: User | None) -> dict[st
         'feature': {
             'push': secret.WS_PUSH_ENABLED and user is not None and user.check_play_game() is None,
             'debug': secret.DEBUG_MODE,
-            'recaptcha': secret.USE_RECAPTCHA,
+            'captcha': secret.USE_CAPTCHA,
             'email_login': secret.EMAIL_AUTH_ENABLE,
             'sso_login': secret.SSO_AUTH_ENABLE,
             'playground': secret.PLAYGROUND_MODE,

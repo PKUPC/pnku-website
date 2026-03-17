@@ -14,3 +14,4 @@ export const HEADER_BREAK_POINT = 780;
 export const DEFAULT_MAX_WIDTH = '1200px';
 
 export const ARCHIVE_MODE = import.meta.env.VITE_ARCHIVE_MODE === 'true';
+export const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);

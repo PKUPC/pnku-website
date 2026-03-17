@@ -22,7 +22,7 @@ export function PuzzleBody({ puzzleData }: { puzzleData: Wish.Puzzle.PuzzleDetai
                 ))}
 
             <div className={styles.puzzleBody}>
-                <TemplateStr name={'puzzle-desc'}>{puzzleData.desc}</TemplateStr>
+                <TemplateStr key={'puzzle-body-' + puzzleData.key} name={'puzzle-desc'} data={puzzleData.desc} />
             </div>
 
             {puzzleData.actions.map((action, idx) => (

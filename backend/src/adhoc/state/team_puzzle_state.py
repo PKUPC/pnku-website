@@ -4,6 +4,7 @@ from collections.abc import Awaitable, Callable, Coroutine, Hashable
 from typing import TYPE_CHECKING, Any
 
 from pycrdt import Doc, TransactionEvent
+from pydantic import BaseModel, ValidationError
 
 from src import secret, utils
 from src.adhoc.constants import PuzzleVisibleStatusLiteral
@@ -60,6 +61,8 @@ class SubmissionResult:
                 return '答案错误'
             case 'staff_pass':
                 return '答案正确'
+            case 'surprise':
+                return '发现彩蛋'
             case _:
                 return '未知错误'
 
@@ -91,6 +94,9 @@ class SubmissionResult:
             case 'staff_wrong':
                 status = 'error'
                 message = f'{self.info}'
+            case 'surprise':
+                status = 'info'
+                message = f'你发现了一个彩蛋：\n{self.info}'
 
         if self.manual_type_name is not None:
             title = self.manual_type_name
@@ -106,6 +112,8 @@ class SubmissionResult:
 
 
 class TeamPuzzleState:
+    StoredStateModel: type[BaseModel] = BaseModel
+
     def __init__(self, game_state: TeamGameState, team: Team, puzzle: Puzzle):
         self.game_state = game_state
         self.game = game_state.game
@@ -131,6 +139,14 @@ class TeamPuzzleState:
         return self.game.puzzle_states.puzzle_state_store_by_puzzle_key_and_team_id.get(
             (self.puzzle.model.key, self.team.model.id), None
         )
+
+    def check_stored_state(self, data: dict[str, Any]) -> bool:
+        try:
+            self.StoredStateModel.model_validate(data)
+        except ValidationError as e:
+            self.game.log('error', 'TeamPuzzleState.check_stored_state', f'ValidationError: {e}')
+            return False
+        return True
 
     @property
     def total_milestone_count(self) -> int:
@@ -207,7 +223,7 @@ class TeamPuzzleState:
     def get_render_info(self) -> tuple[tuple[str, str | int | tuple[Hashable, ...]], ...]:
         return tuple()
 
-    def on_puzzle_action(self, event: PuzzleActionEvent) -> None:
+    def on_puzzle_action(self, event: PuzzleActionEvent, is_reloading: bool = False) -> None:
         pass
 
     def get_dyn_actions(self) -> list[dict[str, Any]]:

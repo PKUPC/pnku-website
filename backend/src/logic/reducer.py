@@ -101,7 +101,11 @@ class Reducer(StateContainerBase):
     @on_action(glitter.UserRegReq)
     async def on_user_reg(self, req: glitter.UserRegReq) -> ActionResult:
         if req.login_key in self._game.users.user_by_login_key:
-            return make_datebase_error('user already exists')
+            {
+                'status': 'error',
+                'title': 'USER_ALREADY_EXISTS',
+                'message': '该账号已注册，请直接登录！',
+            }
 
         with self.SqlSession() as session:
             user = UserStore(
@@ -954,7 +958,6 @@ class Reducer(StateContainerBase):
 
         with utils.log_slow(self.log, 'reducer.handle_action', f'handle action {action.req.type}'):
             listener_result = await listener(self, action.req)
-            # TODO: 可以在这里自动打包 dict
             return listener_result
 
     async def process_event(self, event: glitter.Event) -> None:
