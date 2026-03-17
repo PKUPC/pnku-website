@@ -70,10 +70,17 @@ def render_template(template_str: str, args: dict[str, Any]) -> str:
     return markdown_processor.convert(md_str)
 
 
+def set_link_attrs(attrs, new=False):  # type: ignore[no-untyped-def]
+    attrs[(None, 'target')] = '_blank'
+    attrs[(None, 'rel')] = 'noopener noreferrer'
+    return attrs
+
+
 def pure_render_template(template_str: str) -> str:
     # md to str
     markdown_processor.reset()
     md_html = markdown_processor.convert(template_str)
     clean_html = bleach.clean(md_html, markdown_tags, markdown_attrs)
-    # print(clean_html)
+    clean_html = bleach.linkify(clean_html, callbacks=[set_link_attrs])
+
     return clean_html
