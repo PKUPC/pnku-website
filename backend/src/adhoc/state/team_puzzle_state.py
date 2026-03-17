@@ -4,6 +4,7 @@ from collections.abc import Awaitable, Callable, Coroutine, Hashable
 from typing import TYPE_CHECKING, Any
 
 from pycrdt import Doc, TransactionEvent
+from pydantic import BaseModel, ValidationError
 
 from src import secret, utils
 from src.adhoc.constants import PuzzleVisibleStatusLiteral
@@ -106,6 +107,8 @@ class SubmissionResult:
 
 
 class TeamPuzzleState:
+    StoredStateModel: type[BaseModel] = BaseModel
+
     def __init__(self, game_state: TeamGameState, team: Team, puzzle: Puzzle):
         self.game_state = game_state
         self.game = game_state.game
@@ -131,6 +134,14 @@ class TeamPuzzleState:
         return self.game.puzzle_states.puzzle_state_store_by_puzzle_key_and_team_id.get(
             (self.puzzle.model.key, self.team.model.id), None
         )
+
+    def check_stored_state(self, data: dict[str, Any]) -> bool:
+        try:
+            self.StoredStateModel.model_validate(data)
+        except ValidationError as e:
+            self.game.log('error', 'TeamPuzzleState.check_stored_state', f'ValidationError: {e}')
+            return False
+        return True
 
     @property
     def total_milestone_count(self) -> int:
