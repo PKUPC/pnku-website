@@ -210,7 +210,7 @@ types-html5lib==1.1.11.20250917
 types-markdown==3.9.0.20250906
 types-psutil==7.0.0.20251001
 types-pyopenssl==24.1.0.20240722
-types-pytz==2025.2.0.20250809
+types-pytz==2026.1.1.20260304
 types-setuptools==80.9.0.20250822
     # via types-cffi
 types-wtforms==3.2.1.20250809
